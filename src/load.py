@@ -1,7 +1,9 @@
 import csv
+import save
 
-def readStocks(stocksFile):
+def readStocks(filePath):
     stocks = []
+    stocksFile = open(filePath)
     reader = csv.reader(stocksFile)
     next(reader) # Skip the first headers row.
     for row in reader:
@@ -13,10 +15,7 @@ def readStocks(stocksFile):
         stocks.append(stock)
     return stocks
 
-def getReadFromFile(filePath, readerFunction):
-    fileToRead = open(filePath)
-    return readerFunction(fileToRead)
-
 filePath = "../resources/NYSE-Most-Active-Stocks-2016-03-14.csv"
-stocks = getReadFromFile(filePath, readStocks)
-print(stocks)
+stocks = readStocks(filePath)
+print(len(stocks))
+save.saveStockList(stocks)
