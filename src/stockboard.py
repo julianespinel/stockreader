@@ -41,8 +41,8 @@ initialDate = today.replace(year=today.year-yearsAgo)
 for stock in stocks:
     quote = stock["quote"]
     for index in range(yearsAgo):
-        initialDate = today.replace(year=(today.year-index))
-        finalDate = today.replace(year=(today.year-index+1))
+        initialDate = today.replace(year=(today.year-(index+1)))
+        finalDate = today.replace(year=(today.year-index))
         print("stock", quote, "initialDate", initialDate, "finalDate", finalDate)
         stockHistoricalDataArray = download.getStockHistoricalData(initialDate, finalDate, quote)
         save.saveStockHistoricalData(quote, stockHistoricalDataArray)
