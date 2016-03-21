@@ -1,6 +1,6 @@
 import csv
 
-def readStocks(filePath):
+def readStocksFromFile(filePath, stockMarket):
     stocks = []
     stocksFile = open(filePath)
     reader = csv.reader(stocksFile)
@@ -10,6 +10,12 @@ def readStocks(filePath):
         name = firstArray[0].strip()
         secondArray = firstArray[1].split(")")
         quote = secondArray[0].strip()
-        stock = { "name": name, "quote": quote }
+        stock = { "name": name, "quote": quote, "stockMarket": stockMarket }
         stocks.append(stock)
+    return stocks
+
+def readStocksFromMultipleFiles(filePathList, stockMarket):
+    stocks = []
+    for filePath in filePathList:
+        stocks.extend(readStocksFromFile(filePath, stockMarket))
     return stocks
