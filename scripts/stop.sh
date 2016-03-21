@@ -1,0 +1,1 @@
+pkill -f stockboard.py
