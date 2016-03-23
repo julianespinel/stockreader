@@ -1,7 +1,13 @@
 nyse = [
-  "resources/NYSE-Most-Active-Stocks-2016-03-14.csv"
+  "resources/NYSE-Volume-Percentage-Movers-2016-03-21.csv",
+  "resources/NYSE-Most-Active-Stocks-2016-03-21.csv",
+  "resources/NYSE-Biggest-Percentage-Gainers-2016-03-21.csv",
+  "resources/NYSE-Biggest-Percentage-Decliners-2016-03-21.csv"
 ]
 
 nasdaq = [
-  "resources/NASDAQ-Most-Active-Stocks-2016-03-21.csv"
+  "resources/Nasdaq-Volume-Percentage-Movers-2016-03-21.csv",
+  "resources/Nasdaq-Most-Active-Stocks-2016-03-21.csv",
+  "resources/Nasdaq-Biggest-Percentage-Gainers-2016-03-21.csv",
+  "resources/Nasdaq-Biggest-Percentage-Decliners-2016-03-21.csv"
 ]

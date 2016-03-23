@@ -1,0 +1,101 @@
+Name,Volume,Price,Chg,% Chg
+Bank of America (BAC),103317446,$13.84,0.05,0.36
+Valeant Pharmaceuticals International (VRX),70964590,28.98,2,7.41
+Pfizer (PFE),34185372,30.07,0.62,2.11
+Whiting Petroleum (WLL),31241494,8.06,-0.28,-3.36
+Freeport-McMoRan (FCX),31193545,10.8,0.04,0.37
+General Electric (GE),25975803,31.09,0.17,0.55
+Marathon Oil (MRO),25715990,11.43,-0.2,-1.72
+Chesapeake Energy (CHK),24570672,4.88,-0.03,-0.61
+Vale ADR (VALE),22496509,4.23,0.06,1.44
+Petroleo Brasileiro ADR (PBR),21356429,5.64,0.07,1.26
+Ford Motor (F),20528891,13.66,0.02,0.15
+AT&T (T),20228332,38.92,0.36,0.93
+Ambev ADR (ABEV),19895786,5.14,0.05,0.98
+SunEdison (SUNE),19749878,2.01,-0.12,-5.63
+Energy Transfer Equity (ETE),19134407,7.6,-0.41,-5.12
+Alcoa (AA),19057553,9.89,-0.14,-1.4
+Oracle (ORCL),16759399,41.61,0.13,0.31
+Itau Unibanco Holding ADR (ITUB),16604230,9.12,-0.02,-0.22
+Transocean (RIG),16383045,10.53,-0.25,-2.32
+United States Steel (X),16274666,15.15,-0.61,-3.87
+Citigroup (C),16011858,43.6,0.06,0.14
+Alibaba Group Holding ADR (BABA),15416683,78.11,1.86,2.44
+Barrick Gold (ABX),15302486,14.69,-0.05,-0.34
+Cemex ADR (CX),15142475,7.13,0.23,3.33
+Starwood Hotels&Resorts Worldwide (HOT),14702068,84.19,3.62,4.49
+Regions Financial (RF),14573822,8.21,-0.02,-0.24
+Avon Products (AVP),13930524,4.73,-0.06,-1.25
+Sprint (S),13707249,3.21,-0.05,-1.53
+HP (HPQ),13595478,12.21,0.03,0.25
+Valspar (VAL),13433543,103.22,19.39,23.13
+Wells Fargo (WFC),13333283,50.67,0.13,0.26
+Nike Cl B (NKE),13260236,64.72,1.73,2.75
+Baxalta (BXLT),13204365,39.84,0.78,2
+Kinder Morgan (KMI),13178542,18.36,-0.37,-1.98
+Devon Energy (DVN),12844861,28.02,0.48,1.74
+Vipshop Holdings ADR (VIPS),12779562,12.86,0.57,4.64
+JPMorgan Chase (JPM),12677374,60.46,-0.02,-0.03
+Twitter (TWTR),12482044,16.89,0.04,0.24
+Genworth Financial Cl A (GNW),12235884,3.26,0.23,7.59
+ArcelorMittal ADR (MT),12174912,4.39,-0.17,-3.73
+Weatherford International (WFT),12116970,7.6,0.05,0.66
+Southwestern Energy (SWN),11223766,7.86,-0.07,-0.88
+California Resources (CRC),11048075,1.48,-0.1,-6.33
+Encana (ECA),10973970,5.98,-0.08,-1.32
+Hewlett Packard Enterprise (HPE),10667800,17.71,0.38,2.19
+KeyCorp (KEY),10572168,11.43,0.04,0.35
+Columbia Pipeline Group (CPGX),10536802,25.02,0.18,0.72
+Petroleo Brasileiro ADR A (PBRA),10485281,4.43,0.07,1.61
+Juniper Networks (JNPR),10485129,25.8,-0.59,-2.24
+Verizon Communications (VZ),10477093,53.44,0.2,0.38
+Hertz Global Holdings (HTZ),10284482,11.31,-0.14,-1.22
+Kinross Gold (KGC),10070606,3.16,0.02,0.64
+Morgan Stanley (MS),9974482,25.94,-0.34,-1.29
+Gerdau ADR (GGB),9735557,1.63,0.07,4.49
+Hilton Worldwide Holdings (HLT),9636018,22.41,0.4,1.82
+Denbury Resources (DNR),9574948,2.58,-0.03,-1.15
+Coca-Cola (KO),9560672,45.67,0.07,0.15
+Oasis Petroleum (OAS),9447200,7.99,-0.01,-0.12
+VEREIT (VER),9399164,8.57,0.06,0.71
+Yamana Gold (AUY),9314089,3.13,0.04,1.29
+Ultra Petroleum (UPL),9075064,0.57,0.01,1.42
+Wal-Mart Stores (WMT),8867735,67.97,1.02,1.52
+SeaDrill (SDRL),8777985,3.53,-0.22,-5.87
+Procter&Gamble (PG),8412038,83.32,0.17,0.2
+Noble (NE),8369662,11.75,0.51,4.54
+ConocoPhillips (COP),8350103,42.58,-0.44,-1.02
+Exxon Mobil (XOM),8219000,83.62,-0.58,-0.69
+Host Hotels&Resorts (HST),8141224,16.82,-0.15,-0.88
+Chevron (CVX),7950126,96.44,-1.25,-1.28
+BP ADR (BP),7652338,31.12,-0.21,-0.67
+Continental Resources (CLR),7475087,31.06,0.03,0.1
+Schlumberger (SLB),7465318,74.89,1.37,1.86
+WPX Energy (WPX),7421406,6.37,0.16,2.58
+Johnson&Johnson (JNJ),7412828,107.28,-0.22,-0.2
+General Motors (GM),7351780,32.08,0.12,0.38
+Gold Fields ADR (GFI),7339372,3.84,0.08,2.13
+Merck&Co (MRK),7338900,52.8,0.55,1.05
+Cabot Oil&Gas (COG),7251282,21.79,-0.98,-4.3
+Banco Santander ADR (SAN),7088469,4.71,-0.08,-1.67
+Charles Schwab (SCHW),7083700,28.28,-0.09,-0.32
+Dow Chemical (DOW),7058109,51.54,-0.12,-0.23
+Companhia Energetica de Minas Gerais-Cemig ADR (CIG),7035782,2.2,0.06,2.8
+AK Steel Holding (AKS),6973292,4.28,0.08,1.9
+Halliburton (HAL),6962598,36.38,0.08,0.22
+Delta Air Lines (DAL),6960463,50.12,0.07,0.14
+EMC (EMC),6916626,26.48,-0.02,-0.08
+Walt Disney (DIS),6900462,98.46,-0.74,-0.75
+IAMGOLD (IAG),6823531,2.16,0.02,0.93
+Potash of Saskatchewan (POT),6716133,18.95,0.06,0.32
+MGM Resorts International (MGM),6706633,20.97,-0.45,-2.1
+Goldcorp (GG),6611841,16.83,-0.04,-0.24
+VISA Cl A (V),6585392,73.77,-0.01,-0.01
+Synchrony Financial (SYF),6534564,28.79,0.33,1.16
+Cliffs Natural Resources (CLF),6496941,3.06,-0.01,-0.33
+Rite Aid (RAD),6464626,7.99,0.02,0.25
+Fitbit (FIT),6436239,14.9,0.52,3.62
+Williams (WMB),6426248,17.35,-0.8,-4.41
+ICICI Bank ADR (IBN),6418029,7,0.05,0.72
+Nabors Industries (NBR),6278301,9.41,0.27,2.95
+AES (AES),6247837,11.54,-0.08,-0.69
