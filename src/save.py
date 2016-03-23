@@ -13,7 +13,7 @@ def saveStockList(stocks):
             stocklistCollection.create_index([("quote", pymongo.ASCENDING)], unique=True)
             stocklistCollection.insert_many(stocks)
         except (DuplicateKeyError, BulkWriteError) as err:
-            print(err)
+            print("saveStockList: ", err)
 
 def saveStockHistoricalData(quote, stockHistoricalDataArray):
     if len(stockHistoricalDataArray) > 0:
@@ -22,7 +22,7 @@ def saveStockHistoricalData(quote, stockHistoricalDataArray):
             stockHistoricalDataCollection.create_index([("Symbol", pymongo.ASCENDING), ("Date", pymongo.DESCENDING)], unique=True)
             stockHistoricalDataCollection.insert_many(stockHistoricalDataArray)
         except (DuplicateKeyError, BulkWriteError) as err:
-            print(err)
+            print("saveStockHistoricalData: ", err)
 
 def saveStockCurrentData(quote, stockCurrentData):
     if stockCurrentData is not None:
@@ -31,4 +31,4 @@ def saveStockCurrentData(quote, stockCurrentData):
             stockCurrentDataCollection.create_index([("symbol", pymongo.ASCENDING)], unique=True)
             stockCurrentDataCollection.insert_one(stockCurrentData)
         except DuplicateKeyError as err:
-            print(err)
+            print("saveStockCurrentData: ", err)
