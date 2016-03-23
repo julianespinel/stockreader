@@ -1,12 +1,12 @@
 import sys
-import load
+import read
 import save
 import toml
-import download
-from datetime import date
+import domain
+from concurrent.futures import ThreadPoolExecutor
 
 def getConfig():
-    # Load config parameters from a TOML file.
+    # Read config parameters from a TOML file.
     config = None
     configFilePath = sys.argv[1]
     with open(configFilePath) as configFile:
@@ -18,31 +18,17 @@ config = getConfig()
 nyse = "nyse"
 nyseFilePathList = config[nyse]
 print(nyse, nyseFilePathList)
-stocks = load.readStocksFromMultipleFiles(nyseFilePathList, nyse)
+stocks = read.readStocksFromMultipleFiles(nyseFilePathList, nyse)
 # NASDAQ Stocks
 nasdaq = "nasdaq"
 nasdaqFilePathList = config[nasdaq]
 print(nasdaq, nasdaqFilePathList)
-stocks.extend(load.readStocksFromMultipleFiles(nasdaqFilePathList, nasdaq))
+stocks.extend(read.readStocksFromMultipleFiles(nasdaqFilePathList, nasdaq))
 print("stocks", len(stocks))
 save.saveStockList(stocks)
 
-# Download and save stock current data.
-for stock in stocks:
-    quote = stock["quote"]
-    print("stock", quote)
-    stockCurrentData = download.getStockCurrentData(quote)
-    save.saveStockCurrentData(quote, stockCurrentData)
-
-# Download and save stock historical data.
-yearsAgo = 10
-today = date.today()
-initialDate = today.replace(year=today.year-yearsAgo)
-for stock in stocks:
-    quote = stock["quote"]
-    for index in range(yearsAgo):
-        initialDate = today.replace(year=(today.year-(index+1)))
-        finalDate = today.replace(year=(today.year-index))
-        print("stock", quote, "initialDate", initialDate, "finalDate", finalDate)
-        stockHistoricalDataArray = download.getStockHistoricalData(initialDate, finalDate, quote)
-        save.saveStockHistoricalData(quote, stockHistoricalDataArray)
+workers = 8
+with ThreadPoolExecutor(max_workers=workers) as executor:
+    for stock in stocks:
+        executor.submit(domain.downloadAndSaveStockCurrentData, stock)
+        executor.submit(domain.downloadAndSaveStockHistoricalData, stock)
