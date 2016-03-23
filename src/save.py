@@ -29,6 +29,7 @@ def saveStockCurrentData(quote, stockCurrentData):
         try:
             stockCurrentDataCollection = db["stocks_current_data"]
             stockCurrentDataCollection.create_index([("symbol", pymongo.ASCENDING)], unique=True)
-            stockCurrentDataCollection.insert_one(stockCurrentData)
+            query = {"symbol": quote}
+            stockCurrentDataCollection.replace_one(query, stockCurrentData, upsert=True)
         except DuplicateKeyError as err:
             print("saveStockCurrentData: ", err)
