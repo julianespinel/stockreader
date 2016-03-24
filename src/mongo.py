@@ -24,7 +24,7 @@ def saveStockHistoricalData(quote, stockHistoricalDataArray):
         except (DuplicateKeyError, BulkWriteError) as err:
             print("saveStockHistoricalData: ", err)
 
-def saveStockCurrentData(quote, stockCurrentData):
+def upsertStockCurrentData(quote, stockCurrentData):
     if stockCurrentData is not None:
         try:
             stockCurrentDataCollection = db["stocks_current_data"]
@@ -33,3 +33,11 @@ def saveStockCurrentData(quote, stockCurrentData):
             stockCurrentDataCollection.replace_one(query, stockCurrentData, upsert=True)
         except DuplicateKeyError as err:
             print("saveStockCurrentData: ", err)
+
+def readStocksFromStockList():
+    stocks = []
+    stocklistCollection = db["stocklist"]
+    cursor = stocklistCollection.find()
+    for stock in cursor:
+        stocks.append(stock)
+    return stocks
