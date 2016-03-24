@@ -1,4 +1,4 @@
-import save
+import mongo
 import download
 from datetime import date
 
@@ -8,7 +8,7 @@ def downloadAndSaveStockCurrentData(stock):
     quote = stock["quote"]
     print("stock", quote)
     stockCurrentData = download.getStockCurrentData(quote)
-    save.saveStockCurrentData(quote, stockCurrentData)
+    mongo.saveStockCurrentData(quote, stockCurrentData)
 
 def downloadAndSaveStockHistoricalData(stock):
     today = date.today()
@@ -18,4 +18,4 @@ def downloadAndSaveStockHistoricalData(stock):
         finalDate = today.replace(year=(today.year-index))
         print("stock", quote, "initialDate", initialDate, "finalDate", finalDate)
         stockHistoricalDataArray = download.getStockHistoricalData(initialDate, finalDate, quote)
-        save.saveStockHistoricalData(quote, stockHistoricalDataArray)
+        mongo.saveStockHistoricalData(quote, stockHistoricalDataArray)
