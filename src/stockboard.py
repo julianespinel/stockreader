@@ -1,9 +1,9 @@
 import sys
+import job
 import read
-import save
+import mongo
 import toml
-import domain
-from concurrent.futures import ThreadPoolExecutor
+import schedule
 
 def getConfig():
     # Read config parameters from a TOML file.
@@ -25,10 +25,12 @@ nasdaqFilePathList = config[nasdaq]
 print(nasdaq, nasdaqFilePathList)
 stocks.extend(read.readStocksFromMultipleFiles(nasdaqFilePathList, nasdaq))
 print("stocks", len(stocks))
-save.saveStockList(stocks)
+mongo.saveStockList(stocks)
 
-workers = 8
-with ThreadPoolExecutor(max_workers=workers) as executor:
-    for stock in stocks:
-        executor.submit(domain.downloadAndSaveStockCurrentData, stock)
-        executor.submit(domain.downloadAndSaveStockHistoricalData, stock)
+print("*********************************************************** 1")
+schedule.every().day.at("18:00").do(job.downloadAndSaveStockHistoricalDataInParallel)
+print("*********************************************************** 2")
+schedule.every(1).hour.do(job.downloadAndSaveStockCurrentDataInParallel)
+print("*********************************************************** 3")
+while True:
+    schedule.run_pending()
