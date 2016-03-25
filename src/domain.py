@@ -1,6 +1,6 @@
 import mongo
 import download
-from datetime import date
+from datetime import date, timedelta
 
 YEARS_AGO = 10
 
@@ -9,6 +9,14 @@ def downloadAndSaveStockCurrentData(stock):
     print("stock", quote)
     stockCurrentData = download.getStockCurrentData(quote)
     mongo.saveStockCurrentData(quote, stockCurrentData)
+
+def downloadAndSaveStockDataDaysFromToday(stock, daysFromToday):
+    today = date.today()
+    initialDate = today - timedelta(days=daysFromToday)
+    quote = stock["quote"]
+    print("stock", quote, "initialDate", initialDate, "today", today)
+    stockHistoricalDataArray = download.getStockHistoricalData(initialDate, today, quote)
+    mongo.saveStockHistoricalData(quote, stockHistoricalDataArray)
 
 def downloadAndSaveStockHistoricalData(stock):
     today = date.today()
