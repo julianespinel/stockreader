@@ -28,11 +28,11 @@ print("stocks", len(stocks))
 mongo.saveStockList(stocks)
 
 print("*********************************************************** 1")
-schedule.every().day.at("18:00").do(job.downloadAndSaveStockHistoricalDataInParallel)
-print("*********************************************************** 2")
 schedule.every(1).hour.do(job.downloadAndSaveStockCurrentDataInParallel)
 print("*********************************************************** 2")
 schedule.every().day.at("18:00").do(job.downloadAndSaveStockWeeklyDataInParallel)
 print("*********************************************************** 3")
+schedule.every().saturday.at("23:00").do(job.downloadAndSaveStockHistoricalDataInParallel)
+print("*********************************************************** 4")
 while True:
     schedule.run_pending()
