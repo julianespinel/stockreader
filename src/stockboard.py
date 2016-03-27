@@ -3,7 +3,10 @@ import job
 import read
 import mongo
 import toml
-import schedule
+import threading
+
+NYSE = "nyse"
+NASDAQ = "nasdaq"
 
 def getConfig():
     # Read config parameters from a TOML file.
@@ -14,18 +17,10 @@ def getConfig():
     return config
 
 config = getConfig()
-# NYSE Stocks
-nyse = "nyse"
-nyseFilePathList = config[nyse]
-print(nyse, nyseFilePathList)
-stocks = read.readStocksFromMultipleFiles(nyseFilePathList, nyse)
-# NASDAQ Stocks
-nasdaq = "nasdaq"
-nasdaqFilePathList = config[nasdaq]
-print(nasdaq, nasdaqFilePathList)
-stocks.extend(read.readStocksFromMultipleFiles(nasdaqFilePathList, nasdaq))
-print("stocks", len(stocks))
+stocks = read.readStocksFromExchangeFile(config, NYSE)
+stocks.extend(read.readStocksFromExchangeFile(config, NASDAQ))
 mongo.saveStockList(stocks)
+print("stocks", len(stocks))
 
 print("*********************************************************** 1")
 schedule.every(1).hour.do(job.downloadAndSaveStockCurrentDataInParallel)

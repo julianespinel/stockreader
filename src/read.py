@@ -19,3 +19,9 @@ def readStocksFromMultipleFiles(filePathList, stockMarket):
     for filePath in filePathList:
         stocks.extend(readStocksFromFile(filePath, stockMarket))
     return stocks
+
+def readStocksFromExchangeFile(config, exchange):
+    exchangeFilePathList = config[exchange]
+    print(exchange, exchangeFilePathList)
+    stocksFromExchange = readStocksFromMultipleFiles(exchangeFilePathList, exchange)
+    return stocksFromExchange
