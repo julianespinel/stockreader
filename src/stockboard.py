@@ -22,12 +22,7 @@ stocks.extend(read.readStocksFromExchangeFile(config, NASDAQ))
 mongo.saveStockList(stocks)
 print("stocks", len(stocks))
 
-print("*********************************************************** 1")
-schedule.every(1).hour.do(job.downloadAndSaveStockCurrentDataInParallel)
-print("*********************************************************** 2")
-schedule.every().day.at("18:00").do(job.downloadAndSaveStockWeeklyDataInParallel)
-print("*********************************************************** 3")
-schedule.every().saturday.at("23:00").do(job.downloadAndSaveStockHistoricalDataInParallel)
-print("*********************************************************** 4")
-while True:
-    schedule.run_pending()
+jobsThread = threading.Thread(target=job.updateStocks, args=(stocks, )) # Why args should be a tuple?
+jobsThread.start()
+
+print("*********************************************************** 5")
