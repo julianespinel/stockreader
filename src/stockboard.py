@@ -4,6 +4,7 @@ import read
 import mongo
 import toml
 import threading
+import infrastructure as log
 
 from flask import Flask
 from flask_restful import Api
@@ -11,6 +12,8 @@ from api import StockAPI
 
 NYSE = "nyse"
 NASDAQ = "nasdaq"
+
+logger = log.getLogger("reader")
 
 def getConfig():
     # Read config parameters from a TOML file.
@@ -25,7 +28,7 @@ exchanges = config["exchanges"]
 stocks = read.readStocksFromExchangeFile(exchanges, NYSE)
 stocks.extend(read.readStocksFromExchangeFile(exchanges, NASDAQ))
 mongo.saveStockList(stocks)
-print("stocks", len(stocks))
+logger.info("stocks %s", len(stocks))
 
 jobsThread = threading.Thread(target=job.updateStocks)
 jobsThread.start()

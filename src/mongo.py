@@ -1,6 +1,9 @@
 import pymongo
+import infrastructure as log
 from pymongo import MongoClient
 from pymongo.errors import DuplicateKeyError, BulkWriteError
+
+logger = log.getLogger("mongo")
 
 client = MongoClient()
 db = client["stockboarddb"]
@@ -13,7 +16,7 @@ def saveStockList(stocks):
             stocklistCollection.create_index([("quote", pymongo.ASCENDING)], unique=True)
             stocklistCollection.insert_many(stocks)
         except (DuplicateKeyError, BulkWriteError) as err:
-            print("saveStockList: ", err)
+            logger.error("saveStockList: %s", err)
 
 def saveStockHistoricalData(quote, stockHistoricalDataArray):
     if len(stockHistoricalDataArray) > 0:
@@ -22,7 +25,7 @@ def saveStockHistoricalData(quote, stockHistoricalDataArray):
             stockHistoricalDataCollection.create_index([("Symbol", pymongo.ASCENDING), ("Date", pymongo.DESCENDING)], unique=True)
             stockHistoricalDataCollection.insert_many(stockHistoricalDataArray)
         except (DuplicateKeyError, BulkWriteError) as err:
-            print("saveStockHistoricalData: ", err)
+            logger.error("saveStockHistoricalData: %s", err)
 
 def upsertStockCurrentData(quote, stockCurrentData):
     if stockCurrentData is not None:
@@ -32,7 +35,7 @@ def upsertStockCurrentData(quote, stockCurrentData):
             query = {"symbol": quote}
             stockCurrentDataCollection.replace_one(query, stockCurrentData, upsert=True)
         except DuplicateKeyError as err:
-            print("saveStockCurrentData: ", err)
+            logger.error("saveStockCurrentData: %s", err)
 
 def readStocksFromStockList():
     stocks = []
