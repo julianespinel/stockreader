@@ -5,6 +5,10 @@ import mongo
 import toml
 import threading
 
+from flask import Flask
+from flask_restful import Api
+from api import StockAPI
+
 NYSE = "nyse"
 NASDAQ = "nasdaq"
 
@@ -17,12 +21,22 @@ def getConfig():
     return config
 
 config = getConfig()
-stocks = read.readStocksFromExchangeFile(config, NYSE)
-stocks.extend(read.readStocksFromExchangeFile(config, NASDAQ))
+exchanges = config["exchanges"]
+stocks = read.readStocksFromExchangeFile(exchanges, NYSE)
+stocks.extend(read.readStocksFromExchangeFile(exchanges, NASDAQ))
 mongo.saveStockList(stocks)
 print("stocks", len(stocks))
 
-jobsThread = threading.Thread(target=job.updateStocks, args=(stocks, )) # Why args should be a tuple?
+jobsThread = threading.Thread(target=job.updateStocks)
 jobsThread.start()
 
-print("*********************************************************** 5")
+# Start the flask server
+app = Flask(__name__)
+api = Api(app)
+api.add_resource(StockAPI, "/stockboard/api/stocks")
+
+server = config["server"]
+host = server["host"]
+port = server["port"]
+debug = server["debug"]
+app.run(host=host, port=port, debug=debug)
