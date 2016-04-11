@@ -1,3 +1,9 @@
+[server]
+host = "localhost"
+port = 5000
+debug = true
+
+[exchanges]
 nyse = [
   "resources/NYSE-Volume-Percentage-Movers-2016-03-21.csv",
   "resources/NYSE-Most-Active-Stocks-2016-03-21.csv",

@@ -41,3 +41,8 @@ def readStocksFromStockList():
     for stock in cursor:
         stocks.append(stock)
     return stocks
+
+def getStockByQuote(quote):
+    stocklistCollection = db["stocklist"]
+    stock = stocklistCollection.find_one({"quote": quote})
+    return stock
