@@ -1,11 +1,17 @@
 import unittest
-from src import domain
+from unittest.mock import MagicMock
+from src.domain import Domain
 
 class DomainTest(unittest.TestCase):
 
+    def setUp(self):
+        self.mongoMock = MagicMock()
+        self.downloadMock = MagicMock()
+        self.domain = Domain(self.mongoMock, self.downloadMock)
+
     def testDownloadAndSaveStockCurrentData(self):
-        print(domain.YEARS_AGO)
-        self.assertEqual(10, domain.YEARS_AGO)
+        print(self.domain.YEARS_AGO)
+        self.assertEqual(10, self.domain.YEARS_AGO)
 
 if __name__ == "main":
     print("***** hello!")
