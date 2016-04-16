@@ -15,7 +15,7 @@ class Domain:
         quote = stock["quote"]
         logger.info("stock %s", quote)
         stockCurrentData = self.download.getStockCurrentData(quote)
-        self.mongo.saveStockCurrentData(quote, stockCurrentData)
+        self.mongo.upsertStockCurrentData(quote, stockCurrentData)
 
     def downloadAndSaveStockDataDaysFromToday(self, stock, daysFromToday):
         today = date.today()
