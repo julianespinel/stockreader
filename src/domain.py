@@ -28,7 +28,7 @@ class Domain:
     def downloadAndSaveStockHistoricalData(self, stock):
         today = date.today()
         quote = stock["quote"]
-        for index in range(YEARS_AGO):
+        for index in range(self.YEARS_AGO):
             initialDate = today.replace(year=(today.year-(index+1)))
             finalDate = today.replace(year=(today.year-index))
             logger.info("stock %s initialDate %s finalDate %s", quote, initialDate, finalDate)
