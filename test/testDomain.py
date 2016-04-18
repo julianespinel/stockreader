@@ -11,7 +11,7 @@ class DomainTest(unittest.TestCase):
         self.downloadMock = Download()
         self.domain = Domain(self.mongoMock, self.downloadMock)
 
-    def testDownloadAndSaveStockCurrentData(self):
+    def testDownloadAndSaveStockCurrentData_OK(self):
         quote = "BAC"
         stock = { "name": "Bank of America", "quote": quote, "stockMarket": "NYSE" }
         stockCurrentData = {
@@ -30,6 +30,16 @@ class DomainTest(unittest.TestCase):
             "Symbol" : "BAC",
             "YearLow" : "10.990"
         }
+        self.downloadMock.getStockCurrentData = Mock(return_value=stockCurrentData)
+        self.mongoMock.upsertStockCurrentData = Mock()
+        self.domain.downloadAndSaveStockCurrentData(stock)
+        self.downloadMock.getStockCurrentData.assert_called_once_with(quote)
+        self.mongoMock.upsertStockCurrentData.assert_called_once_with(quote, stockCurrentData)
+
+    def testDownloadAndSaveStockCurrentData_NOK_emptyStockCurrentData(self):
+        quote = "BAC"
+        stock = { "name": "Bank of America", "quote": quote, "stockMarket": "NYSE" }
+        stockCurrentData = None
         self.downloadMock.getStockCurrentData = Mock(return_value=stockCurrentData)
         self.mongoMock.upsertStockCurrentData = Mock()
         self.domain.downloadAndSaveStockCurrentData(stock)
