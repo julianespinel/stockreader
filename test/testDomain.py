@@ -1,5 +1,6 @@
 import unittest
 from unittest.mock import Mock
+from datetime import date, timedelta
 from src.domain import Domain
 from src.download import Download
 from src.mongo import Mongo
@@ -45,6 +46,63 @@ class DomainTest(unittest.TestCase):
         self.domain.downloadAndSaveStockCurrentData(stock)
         self.downloadMock.getStockCurrentData.assert_called_once_with(quote)
         self.mongoMock.upsertStockCurrentData.assert_called_once_with(quote, stockCurrentData)
+
+    def testDownloadAndSaveStockDataDaysFromToday_OK(self):
+        quote = "BAC"
+        stock = { "name": "Bank of America", "quote": quote, "stockMarket": "NYSE" }
+        daysFromToday = 3
+        stockHistoricalDataArray = [
+            {
+                "Adj_Close": "13.79",
+                "Date": "2016-03-18",
+                "Close": "13.79",
+                "Volume": "145037500",
+                "Open": "13.68",
+                "Low": "13.55",
+                "High": "13.88",
+                "Symbol": "BAC"
+            },
+            {
+                "Adj_Close": "13.40",
+                "Date": "2016-03-17",
+                "Close": "13.40",
+                "Volume": "121732700",
+                "Open": "13.22",
+                "Low": "13.05",
+                "High": "13.48",
+                "Symbol": "BAC"
+            },
+            {
+                "Adj_Close": "13.31",
+                "Date": "2016-03-16",
+                "Close": "13.31",
+                "Volume": "148489100",
+                "Open": "13.51",
+                "Low": "13.09",
+                "High": "13.81",
+                "Symbol": "BAC"
+            }
+        ]
+        self.downloadMock.getStockHistoricalData = Mock(return_value=stockHistoricalDataArray)
+        self.mongoMock.saveStockHistoricalData = Mock()
+        self.domain.downloadAndSaveStockDataDaysFromToday(stock, daysFromToday)
+        today = date.today()
+        initialDate = today - timedelta(days=daysFromToday)
+        self.downloadMock.getStockHistoricalData.assert_called_once_with(initialDate, today, quote)
+        self.mongoMock.saveStockHistoricalData(quote, stockHistoricalDataArray)
+
+    def testDownloadAndSaveStockDataDaysFromToday_NOK_emptyStockHistoricalDataArray(self):
+        quote = "BAC"
+        stock = { "name": "Bank of America", "quote": quote, "stockMarket": "NYSE" }
+        daysFromToday = 3
+        stockHistoricalDataArray = []
+        self.downloadMock.getStockHistoricalData = Mock(return_value=stockHistoricalDataArray)
+        self.mongoMock.saveStockHistoricalData = Mock()
+        self.domain.downloadAndSaveStockDataDaysFromToday(stock, daysFromToday)
+        today = date.today()
+        initialDate = today - timedelta(days=daysFromToday)
+        self.downloadMock.getStockHistoricalData.assert_called_once_with(initialDate, today, quote)
+        self.mongoMock.saveStockHistoricalData(quote, stockHistoricalDataArray)
 
 if __name__ == "main":
     unittest.main()
