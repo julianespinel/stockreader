@@ -89,7 +89,7 @@ class DomainTest(unittest.TestCase):
         today = date.today()
         initialDate = today - timedelta(days=daysFromToday)
         self.downloadMock.getStockHistoricalData.assert_called_once_with(initialDate, today, quote)
-        self.mongoMock.saveStockHistoricalData(quote, stockHistoricalDataArray)
+        self.mongoMock.saveStockHistoricalData.assert_called_once_with(quote, stockHistoricalDataArray)
 
     def testDownloadAndSaveStockDataDaysFromToday_NOK_emptyStockHistoricalDataArray(self):
         quote = "BAC"
@@ -102,7 +102,7 @@ class DomainTest(unittest.TestCase):
         today = date.today()
         initialDate = today - timedelta(days=daysFromToday)
         self.downloadMock.getStockHistoricalData.assert_called_once_with(initialDate, today, quote)
-        self.mongoMock.saveStockHistoricalData(quote, stockHistoricalDataArray)
+        self.mongoMock.saveStockHistoricalData.assert_called_once_with(quote, stockHistoricalDataArray)
 
 if __name__ == "main":
     unittest.main()
