@@ -1,10 +1,14 @@
 import sys
+import toml
+import threading
+
 import job
 import read
 import mongo
-import toml
-import threading
+import domain
+import download
 import infrastructure as log
+from api import StockAPI
 
 from tornado.wsgi import WSGIContainer
 from tornado.httpserver import HTTPServer
@@ -12,7 +16,6 @@ from tornado.ioloop import IOLoop
 
 from flask import Flask
 from flask_restful import Api
-from api import StockAPI
 
 NYSE = "nyse"
 NASDAQ = "nasdaq"
@@ -29,6 +32,9 @@ def getConfig():
 
 # Initialize
 mongo = mongo.Mongo()
+download = download.Download()
+domain = domain.Domain(mongo, download)
+job = job.Job(mongo, domain)
 
 config = getConfig()
 exchanges = config["exchanges"]
@@ -43,7 +49,7 @@ jobsThread.start()
 # Start the flask server
 app = Flask(__name__)
 api = Api(app)
-api.add_resource(StockAPI, "/stockboard/api/stocks")
+api.add_resource(StockAPI, "/stockboard/api/stocks", resource_class_kwargs={"mongo": mongo, "job": job})
 server = config["server"]
 host = server["host"]
 port = server["port"]
