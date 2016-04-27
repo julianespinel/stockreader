@@ -1,16 +1,18 @@
 import unittest
 from unittest.mock import Mock
 from datetime import date, timedelta
-from src.domain import Domain
-from src.download import Download
-from src.mongo import Mongo
+
+from .context import src
+from src import mongo
+from src import download
+from src import domain
 
 class DomainTest(unittest.TestCase):
 
     def setUp(self):
-        self.mongoMock = Mongo()
-        self.downloadMock = Download()
-        self.domain = Domain(self.mongoMock, self.downloadMock)
+        self.mongoMock = mongo.Mongo()
+        self.downloadMock = download.Download()
+        self.domain = domain.Domain(self.mongoMock, self.downloadMock)
 
     def testDownloadAndSaveStockCurrentData_OK(self):
         quote = "BAC"
