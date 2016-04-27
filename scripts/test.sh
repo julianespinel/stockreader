@@ -1,2 +1,2 @@
 cd ..
-python -m unittest discover
+nosetests
