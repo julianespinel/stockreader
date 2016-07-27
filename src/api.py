@@ -16,6 +16,9 @@ class StockAPI(Resource):
     def post(self):
         response = None
         newStock = request.get_json()
+        if newStock is None:
+            response = { "error": "Please provide a valid stock. It should contain a name, a quote and a stock market" }, 400
+            return response
         name = newStock.get("name", None)
         quote = newStock.get("quote", None)
         logger.info("post: %s", newStock)
