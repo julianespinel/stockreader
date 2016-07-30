@@ -7,9 +7,9 @@ logger = log.getLogger("mongo")
 
 class Mongo:
 
-    def __init__(self):
+    def __init__(self, dbName):
         client = MongoClient()
-        self.db = client["stockboarddb"]
+        self.db = client[dbName]
 
     # Do not use map and filter for side effects: http://stackoverflow.com/a/18433519/2420718
     def saveStockList(self, stocks):

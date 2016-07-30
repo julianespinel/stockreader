@@ -31,12 +31,16 @@ def getConfig():
     return config
 
 # Initialize
-mongo = mongo.Mongo()
+config = getConfig()
+mongoConfig = config["mongo"]
+dbName = mongoConfig["dbName"]
+mongo = mongo.Mongo(dbName)
+print(dbName)
+
 download = download.Download()
 domain = domain.Domain(mongo, download)
 job = job.Job(mongo, domain)
 
-config = getConfig()
 exchanges = config["exchanges"]
 stocks = read.readStocksFromExchangeFile(exchanges, NYSE)
 stocks.extend(read.readStocksFromExchangeFile(exchanges, NASDAQ))
