@@ -3,15 +3,13 @@ from unittest.mock import Mock
 from datetime import date, timedelta
 
 from .context import src
-from src import mongo
-from src import download
 from src import domain
 
 class DomainTest(unittest.TestCase):
 
     def setUp(self):
-        self.mongoMock = mongo.Mongo()
-        self.downloadMock = download.Download()
+        self.mongoMock = Mock()
+        self.downloadMock = Mock()
         self.domain = domain.Domain(self.mongoMock, self.downloadMock)
 
     def testDownloadAndSaveStockCurrentData_OK(self):

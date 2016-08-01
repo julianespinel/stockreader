@@ -20,7 +20,7 @@ from flask_restful import Api
 NYSE = "nyse"
 NASDAQ = "nasdaq"
 
-logger = log.getLogger("reader")
+logger = log.getLogger("stockboard")
 
 def getConfig():
     # Read config parameters from a TOML file.
@@ -30,16 +30,25 @@ def getConfig():
         config = toml.loads(configFile.read())
     return config
 
+def readStocksFromExchangeFile(config, exchange):
+    exchangeFilePathList = config[exchange]
+    stocksFromExchange = read.readStocksFromMultipleFiles(exchangeFilePathList, exchange)
+    return stocksFromExchange
+
 # Initialize
-mongo = mongo.Mongo()
+config = getConfig()
+mongoConfig = config["mongo"]
+dbName = mongoConfig["dbName"]
+
+mongo = mongo.Mongo(dbName)
+read = read.Read()
 download = download.Download()
 domain = domain.Domain(mongo, download)
 job = job.Job(mongo, domain)
 
-config = getConfig()
 exchanges = config["exchanges"]
-stocks = read.readStocksFromExchangeFile(exchanges, NYSE)
-stocks.extend(read.readStocksFromExchangeFile(exchanges, NASDAQ))
+stocks = readStocksFromExchangeFile(exchanges, NYSE)
+stocks.extend(readStocksFromExchangeFile(exchanges, NASDAQ))
 mongo.saveStockList(stocks)
 logger.info("stocks %s", len(stocks))
 

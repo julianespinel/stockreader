@@ -63,3 +63,6 @@ target/
 
 # backup or locked files.
 **/*.~*
+
+# PyCharm
+.idea/

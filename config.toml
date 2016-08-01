@@ -3,6 +3,9 @@ host = "localhost"
 port = 5000
 debug = false
 
+[mongo]
+dbName = "stockboarddb"
+
 [exchanges]
 nyse = [
   "resources/NYSE-Volume-Percentage-Movers-2016-03-21.csv",
