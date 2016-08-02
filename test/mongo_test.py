@@ -9,11 +9,11 @@ class MongoTest(unittest.TestCase):
     def setUp(self):
         dbHost = "localhost"
         dbPort = 27017
-        testDBName = "test_stockboard_db"
+        testDBName = "test_stockreader_db"
         self.mongo = mongo.Mongo(dbHost, dbPort, testDBName)
 
     def tearDown(self):
-        testDBName = "test_stockboard_db"
+        testDBName = "test_stockreader_db"
         mongoClient = pymongo.MongoClient()
         mongoClient.drop_database(testDBName)
 

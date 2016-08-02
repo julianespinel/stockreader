@@ -6,7 +6,7 @@ debug = false
 [mongo]
 host = "db"
 port = 27017
-name = "stockboarddb"
+name = "stockreaderdb"
 
 [exchanges]
 nyse = [

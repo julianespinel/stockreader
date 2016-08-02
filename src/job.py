@@ -37,7 +37,7 @@ class Job:
             schedule.run_pending()
             time.sleep(1)
 
-    def addStockToStockboard(self, stock):
+    def addStockToStockreader(self, stock):
         self.mongo.saveStockList([stock])
         with ThreadPoolExecutor(max_workers=self.WORKERS) as executor:
             executor.submit(self.domain.downloadAndSaveStockCurrentData, stock)

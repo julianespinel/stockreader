@@ -20,7 +20,7 @@ from flask_restful import Api
 NYSE = "nyse"
 NASDAQ = "nasdaq"
 
-logger = log.getLogger("stockboard")
+logger = log.getLogger("stockreader")
 
 def getConfig():
     # Read config parameters from a TOML file.
@@ -60,7 +60,7 @@ jobsThread.start()
 # Start the flask server
 app = Flask(__name__)
 api = Api(app)
-api.add_resource(StockAPI, "/stockboard/api/stocks", resource_class_kwargs={"mongo": mongo, "job": job})
+api.add_resource(StockAPI, "/stockreader/api/stocks", resource_class_kwargs={"mongo": mongo, "job": job})
 server = config["server"]
 host = server["host"]
 port = server["port"]

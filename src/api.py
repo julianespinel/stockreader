@@ -33,7 +33,7 @@ class StockAPI(Resource):
             response = { "error": "The given stock already exists" }, 409
             return response
         # Add stock async
-        thread = threading.Thread(target=self.job.addStockToStockboard, args=(newStock, )) # Why args should be a tuple?
+        thread = threading.Thread(target=self.job.addStockToStockreader, args=(newStock, )) # Why args should be a tuple?
         thread.start()
         response = { "success": "The stock " + quote + " is being added" }, 202
         return response

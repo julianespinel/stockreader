@@ -1,6 +1,6 @@
 api:
   build: .
-  command: python3 src/stockboard.py config-docker.toml
+  command: python3 src/stockreader.py config-docker.toml
   ports:
     - "5000:5000"
   volumes:

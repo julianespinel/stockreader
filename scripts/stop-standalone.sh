@@ -1,1 +1,1 @@
-pkill -f stockboard.py
+pkill -f stockreader.py

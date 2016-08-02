@@ -16,13 +16,13 @@ class ApiTest(unittest.TestCase):
         flaskApi = Api()
         self.mongoMock = Mock()
         self.jobMock = Mock()
-        flaskApi.add_resource(api.StockAPI, "/stockboard/api/stocks",
+        flaskApi.add_resource(api.StockAPI, "/stockreader/api/stocks",
                               resource_class_kwargs={"mongo": self.mongoMock, "job": self.jobMock})
         flaskApi.init_app(app)
         self.client = app.test_client()
 
     def testAddStock_NOK_emptyRequestBody(self):
-        response = self.client.post("/stockboard/api/stocks")
+        response = self.client.post("/stockreader/api/stocks")
         self.assertEquals(response.status_code, 400)
         data = json.loads(response.data)
         expectedErrorMessage = "Please provide a stock in the request body. It should have a name, a quote and a stock market"
@@ -30,7 +30,7 @@ class ApiTest(unittest.TestCase):
 
     def testAddStock_NOK_notValidStock(self):
         stock = { "name": "Bank of America", "quote": "", "stockMarket": "" }
-        response = self.client.post("/stockboard/api/stocks", data=json.dumps(stock), content_type="application/json")
+        response = self.client.post("/stockreader/api/stocks", data=json.dumps(stock), content_type="application/json")
         self.assertEquals(response.status_code, 400)
         data = json.loads(response.data)
         expectedErrorMessage = "Please provide a valid stock. It should have a name, a quote and a stock market"
@@ -40,7 +40,7 @@ class ApiTest(unittest.TestCase):
         self.mongoMock.getStockByQuote = Mock(return_value=True)
         quote = "BAC"
         stock = { "name": "Bank of America", "quote": quote, "stockMarket": "NYSE" }
-        response = self.client.post("/stockboard/api/stocks", data=json.dumps(stock), content_type="application/json")
+        response = self.client.post("/stockreader/api/stocks", data=json.dumps(stock), content_type="application/json")
         self.mongoMock.getStockByQuote.assert_called_once_with(quote)
         self.assertEquals(response.status_code, 409)
         data = json.loads(response.data)
@@ -51,7 +51,7 @@ class ApiTest(unittest.TestCase):
         self.mongoMock.getStockByQuote = Mock(return_value=False)
         quote = "BAC"
         stock = { "name": "Bank of America", "quote": quote, "stockMarket": "NYSE" }
-        response = self.client.post("/stockboard/api/stocks", data=json.dumps(stock), content_type="application/json")
+        response = self.client.post("/stockreader/api/stocks", data=json.dumps(stock), content_type="application/json")
         self.mongoMock.getStockByQuote.assert_called_once_with(quote)
         self.assertEquals(response.status_code, 202)
         data = json.loads(response.data)
