@@ -4,7 +4,9 @@ port = 5000
 debug = false
 
 [mongo]
-dbName = "stockboarddb"
+host = "localhost"
+port = 27017
+name = "stockboarddb"
 
 [exchanges]
 nyse = [
