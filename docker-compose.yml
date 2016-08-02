@@ -1,0 +1,15 @@
+api:
+  build: .
+  command: python3 src/stockboard.py config-docker.toml
+  ports:
+    - "5000:5000"
+  volumes:
+    - .:/mongo_data
+  links:
+    - db
+db:
+  image: mongo:3
+  ports:
+    - "27017:27017"
+  volumes:
+    - /data/db/:/data/db

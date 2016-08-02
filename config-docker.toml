@@ -1,0 +1,24 @@
+[server]
+host = "localhost"
+port = 5000
+debug = false
+
+[mongo]
+host = "db"
+port = 27017
+name = "stockboarddb"
+
+[exchanges]
+nyse = [
+  "resources/NYSE-Volume-Percentage-Movers-2016-03-21.csv",
+  "resources/NYSE-Most-Active-Stocks-2016-03-21.csv",
+  "resources/NYSE-Biggest-Percentage-Gainers-2016-03-21.csv",
+  "resources/NYSE-Biggest-Percentage-Decliners-2016-03-21.csv"
+]
+
+nasdaq = [
+  "resources/Nasdaq-Volume-Percentage-Movers-2016-03-21.csv",
+  "resources/Nasdaq-Most-Active-Stocks-2016-03-21.csv",
+  "resources/Nasdaq-Biggest-Percentage-Gainers-2016-03-21.csv",
+  "resources/Nasdaq-Biggest-Percentage-Decliners-2016-03-21.csv"
+]
