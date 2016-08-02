@@ -3,42 +3,34 @@
 [![Build Status](https://travis-ci.org/julianespinel/stockreader.svg?branch=master)](https://travis-ci.org/julianespinel/stockreader)
 [![Coverage Status](https://coveralls.io/repos/github/julianespinel/stockreader/badge.svg?branch=master)](https://coveralls.io/github/julianespinel/stockreader?branch=master)
 
-stockreader helps investors to select the next public company to invest in. <br>
-Work in progress, this system is not an MVP yet.
+Read stock data from the US stock market.
 
 ## Description
 
-The stockreader system is composed by four microservices that perform independent and well defined business tasks:
+Stockreader is a system that retrieves current stock data and historical stock data from the US stock market.
 
-1. Stocks Reader * add link to repository<br>
-It's responsible for keeping the stockreader database up to date. This system reads the stock data from the internet and saves it into the system's DB.
+The system executes this steps automatically at start-up:
+1. Read the stocks from the files listed in the config-*.toml file
+2. Save the stocks of the step one into the DB.
+3. Download and save the stock historical data of the past ten years.
 
-2. Portfolio Manager * add link to repository<br>
-It's responsible for managing the portfolios of the investors. This system creates, updates and deletes portfolios.
+Additionally the system repeat the following tasks in different period of times:
 
-3. Market Analyzer * add link to repository<br>
-It's responsible for executing analysis on the stock market. This system answers questions about the stock market. e.g: "Which stocks have lost more than 15% in the last 5 days?".
+1. Download and save the stocks current data every one hour.
+4. Download and save the stocks historical data of the past week every day at 18:00.
+5. Download and save the stock historical data of the past ten years every last day of the month at 23:00.
 
-4. stockreader-UI * add link to repository<br>
-The stockreader-UI is responsible for the graphic user interaface. It is a web application that provides a simple way to use the stockreader platform.
+This recurring tasks guarantee that the system has the historical stock data of at least the last 10 years.
 
 ## How to install?
 
-stockreader is an open source project. You can either use the public deployment or you can download it and run a private deployment.
-
-### Public deployment
-
-Just go to: * public deployment URL
-
-### Private deployment
-
-In order to have a private deployment you have to install the dependencies and follow some simple steps using the terminal.
+In order to install Stockreader you only have to install the dependencies required by the system (docker and docker-compose) and then run 3 commands in the terminal.
 
 #### 1. Dependencies
 
 The only two dependencies stockreader needs to install are:
-1. docker-engine * link
-2. docker-compose * link (It will be automatically installed in Windows and OS X, follow the link if you are in Linux)
+1. [docker-engine](https://docs.docker.com/engine/installation) (It will automatically install docker-compose in Windows and OS X. If you are using Linux please go to step 2 of this list)
+2. [docker-compose](https://docs.docker.com/compose/install)
 
 #### 2. Installation steps
 
@@ -46,19 +38,12 @@ Please copy and paste this commands in the terminal:
 
 1. `git clone git@github.com:julianespinel/stockreader.git` <br>
 2. `cd stockreader/scripts` <br>
-3. `sh install.sh`
+3. `sh start-docker.sh`
 
-Now open a web browser and go to: http://private-host-url/stockreader <br>
-If you can see a screenshot like this you have installed it correctly.
-
-* add screenshot
+Now open a web browser and go to: `http://localhost:5000/stockreader/admin/ping` <br>
+If you can see `pong` in the web browser, then Stockreader is being correctly installed.
 
 ## How to use?
 
-1. Register * link
-2. Login * link
-3. Once you are in the home screen you can use three features:
-  1. See and modify your portfolios * link
-  2. Perform analysis over the US stock market * link
-  3. Subscribe to analysis sent daily, weekly or monthly to your email.
-
+Stockreader has a simple HTTP API, throught it you can request stock current and historical data. <br>
+Please refer to the API documentation. * link.
