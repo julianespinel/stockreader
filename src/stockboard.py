@@ -38,9 +38,11 @@ def readStocksFromExchangeFile(config, exchange):
 # Initialize
 config = getConfig()
 mongoConfig = config["mongo"]
-dbName = mongoConfig["dbName"]
+dbHost = mongoConfig["host"]
+dbPort = mongoConfig["port"]
+dbName = mongoConfig["name"]
 
-mongo = mongo.Mongo(dbName)
+mongo = mongo.Mongo(dbHost, dbPort, dbName)
 read = read.Read()
 download = download.Download()
 domain = domain.Domain(mongo, download)

@@ -7,8 +7,8 @@ logger = log.getLogger("mongo")
 
 class Mongo:
 
-    def __init__(self, dbName):
-        client = MongoClient()
+    def __init__(self, dbHost, dbPort, dbName):
+        client = MongoClient(dbHost, dbPort)
         self.db = client[dbName]
 
     # Do not use map and filter for side effects: http://stackoverflow.com/a/18433519/2420718
