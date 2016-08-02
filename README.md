@@ -30,6 +30,7 @@ In order to install Stockreader you only have to install the dependencies requir
 #### 1. Dependencies
 
 The only two dependencies stockreader needs to install are:
+
 1. [docker-engine](https://docs.docker.com/engine/installation) (It will automatically install docker-compose in Windows and OS X. If you are using Linux please go to step 2 of this list)
 2. [docker-compose](https://docs.docker.com/compose/install)
 
@@ -46,5 +47,5 @@ If you can see `pong` in the web browser, then Stockreader is being correctly in
 
 ## How to use?
 
-Stockreader has a simple HTTP API, throught it you can request stock current and historical data. <br>
+Stockreader has a simple HTTP API. Throught it you can request stock current data and historical data. <br>
 Please refer to the API documentation. * link.
