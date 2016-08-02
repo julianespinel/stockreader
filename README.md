@@ -10,7 +10,8 @@ Read stock data from the US stock market.
 Stockreader is a system that retrieves current stock data and historical stock data from the US stock market.
 
 The system executes this steps automatically at start-up:
-1. Read the stocks from the files listed in the config-*.toml file
+
+1. Read the stocks from the files listed in the config-*.toml file.
 2. Save the stocks of the step one into the DB.
 3. Download and save the stock historical data of the past ten years.
 
