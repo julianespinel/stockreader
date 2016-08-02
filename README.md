@@ -3,11 +3,9 @@
 [![Build Status](https://travis-ci.org/julianespinel/stockboard.svg?branch=master)](https://travis-ci.org/julianespinel/stockboard)
 [![Coverage Status](https://coveralls.io/repos/github/julianespinel/stockboard/badge.svg?branch=master)](https://coveralls.io/github/julianespinel/stockboard?branch=master)
 
-A stocks dashboard to guide your Wall Street investments.
+Stockboard helps investors to select the next public company to invest in.
 
 ## Description
-
-Stockboard is system created to help investors to select the next public company to invest in.
 
 The Stockboard system is composed by four microservices that perform independent and well defined business tasks:
 
