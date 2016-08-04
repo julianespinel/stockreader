@@ -6,7 +6,7 @@ from flask import request
 from flask_restful import Api
 
 from .context import src
-from src import api
+from src import stocks_api
 
 class ApiTest(unittest.TestCase):
 
@@ -16,7 +16,7 @@ class ApiTest(unittest.TestCase):
         flaskApi = Api()
         self.mongoMock = Mock()
         self.jobMock = Mock()
-        flaskApi.add_resource(api.StockAPI, "/stockreader/api/stocks",
+        flaskApi.add_resource(stocks_api.StocksAPI, "/stockreader/api/stocks",
                               resource_class_kwargs={"mongo": self.mongoMock, "job": self.jobMock})
         flaskApi.init_app(app)
         self.client = app.test_client()
