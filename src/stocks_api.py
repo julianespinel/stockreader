@@ -5,9 +5,9 @@ from flask_restful import Resource
 
 import infrastructure as log
 
-logger = log.getLogger("api")
+logger = log.getLogger("stocks_api")
 
-class StockAPI(Resource):
+class StocksAPI(Resource):
 
     def __init__(self, **kwargs):
         self.mongo = kwargs["mongo"]

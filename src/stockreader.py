@@ -7,8 +7,10 @@ import read
 import mongo
 import domain
 import download
+from stocks_api import StocksAPI
+from admin_api import AdminAPI
+
 import infrastructure as log
-from api import StockAPI
 
 from tornado.wsgi import WSGIContainer
 from tornado.httpserver import HTTPServer
@@ -60,7 +62,8 @@ jobsThread.start()
 # Start the flask server
 app = Flask(__name__)
 api = Api(app)
-api.add_resource(StockAPI, "/stockreader/api/stocks", resource_class_kwargs={"mongo": mongo, "job": job})
+api.add_resource(StocksAPI, "/stockreader/api/stocks", resource_class_kwargs={"mongo": mongo, "job": job})
+api.add_resource(AdminAPI, "/stockreader/admin/ping")
 server = config["server"]
 host = server["host"]
 port = server["port"]
