@@ -1,5 +1,3 @@
-import time
-import schedule
 from concurrent.futures import ThreadPoolExecutor
 
 class Job:
@@ -7,9 +5,10 @@ class Job:
     WORKERS = 8
     DAYS_FROM_TODAY = 7
 
-    def __init__(self, mongo, domain):
+    def __init__(self, mongo, domain, scheduler):
         self.mongo = mongo
         self.domain = domain
+        self.scheduler = scheduler
 
     def downloadAndSaveStockCurrentDataInParallel(self):
         stocks = self.mongo.readStocksFromStockList()
@@ -30,12 +29,10 @@ class Job:
                 executor.submit(self.domain.downloadAndSaveStockHistoricalData, stock)
 
     def updateStocks(self):
-        schedule.every(1).hour.do(self.downloadAndSaveStockCurrentDataInParallel)
-        schedule.every().day.at("18:00").do(self.downloadAndSaveStockWeeklyDataInParallel)
-        schedule.every().saturday.at("23:00").do(self.downloadAndSaveStockHistoricalDataInParallel)
-        while True:
-            schedule.run_pending()
-            time.sleep(1)
+        self.scheduler.add_job(self.downloadAndSaveStockCurrentDataInParallel, 'cron', hour='*')
+        self.scheduler.add_job(self.downloadAndSaveStockWeeklyDataInParallel, 'cron', hour=18)
+        self.scheduler.add_job(self.downloadAndSaveStockHistoricalDataInParallel, 'cron', day='last', hour=23)
+        self.scheduler.start()
 
     def addStockToStockreader(self, stock):
         self.mongo.saveStockList([stock])

@@ -19,6 +19,8 @@ from tornado.ioloop import IOLoop
 from flask import Flask
 from flask_restful import Api
 
+from apscheduler.schedulers.background import BackgroundScheduler
+
 NYSE = "nyse"
 NASDAQ = "nasdaq"
 
@@ -48,7 +50,9 @@ mongo = mongo.Mongo(dbHost, dbPort, dbName)
 read = read.Read()
 download = download.Download()
 domain = domain.Domain(mongo, download)
-job = job.Job(mongo, domain)
+
+scheduler = BackgroundScheduler()
+job = job.Job(mongo, domain, scheduler)
 
 exchanges = config["exchanges"]
 stocks = readStocksFromExchangeFile(exchanges, NYSE)
@@ -56,8 +60,9 @@ stocks.extend(readStocksFromExchangeFile(exchanges, NASDAQ))
 mongo.saveStockList(stocks)
 logger.info("stocks %s", len(stocks))
 
-jobsThread = threading.Thread(target=job.updateStocks)
-jobsThread.start()
+job.updateStocks()
+# jobsThread = threading.Thread(target=job.updateStocks)
+# jobsThread.start()
 
 # Start the flask server
 app = Flask(__name__)
