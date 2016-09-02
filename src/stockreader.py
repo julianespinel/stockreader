@@ -53,15 +53,15 @@ domain = domain.Domain(mongo, download)
 scheduler = BackgroundScheduler()
 job = job.Job(domain, scheduler)
 
+# add stocks from files.
 exchanges = config["exchanges"]
 stocks = readStocksFromExchangeFile(exchanges, NYSE)
 stocks.extend(readStocksFromExchangeFile(exchanges, NASDAQ))
-mongo.saveStockList(stocks)
 logger.info("stocks %s", len(stocks))
+job.addStocksListToStockreader(stocks)
 
+# Schedule recurrent stock update jobs.
 job.updateStocks()
-# jobsThread = threading.Thread(target=job.updateStocks)
-# jobsThread.start()
 
 # Start the flask server
 app = Flask(__name__)
