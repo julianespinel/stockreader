@@ -171,5 +171,23 @@ class DomainTest(unittest.TestCase):
         self.assertEqual(expectedResult, self.domain.stockExists(quote))
         self.mongoMock.stockExists.assert_called_once_with(quote)
 
+    def testGetStockList_OK(self):
+        expectedStockList = [
+            { "stockMarket" : "nyse", "name" : "Valspar", "quote" : "VAL" },
+            { "stockMarket" : "nyse", "name" : "Trinseo", "quote" : "TSE" },
+            { "stockMarket" : "nyse", "name" : "Celestica", "quote" : "CLS" }
+        ]
+        self.mongoMock.readStocksFromStockList = Mock(return_value=expectedStockList)
+        stockList = self.domain.getStockList()
+        self.assertEqual(len(expectedStockList), len(stockList))
+        self.mongoMock.readStocksFromStockList.assert_called_once_with()
+
+    def testGetStockList_NOK_emptyStockList(self):
+        expectedStockList = []
+        self.mongoMock.readStocksFromStockList = Mock(return_value=expectedStockList)
+        stockList = self.domain.getStockList()
+        self.assertEqual(len(expectedStockList), len(stockList))
+        self.mongoMock.readStocksFromStockList.assert_called_once_with()
+
 if __name__ == "main":
     unittest.main()

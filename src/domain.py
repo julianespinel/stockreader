@@ -37,3 +37,6 @@ class Domain:
 
     def stockExists(self, quote):
         return self.mongo.stockExists(quote)
+
+    def getStockList(self):
+        return self.mongo.readStocksFromStockList()
