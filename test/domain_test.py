@@ -189,5 +189,11 @@ class DomainTest(unittest.TestCase):
         self.assertEqual(len(expectedStockList), len(stockList))
         self.mongoMock.readStocksFromStockList.assert_called_once_with()
 
+    def testAddStockToStockList_OK(self):
+        stock = { "stockMarket" : "nyse", "name" : "Trinseo", "quote" : "TSE" }
+        self.mongoMock.saveStockList = Mock()
+        self.domain.addStockToStockList(stock)
+        self.mongoMock.saveStockList.assert_called_once_with([stock])
+
 if __name__ == "main":
     unittest.main()

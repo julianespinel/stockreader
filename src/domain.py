@@ -40,3 +40,6 @@ class Domain:
 
     def getStockList(self):
         return self.mongo.readStocksFromStockList()
+
+    def addStockToStockList(self, stock):
+        self.mongo.saveStockList([stock])
