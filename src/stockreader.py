@@ -61,7 +61,7 @@ logger.info("stocks %s", len(stocks))
 job.addStocksListToStockreader(stocks)
 
 # Schedule recurrent stock update jobs.
-job.updateStocks()
+job.scheduleStockUpdates()
 
 # Start the flask server
 app = Flask(__name__)
