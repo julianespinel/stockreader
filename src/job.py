@@ -41,3 +41,7 @@ class Job:
                 executor.submit(self.domain.downloadAndSaveStockCurrentData, stock)
                 executor.submit(self.domain.downloadAndSaveStockDataDaysFromToday, stock, self.DAYS_FROM_TODAY)
                 executor.submit(self.domain.downloadAndSaveStockHistoricalData, stock)
+
+    def addStocksListToStockreader(self, stocks):
+        for stock in stocks:
+            self.addStockToStockreader(stock)
