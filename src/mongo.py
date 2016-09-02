@@ -17,7 +17,7 @@ class Mongo:
             try:
                 stocklistCollection = self.db["stocklist"]
                 stocklistCollection.create_index([("quote", pymongo.ASCENDING)], unique=True)
-                stocklistCollection.insert_many(stocks)
+                stocklistCollection.insert_many(stocks, ordered=False)
             except (DuplicateKeyError, BulkWriteError) as err:
                 logger.error("saveStockList: %s", err)
 
@@ -44,7 +44,7 @@ class Mongo:
             try:
                 stockHistoricalDataCollection = self.db[quote + "_historical_data"]
                 stockHistoricalDataCollection.create_index([("Symbol", pymongo.ASCENDING), ("Date", pymongo.DESCENDING)], unique=True)
-                stockHistoricalDataCollection.insert_many(stockHistoricalDataArray)
+                stockHistoricalDataCollection.insert_many(stockHistoricalDataArray, ordered=False)
             except (DuplicateKeyError, BulkWriteError) as err:
                 logger.error("saveStockHistoricalData: %s", err)
 
