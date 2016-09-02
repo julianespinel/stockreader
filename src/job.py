@@ -46,9 +46,9 @@ class Job:
 
     def scheduleStockUpdates(self):
         stocks = self.domain.getStockList()
-        self.scheduler.add_job(self.downloadAndSaveStockCurrentDataInParallel(stocks), 'cron', hour='*')
-        self.scheduler.add_job(self.downloadAndSaveStockWeeklyDataInParallel(stocks), 'cron', hour=self.DAILY_UPDATE_HOUR)
-        self.scheduler.add_job(self.downloadAndSaveStockHistoricalDataInParallel(stocks), 'cron', day='last', hour=self.MONTHLY_UPDATE_HOUR)
+        self.scheduler.add_job(self.downloadAndSaveStockCurrentDataInParallel, 'cron', args=[stocks], hour='*')
+        self.scheduler.add_job(self.downloadAndSaveStockWeeklyDataInParallel, 'cron', args=[stocks], hour=self.DAILY_UPDATE_HOUR)
+        self.scheduler.add_job(self.downloadAndSaveStockHistoricalDataInParallel, 'cron', args=[stocks], day='last', hour=self.MONTHLY_UPDATE_HOUR)
         self.scheduler.start()
 
     def addStockToStockreader(self, stock):
