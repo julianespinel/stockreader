@@ -14,10 +14,10 @@ class ApiTest(unittest.TestCase):
         app = Flask(__name__)
         app.config['DEBUG'] = True
         flaskApi = Api()
-        self.mongoMock = Mock()
+        self.domainMock = Mock()
         self.jobMock = Mock()
         flaskApi.add_resource(stocks_api.StocksAPI, "/stockreader/api/stocks",
-                              resource_class_kwargs={"mongo": self.mongoMock, "job": self.jobMock})
+                              resource_class_kwargs={"domain": self.domainMock, "job": self.jobMock})
         flaskApi.init_app(app)
         self.client = app.test_client()
 
@@ -37,22 +37,22 @@ class ApiTest(unittest.TestCase):
         self.assertEquals(expectedErrorMessage, data["error"])
 
     def testAddStock_NOK_existingStock(self):
-        self.mongoMock.getStockByQuote = Mock(return_value=True)
+        self.domainMock.stockExists = Mock(return_value=True)
         quote = "BAC"
         stock = { "name": "Bank of America", "quote": quote, "stockMarket": "NYSE" }
         response = self.client.post("/stockreader/api/stocks", data=json.dumps(stock), content_type="application/json")
-        self.mongoMock.getStockByQuote.assert_called_once_with(quote)
+        self.domainMock.stockExists.assert_called_once_with(quote)
         self.assertEquals(response.status_code, 409)
         data = json.loads(response.data)
         expectedErrorMessage = "The given stock already exists"
         self.assertEquals(expectedErrorMessage, data["error"])
 
     def testAddStock_OK(self):
-        self.mongoMock.getStockByQuote = Mock(return_value=False)
+        self.domainMock.stockExists = Mock(return_value=False)
         quote = "BAC"
         stock = { "name": "Bank of America", "quote": quote, "stockMarket": "NYSE" }
         response = self.client.post("/stockreader/api/stocks", data=json.dumps(stock), content_type="application/json")
-        self.mongoMock.getStockByQuote.assert_called_once_with(quote)
+        self.domainMock.stockExists.assert_called_once_with(quote)
         self.assertEquals(response.status_code, 202)
         data = json.loads(response.data)
         expectedMessage = "The stock " + quote + " is being added"
