@@ -34,3 +34,6 @@ class Domain:
             logger.info("stock %s initialDate %s finalDate %s", quote, initialDate, finalDate)
             stockHistoricalDataArray = self.download.getStockHistoricalData(initialDate, finalDate, quote)
             self.mongo.saveStockHistoricalData(quote, stockHistoricalDataArray)
+
+    def stockExists(self, quote):
+        return self.mongo.stockExists(quote)

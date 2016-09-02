@@ -157,5 +157,19 @@ class DomainTest(unittest.TestCase):
         self.mongoMock.saveStockHistoricalData.assert_called_with(quote, stockHistoricalDataArray)
         self.assertTrue(self.mongoMock.saveStockHistoricalData.call_count == self.domain.YEARS_AGO)
 
+    def testStockExists_OK(self):
+        quote = "BAC"
+        expectedResult = True
+        self.mongoMock.stockExists = Mock(return_value=expectedResult)
+        self.assertEqual(expectedResult, self.domain.stockExists(quote))
+        self.mongoMock.stockExists.assert_called_once_with(quote)
+
+    def testStockExists_NOK_stockDoesNotExists(self):
+        quote = "BAC"
+        expectedResult = False
+        self.mongoMock.stockExists = Mock(return_value=expectedResult)
+        self.assertEqual(expectedResult, self.domain.stockExists(quote))
+        self.mongoMock.stockExists.assert_called_once_with(quote)
+
 if __name__ == "main":
     unittest.main()
