@@ -1,6 +1,5 @@
 import sys
 import toml
-import threading
 
 import job
 import read
@@ -52,22 +51,22 @@ download = download.Download()
 domain = domain.Domain(mongo, download)
 
 scheduler = BackgroundScheduler()
-job = job.Job(mongo, domain, scheduler)
+job = job.Job(domain, scheduler)
 
+# add stocks from files.
 exchanges = config["exchanges"]
 stocks = readStocksFromExchangeFile(exchanges, NYSE)
 stocks.extend(readStocksFromExchangeFile(exchanges, NASDAQ))
-mongo.saveStockList(stocks)
 logger.info("stocks %s", len(stocks))
+job.addStocksListToStockreader(stocks)
 
-job.updateStocks()
-# jobsThread = threading.Thread(target=job.updateStocks)
-# jobsThread.start()
+# Schedule recurrent stock update jobs.
+job.scheduleStockUpdates()
 
 # Start the flask server
 app = Flask(__name__)
 api = Api(app)
-api.add_resource(StocksAPI, "/stockreader/api/stocks", resource_class_kwargs={"mongo": mongo, "job": job})
+api.add_resource(StocksAPI, "/stockreader/api/stocks", resource_class_kwargs={"domain": domain, "job": job})
 api.add_resource(AdminAPI, "/stockreader/admin/ping")
 server = config["server"]
 host = server["host"]

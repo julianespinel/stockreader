@@ -30,6 +30,18 @@ class MongoTest(unittest.TestCase):
         stockCount = len(self.mongo.readStocksFromStockList())
         self.assertEquals(len(stocks), stockCount)
 
+    def testStockExists_OK(self):
+        stockCount = len(self.mongo.readStocksFromStockList())
+        self.assertEquals(0, stockCount)
+        stocks = [
+            {"name": "Twitter", "quote": "TWTR", "stockMarket": "NYSE"},
+            {"name": "Facebook", "quote": "FB", "stockMarket": "NASDAQ"}
+        ]
+        self.mongo.saveStockList(stocks)
+        stockCount = len(self.mongo.readStocksFromStockList())
+        self.assertEquals(len(stocks), stockCount)
+        self.assertTrue(self.mongo.stockExists("FB"))
+
     def testGetStockByQuote_OK(self):
         stockCount = len(self.mongo.readStocksFromStockList())
         self.assertEquals(0, stockCount)

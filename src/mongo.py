@@ -29,6 +29,11 @@ class Mongo:
             stocks.append(stock)
         return stocks
 
+    def stockExists(self, quote):
+        stockCurrentDataCollection = self.db["stocklist"]
+        cursor = stockCurrentDataCollection.find({ "quote": quote }).limit(1)
+        return (cursor.count() > 0)
+
     def getStockByQuote(self, quote):
         stocklistCollection = self.db["stocklist"]
         stock = stocklistCollection.find_one({"quote": quote})
