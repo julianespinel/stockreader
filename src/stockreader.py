@@ -1,6 +1,5 @@
 import sys
 import toml
-import threading
 
 import job
 import read
@@ -67,7 +66,7 @@ job.updateStocks()
 # Start the flask server
 app = Flask(__name__)
 api = Api(app)
-api.add_resource(StocksAPI, "/stockreader/api/stocks", resource_class_kwargs={"mongo": mongo, "job": job})
+api.add_resource(StocksAPI, "/stockreader/api/stocks", resource_class_kwargs={"domain": domain, "job": job})
 api.add_resource(AdminAPI, "/stockreader/admin/ping")
 server = config["server"]
 host = server["host"]
