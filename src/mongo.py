@@ -19,7 +19,7 @@ class Mongo:
                 stocklistCollection.create_index([("quote", pymongo.ASCENDING)], unique=True)
                 stocklistCollection.insert_many(stocks, ordered=False)
             except (DuplicateKeyError, BulkWriteError) as err:
-                logger.error("saveStockList: %s", err)
+                logger.error("saveStockList: %i %s", len(stocks), err)
 
     def readStocksFromStockList(self):
         stocks = []
@@ -46,7 +46,7 @@ class Mongo:
                 stockHistoricalDataCollection.create_index([("Symbol", pymongo.ASCENDING), ("Date", pymongo.DESCENDING)], unique=True)
                 stockHistoricalDataCollection.insert_many(stockHistoricalDataArray, ordered=False)
             except (DuplicateKeyError, BulkWriteError) as err:
-                logger.error("saveStockHistoricalData: %s", err)
+                logger.error("saveStockHistoricalData: %s %i %s", quote, len(stockHistoricalDataArray), err)
 
     def getStockHistoricalData(self, quote):
         stockHistoricalDataCollection = self.db[quote + "_historical_data"]
