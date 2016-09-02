@@ -10,7 +10,7 @@ logger = log.getLogger("stocks_api")
 class StocksAPI(Resource):
 
     def __init__(self, **kwargs):
-        self.mongo = kwargs["mongo"]
+        self.domain = kwargs["domain"]
         self.job = kwargs["job"]
 
     def post(self):
@@ -28,7 +28,7 @@ class StocksAPI(Resource):
             response = { "error": "Please provide a valid stock. It should have a name, a quote and a stock market" }, 400
             return response
         # This validation (stockExistInDB) should be performed in the domain level, not in the API level.
-        stockExistInDB = self.mongo.getStockByQuote(quote)
+        stockExistInDB = self.domain.stockExists(quote)
         if stockExistInDB:
             response = { "error": "The given stock already exists" }, 409
             return response
