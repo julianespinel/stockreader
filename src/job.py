@@ -3,6 +3,7 @@ from concurrent.futures import ThreadPoolExecutor
 class Job:
 
     WORKERS = 8
+    LESS_WORKERS = 3
     DAYS_FROM_TODAY = 7
 
     def __init__(self, domain, scheduler):
@@ -34,8 +35,9 @@ class Job:
         self.scheduler.start()
 
     def addStockToStockreader(self, stock):
-        self.mongo.saveStockList([stock])
-        with ThreadPoolExecutor(max_workers=self.WORKERS) as executor:
-            executor.submit(self.domain.downloadAndSaveStockCurrentData, stock)
-            executor.submit(self.domain.downloadAndSaveStockDataDaysFromToday, stock, self.DAYS_FROM_TODAY)
-            executor.submit(self.domain.downloadAndSaveStockHistoricalData, stock)
+        if not self.domain.stockExists(stock["quote"]):
+            self.domain.addStockToStockList(stock)
+            with ThreadPoolExecutor(max_workers=self.LESS_WORKERS) as executor:
+                executor.submit(self.domain.downloadAndSaveStockCurrentData, stock)
+                executor.submit(self.domain.downloadAndSaveStockDataDaysFromToday, stock, self.DAYS_FROM_TODAY)
+                executor.submit(self.domain.downloadAndSaveStockHistoricalData, stock)
