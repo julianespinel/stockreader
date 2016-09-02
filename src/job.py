@@ -45,3 +45,6 @@ class Job:
     def addStocksListToStockreader(self, stocks):
         for stock in stocks:
             self.addStockToStockreader(stock)
+
+    def getNumberOfWorkers(self, anyList):
+        return len(anyList) if len(anyList) < self.WORKERS else self.WORKERS
