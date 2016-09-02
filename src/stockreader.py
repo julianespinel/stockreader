@@ -52,7 +52,7 @@ download = download.Download()
 domain = domain.Domain(mongo, download)
 
 scheduler = BackgroundScheduler()
-job = job.Job(mongo, domain, scheduler)
+job = job.Job(domain, scheduler)
 
 exchanges = config["exchanges"]
 stocks = readStocksFromExchangeFile(exchanges, NYSE)

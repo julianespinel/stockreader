@@ -5,25 +5,24 @@ class Job:
     WORKERS = 8
     DAYS_FROM_TODAY = 7
 
-    def __init__(self, mongo, domain, scheduler):
-        self.mongo = mongo
+    def __init__(self, domain, scheduler):
         self.domain = domain
         self.scheduler = scheduler
 
     def downloadAndSaveStockCurrentDataInParallel(self):
-        stocks = self.mongo.readStocksFromStockList()
+        stocks = self.domain.getStockList()
         with ThreadPoolExecutor(max_workers=self.WORKERS) as executor:
             for stock in stocks:
                 executor.submit(self.domain.downloadAndSaveStockCurrentData, stock)
 
     def downloadAndSaveStockWeeklyDataInParallel(self):
-        stocks = self.mongo.readStocksFromStockList()
+        stocks = self.domain.getStockList()
         with ThreadPoolExecutor(max_workers=self.WORKERS) as executor:
             for stock in stocks:
                 executor.submit(self.domain.downloadAndSaveStockDataDaysFromToday, stock, self.DAYS_FROM_TODAY)
 
     def downloadAndSaveStockHistoricalDataInParallel(self):
-        stocks = self.mongo.readStocksFromStockList()
+        stocks = self.domain.getStockList()
         with ThreadPoolExecutor(max_workers=self.WORKERS) as executor:
             for stock in stocks:
                 executor.submit(self.domain.downloadAndSaveStockHistoricalData, stock)
