@@ -17,6 +17,9 @@ class Job:
         self.domain = domain
         self.scheduler = scheduler
 
+    def getNumberOfWorkers(self, anyList):
+        return len(anyList) if len(anyList) < self.WORKERS else self.WORKERS
+
     def downloadAndSaveStockCurrentDataInParallel(self, stocks):
         numberOfWorkers = self.getNumberOfWorkers(stocks)
         with ThreadPoolExecutor(max_workers=numberOfWorkers) as executor:
@@ -58,6 +61,3 @@ class Job:
     def addStocksListToStockreader(self, stocks):
         for stock in stocks:
             self.addStockToStockreader(stock)
-
-    def getNumberOfWorkers(self, anyList):
-        return len(anyList) if len(anyList) < self.WORKERS else self.WORKERS
