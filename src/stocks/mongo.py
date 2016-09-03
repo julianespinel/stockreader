@@ -65,8 +65,9 @@ class Mongo:
     def saveStockHistoricalData(self, quote, stockHistoricalDataArray):
         if len(stockHistoricalDataArray) > 0:
             try:
-                stockHistoricalDataCollection = self.db[quote + "_historical_data"]
-                stockHistoricalDataCollection.create_index([("Symbol", pymongo.ASCENDING), ("Date", pymongo.DESCENDING)], unique=True)
+                collection_name = quote + self.HISTORICAL_DATA_SUFIX
+                self.create_historical_collection_if_not_exists(collection_name)
+                stockHistoricalDataCollection = self.db[collection_name]
                 stockHistoricalDataCollection.insert_many(stockHistoricalDataArray, ordered=False)
             except (DuplicateKeyError, BulkWriteError) as err:
                 logger.error("saveStockHistoricalData: %s %i %s", quote, len(stockHistoricalDataArray), err)
