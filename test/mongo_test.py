@@ -3,7 +3,7 @@ import unittest
 import pymongo
 
 from src.stocks import mongo
-
+from src.infrastructure import json
 
 class MongoTest(unittest.TestCase):
 
@@ -116,6 +116,7 @@ class MongoTest(unittest.TestCase):
                 "Symbol": "BAC"
             }
         ]
+        stockHistoricalDataArray = json.json_keys_to_lower_and_snake_case(stockHistoricalDataArray)
         self.mongo.saveStockHistoricalData(quote, stockHistoricalDataArray)
         historicalStockEntries = len(self.mongo.getStockHistoricalData(quote))
         self.assertEquals(len(stockHistoricalDataArray), historicalStockEntries)
@@ -140,6 +141,7 @@ class MongoTest(unittest.TestCase):
             "Symbol" : "BAC",
             "YearLow" : "10.990"
         }
+        stockCurrentData = json.json_keys_to_lower_and_snake_case(stockCurrentData)
         self.mongo.upsertStockCurrentData(quote, stockCurrentData)
         currentData = self.mongo.getStockCurrentData(quote)
         currentData.pop("_id") # Remove MongoDB generated ID to match with stockCurrentData
