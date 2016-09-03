@@ -1,3 +1,4 @@
+import os
 import logging
 from logging.handlers import RotatingFileHandler
 
@@ -11,7 +12,9 @@ def getLoggerHandler(logFileName):
 def getLogger(loggerName):
     logger = logging.getLogger(loggerName)
     logger.setLevel(logging.INFO)
-    logFileName = "logs/reader.log"
-    handler = getLoggerHandler(logFileName)
+    directory = "logs"
+    file_name = "stockreader.log"
+    os.makedirs(directory, exist_ok=True)
+    handler = getLoggerHandler(directory + "/" + file_name)
     logger.addHandler(handler)
     return logger
