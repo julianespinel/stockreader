@@ -7,6 +7,28 @@ logger = log.getLogger("mongo")
 
 class Mongo:
 
+    SYMBOL_KEY = "symbol"
+    DATE_KEY = "date"
+
+    TRADING_DAYS_PER_YEAR = 252
+
+    STOCK_LIST = "stocklist"
+    STOCKS_CURRENT_DATA = "stocks_current_data"
+    HISTORICAL_DATA_SUFIX = "_historical_data"
+
+    def collection_exists(self, collection_name):
+        return collection_name in self.db.collection_names()
+
+    def create_regular_collection_if_not_exists(self, collection_name, index_key):
+        if not self.collection_exists(collection_name):
+            collection = self.db[collection_name]
+            collection.create_index([(index_key, pymongo.ASCENDING)], unique=True)
+
+    def create_historical_collection_if_not_exists(self, collection_name):
+        if not self.collection_exists(collection_name):
+            collection = self.db[collection_name]
+            collection.create_index([(self.SYMBOL_KEY, pymongo.ASCENDING), (self.DATE_KEY, pymongo.DESCENDING)], unique=True)
+
     def __init__(self, dbHost, dbPort, dbName):
         client = MongoClient(dbHost, dbPort)
         self.db = client[dbName]
