@@ -1,6 +1,9 @@
 from datetime import date, timedelta
 from concurrent.futures import ThreadPoolExecutor
 
+from infrastructure import log
+logger = log.getLogger("job")
+
 class Job:
 
     WEEKS_AGO = 1
@@ -52,7 +55,9 @@ class Job:
         self.scheduler.start()
 
     def addStockToStockreader(self, stock):
-        if not self.domain.stockExists(stock["quote"]):
+        symbol = stock["symbol"]
+        logger.info('adding stock %s', symbol)
+        if not self.domain.stockExists(symbol):
             self.domain.addStockToStockList(stock)
             self.downloadAndSaveStockCurrentDataInParallel([stock])
             self.downloadAndSaveStockWeeklyDataInParallel([stock])
