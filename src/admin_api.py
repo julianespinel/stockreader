@@ -1,5 +1,4 @@
 from flask import Blueprint, jsonify
-from flask_restful import Resource
 
 import infrastructure as log
 
