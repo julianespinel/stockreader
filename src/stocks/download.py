@@ -1,5 +1,6 @@
 import urllib
 import requests
+from infrastructure import json
 
 class Download:
 
@@ -16,6 +17,7 @@ class Download:
             stockHistoricalDataArray = response["query"]["results"]["quote"]
         else:
             stockHistoricalDataArray = []
+        stockHistoricalDataArray = json.json_keys_to_lower_and_snake_case(stockHistoricalDataArray)
         return stockHistoricalDataArray
 
     def getStockCurrentData(self, quote):
@@ -31,4 +33,5 @@ class Download:
             stockCurrentData = response["query"]["results"]["quote"]
         else:
             stockCurrentData = None
+        stockCurrentData = json.json_keys_to_lower_and_snake_case(stockCurrentData)
         return stockCurrentData

@@ -16,7 +16,7 @@ class ReadTest(unittest.TestCase):
         stock = stocks[0]
         # Check stock structure
         self.assertIsNotNone(stock["name"])
-        self.assertIsNotNone(stock["quote"])
+        self.assertIsNotNone(stock["symbol"])
         self.assertIsNotNone(stock["stockMarket"])
 
     def testReadStocksFromMultipleFiles(self):
@@ -32,5 +32,5 @@ class ReadTest(unittest.TestCase):
         stock = stocks[0]
         # Check stock structure
         self.assertIsNotNone(stock["name"])
-        self.assertIsNotNone(stock["quote"])
+        self.assertIsNotNone(stock["symbol"])
         self.assertIsNotNone(stock["stockMarket"])

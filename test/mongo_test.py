@@ -3,7 +3,7 @@ import unittest
 import pymongo
 
 from src.stocks import mongo
-
+from src.infrastructure import json
 
 class MongoTest(unittest.TestCase):
 
@@ -22,39 +22,62 @@ class MongoTest(unittest.TestCase):
         stockCount = len(self.mongo.readStocksFromStockList())
         self.assertEquals(0, stockCount)
         stocks = [
-            { "name": "Bank of America", "quote": "BAC", "stockMarket": "NYSE" },
-            { "name": "Tesla", "quote": "TSLA", "stockMarket": "NASDAQ" },
-            { "name": "Twitter", "quote": "TWTR", "stockMarket": "NYSE" },
-            { "name": "Facebook", "quote": "FB", "stockMarket": "NASDAQ" }
+            { "name": "Bank of America", "symbol": "BAC", "stockMarket": "NYSE" },
+            { "name": "Tesla", "symbol": "TSLA", "stockMarket": "NASDAQ" },
+            { "name": "Twitter", "symbol": "TWTR", "stockMarket": "NYSE" },
+            { "name": "Facebook", "symbol": "FB", "stockMarket": "NASDAQ" }
         ]
         self.mongo.saveStockList(stocks)
         stockCount = len(self.mongo.readStocksFromStockList())
         self.assertEquals(len(stocks), stockCount)
 
+    def testSaveStockList_NOK_duplicateStock(self):
+        stockCount = len(self.mongo.readStocksFromStockList())
+        self.assertEquals(0, stockCount)
+        stocks = [
+            { "name": "Bank of America", "symbol": "BAC", "stockMarket": "NYSE" },
+            { "name": "Tesla", "symbol": "TSLA", "stockMarket": "NASDAQ" },
+            { "name": "Tesla", "symbol": "TSLA", "stockMarket": "NASDAQ" },
+            { "name": "Twitter", "symbol": "TWTR", "stockMarket": "NYSE" },
+            { "name": "Facebook", "symbol": "FB", "stockMarket": "NASDAQ" }
+        ]
+        self.mongo.saveStockList(stocks)
+        stockCount = len(self.mongo.readStocksFromStockList())
+        self.assertEquals(len(stocks) - 1, stockCount)
+
     def testStockExists_OK(self):
         stockCount = len(self.mongo.readStocksFromStockList())
         self.assertEquals(0, stockCount)
         stocks = [
-            {"name": "Twitter", "quote": "TWTR", "stockMarket": "NYSE"},
-            {"name": "Facebook", "quote": "FB", "stockMarket": "NASDAQ"}
+            {"name": "Twitter", "symbol": "TWTR", "stockMarket": "NYSE"},
+            {"name": "Facebook", "symbol": "FB", "stockMarket": "NASDAQ"}
         ]
         self.mongo.saveStockList(stocks)
         stockCount = len(self.mongo.readStocksFromStockList())
         self.assertEquals(len(stocks), stockCount)
         self.assertTrue(self.mongo.stockExists("FB"))
 
+    def testStockExists_NOK_emptyStockList(self):
+        stockCount = len(self.mongo.readStocksFromStockList())
+        self.assertEquals(0, stockCount)
+        stocks = []
+        self.mongo.saveStockList(stocks)
+        stockCount = len(self.mongo.readStocksFromStockList())
+        self.assertEquals(len(stocks), stockCount)
+        self.assertFalse(self.mongo.stockExists("FB"))
+
     def testGetStockByQuote_OK(self):
         stockCount = len(self.mongo.readStocksFromStockList())
         self.assertEquals(0, stockCount)
         stocks = [
-            { "name": "Twitter", "quote": "TWTR", "stockMarket": "NYSE" },
-            { "name": "Facebook", "quote": "FB", "stockMarket": "NASDAQ" }
+            { "name": "Twitter", "symbol": "TWTR", "stockMarket": "NYSE" },
+            { "name": "Facebook", "symbol": "FB", "stockMarket": "NASDAQ" }
         ]
         self.mongo.saveStockList(stocks)
         stockCount = len(self.mongo.readStocksFromStockList())
         self.assertEquals(len(stocks), stockCount)
         expectedStock = stocks[0]
-        stockByQuote = self.mongo.getStockByQuote(expectedStock["quote"])
+        stockByQuote = self.mongo.getStockByQuote(expectedStock["symbol"])
         self.assertEquals(expectedStock, stockByQuote)
 
     def testSaveStockHistoricalData_OK(self):
@@ -93,6 +116,7 @@ class MongoTest(unittest.TestCase):
                 "Symbol": "BAC"
             }
         ]
+        stockHistoricalDataArray = json.json_keys_to_lower_and_snake_case(stockHistoricalDataArray)
         self.mongo.saveStockHistoricalData(quote, stockHistoricalDataArray)
         historicalStockEntries = len(self.mongo.getStockHistoricalData(quote))
         self.assertEquals(len(stockHistoricalDataArray), historicalStockEntries)
@@ -117,6 +141,7 @@ class MongoTest(unittest.TestCase):
             "Symbol" : "BAC",
             "YearLow" : "10.990"
         }
+        stockCurrentData = json.json_keys_to_lower_and_snake_case(stockCurrentData)
         self.mongo.upsertStockCurrentData(quote, stockCurrentData)
         currentData = self.mongo.getStockCurrentData(quote)
         currentData.pop("_id") # Remove MongoDB generated ID to match with stockCurrentData

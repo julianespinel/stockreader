@@ -63,8 +63,6 @@ app.register_blueprint(admin_blueprint, url_prefix='/stockreader/admin')
 stocks_api = stocks_api.get_stocks_blueprint(domain, job)
 app.register_blueprint(stocks_api, url_prefix='/stockreader/api/stocks')
 
-print(app.url_map)
-
 server = config["server"]
 host = server["host"]
 port = server["port"]

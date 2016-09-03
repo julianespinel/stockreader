@@ -1,4 +1,3 @@
-pip install -r ../requirements.txt
-mongo createdb.js
 cd ..
+pip install -r requirements.txt
 python src/stockreader.py config-standalone.toml &

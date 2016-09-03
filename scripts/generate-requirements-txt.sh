@@ -1,2 +1,2 @@
 cd ..
-pipreqs ./
+pipreqs --force ./

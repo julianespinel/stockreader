@@ -14,7 +14,7 @@ class DomainTest(unittest.TestCase):
 
     def testDownloadAndSaveStockCurrentData_OK(self):
         quote = "BAC"
-        stock = { "name": "Bank of America", "quote": quote, "stockMarket": "NYSE" }
+        stock = { "name": "Bank of America", "symbol": quote, "stockMarket": "NYSE" }
         stockCurrentData = {
             "symbol" : "BAC",
             "DaysLow" : "13.780",
@@ -39,7 +39,7 @@ class DomainTest(unittest.TestCase):
 
     def testDownloadAndSaveStockCurrentData_NOK_emptyStockCurrentData(self):
         quote = "BAC"
-        stock = { "name": "Bank of America", "quote": quote, "stockMarket": "NYSE" }
+        stock = { "name": "Bank of America", "symbol": quote, "stockMarket": "NYSE" }
         stockCurrentData = None
         self.downloadMock.getStockCurrentData = Mock(return_value=stockCurrentData)
         self.mongoMock.upsertStockCurrentData = Mock()
@@ -51,7 +51,7 @@ class DomainTest(unittest.TestCase):
         initialDate = date(2006, 9, 1)
         finalDate = date(2016, 9, 1)
         quote = "BAC"
-        stock = { "name": "Bank of America", "quote": quote, "stockMarket": "NYSE" }
+        stock = { "name": "Bank of America", "symbol": quote, "stockMarket": "NYSE" }
         stockHistoricalDataArray = [
             {
                 "Adj_Close": "13.79",
@@ -94,7 +94,7 @@ class DomainTest(unittest.TestCase):
         initialDate = date(2006, 9, 1)
         finalDate = date(2016, 9, 1)
         quote = "BAC"
-        stock = { "name": "Bank of America", "quote": quote, "stockMarket": "NYSE" }
+        stock = { "name": "Bank of America", "symbol": quote, "stockMarket": "NYSE" }
         stockHistoricalDataArray = []
         self.downloadMock.getStockHistoricalData = Mock(return_value=stockHistoricalDataArray)
         self.mongoMock.saveStockHistoricalData = Mock()
@@ -118,9 +118,9 @@ class DomainTest(unittest.TestCase):
 
     def testGetStockList_OK(self):
         expectedStockList = [
-            { "stockMarket" : "nyse", "name" : "Valspar", "quote" : "VAL" },
-            { "stockMarket" : "nyse", "name" : "Trinseo", "quote" : "TSE" },
-            { "stockMarket" : "nyse", "name" : "Celestica", "quote" : "CLS" }
+            { "stockMarket" : "nyse", "name" : "Valspar", "symbol" : "VAL" },
+            { "stockMarket" : "nyse", "name" : "Trinseo", "symbol" : "TSE" },
+            { "stockMarket" : "nyse", "name" : "Celestica", "symbol" : "CLS" }
         ]
         self.mongoMock.readStocksFromStockList = Mock(return_value=expectedStockList)
         stockList = self.domain.getStockList()
@@ -135,7 +135,7 @@ class DomainTest(unittest.TestCase):
         self.mongoMock.readStocksFromStockList.assert_called_once_with()
 
     def testAddStockToStockList_OK(self):
-        stock = { "stockMarket" : "nyse", "name" : "Trinseo", "quote" : "TSE" }
+        stock = { "stockMarket" : "nyse", "name" : "Trinseo", "symbol" : "TSE" }
         self.mongoMock.saveStockList = Mock()
         self.domain.addStockToStockList(stock)
         self.mongoMock.saveStockList.assert_called_once_with([stock])
