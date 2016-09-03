@@ -10,13 +10,14 @@ class Domain:
         self.download = download
 
     def downloadAndSaveStockCurrentData(self, stock):
-        quote = stock["quote"]
+        quote = stock["symbol"]
         logger.info("stock %s", quote)
         stockCurrentData = self.download.getStockCurrentData(quote)
         self.mongo.upsertStockCurrentData(quote, stockCurrentData)
 
     def downloadAndSaveStockHistoricalData(self, initialDate, finalDate, stock):
-        quote = stock["quote"]
+        quote = stock["symbol"]
+        logger.info('stocks %s, %s, %s', initialDate, finalDate, quote)
         stockHistoricalDataArray = self.download.getStockHistoricalData(initialDate, finalDate, quote)
         self.mongo.saveStockHistoricalData(quote, stockHistoricalDataArray)
 

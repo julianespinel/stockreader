@@ -15,7 +15,7 @@ class Read:
             name = firstArray[0].strip()
             secondArray = firstArray[1].split(")")
             quote = secondArray[0].strip()
-            stock = { "name": name, "quote": quote, "stockMarket": stockMarket }
+            stock = { "name": name, "symbol": quote, "stockMarket": stockMarket }
             stocks.append(stock)
         return stocks
 
