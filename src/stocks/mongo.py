@@ -46,20 +46,20 @@ class Mongo:
 
     def readStocksFromStockList(self):
         stocks = []
-        stocklistCollection = self.db["stocklist"]
+        stocklistCollection = self.db[self.STOCK_LIST]
         cursor = stocklistCollection.find()
         for stock in cursor:
             stocks.append(stock)
         return stocks
 
     def stockExists(self, quote):
-        stockCurrentDataCollection = self.db["stocklist"]
-        cursor = stockCurrentDataCollection.find({ "quote": quote }).limit(1)
+        stockCurrentDataCollection = self.db[self.STOCK_LIST]
+        cursor = stockCurrentDataCollection.find({ self.SYMBOL_KEY: quote }).limit(1)
         return (cursor.count() > 0)
 
     def getStockByQuote(self, quote):
-        stocklistCollection = self.db["stocklist"]
-        stock = stocklistCollection.find_one({"quote": quote})
+        stocklistCollection = self.db[self.STOCK_LIST]
+        stock = stocklistCollection.find_one({ self.SYMBOL_KEY: quote })
         return stock
 
     def saveStockHistoricalData(self, quote, stockHistoricalDataArray):
@@ -73,9 +73,8 @@ class Mongo:
                 logger.error("saveStockHistoricalData: %s %i %s", quote, len(stockHistoricalDataArray), err)
 
     def getStockHistoricalData(self, quote):
-        stockHistoricalDataCollection = self.db[quote + "_historical_data"]
-        tradingDaysInOneYear = 252
-        cursor = stockHistoricalDataCollection.find({ "Symbol": quote }).limit(tradingDaysInOneYear)
+        stockHistoricalDataCollection = self.db[quote + self.HISTORICAL_DATA_SUFIX]
+        cursor = stockHistoricalDataCollection.find({ self.SYMBOL_KEY: quote }).limit(self.TRADING_DAYS_PER_YEAR)
         return list(cursor)
 
     def upsertStockCurrentData(self, quote, stockCurrentData):
@@ -88,6 +87,6 @@ class Mongo:
                 logger.error("saveStockCurrentData: %s", err)
 
     def getStockCurrentData(self, quote):
-        stockCurrentDataCollection = self.db["stocks_current_data"]
-        stock = stockCurrentDataCollection.find_one({ "symbol": quote })
+        stockCurrentDataCollection = self.db[self.STOCKS_CURRENT_DATA]
+        stock = stockCurrentDataCollection.find_one({ self.SYMBOL_KEY: quote })
         return stock
