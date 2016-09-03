@@ -32,13 +32,14 @@ class Mongo:
     def __init__(self, dbHost, dbPort, dbName):
         client = MongoClient(dbHost, dbPort)
         self.db = client[dbName]
+        self.create_regular_collection_if_not_exists(self.STOCK_LIST, self.SYMBOL_KEY)
+        self.create_regular_collection_if_not_exists(self.STOCKS_CURRENT_DATA, self.SYMBOL_KEY)
 
     # Do not use map and filter for side effects: http://stackoverflow.com/a/18433519/2420718
     def saveStockList(self, stocks):
         if len(stocks) > 0:
             try:
-                stocklistCollection = self.db["stocklist"]
-                stocklistCollection.create_index([("quote", pymongo.ASCENDING)], unique=True)
+                stocklistCollection = self.db[self.STOCK_LIST]
                 stocklistCollection.insert_many(stocks, ordered=False)
             except (DuplicateKeyError, BulkWriteError) as err:
                 logger.error("saveStockList: %i %s", len(stocks), err)
@@ -79,9 +80,8 @@ class Mongo:
     def upsertStockCurrentData(self, quote, stockCurrentData):
         if stockCurrentData is not None:
             try:
-                stockCurrentDataCollection = self.db["stocks_current_data"]
-                stockCurrentDataCollection.create_index([("symbol", pymongo.ASCENDING)], unique=True)
-                query = {"symbol": quote}
+                stockCurrentDataCollection = self.db[self.STOCKS_CURRENT_DATA]
+                query = { self.SYMBOL_KEY: quote }
                 stockCurrentDataCollection.replace_one(query, stockCurrentData, upsert=True)
             except DuplicateKeyError as err:
                 logger.error("saveStockCurrentData: %s", err)
