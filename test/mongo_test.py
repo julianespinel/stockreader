@@ -1,8 +1,9 @@
 import unittest
+
 import pymongo
 
-from .context import src
-from src import mongo
+from src.stocks import mongo
+
 
 class MongoTest(unittest.TestCase):
 

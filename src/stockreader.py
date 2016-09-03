@@ -1,15 +1,9 @@
 import sys
 import toml
 
-import job
-import read
-import mongo
-import domain
-import download
-import stocks_api
-import admin_api
-
-import infrastructure as log
+from infrastructure import log
+from admin import admin_api
+from stocks import job, read, mongo, domain, download, stocks_api
 
 from tornado.wsgi import WSGIContainer
 from tornado.httpserver import HTTPServer
@@ -64,9 +58,12 @@ job.scheduleStockUpdates()
 
 # Start the flask server
 app = Flask(__name__)
-app.register_blueprint(admin_api, url_prefix='/stockreader/admin')
+admin_blueprint = admin_api.get_admin_blueprint()
+app.register_blueprint(admin_blueprint, url_prefix='/stockreader/admin')
 stocks_api = stocks_api.get_stocks_blueprint(domain, job)
 app.register_blueprint(stocks_api, url_prefix='/stockreader/api/stocks')
+
+print(app.url_map)
 
 server = config["server"]
 host = server["host"]

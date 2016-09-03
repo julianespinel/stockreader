@@ -1,4 +1,4 @@
-import infrastructure as log
+from infrastructure import log
 from datetime import date, timedelta
 
 logger = log.getLogger("domain")

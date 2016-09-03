@@ -2,10 +2,9 @@ import unittest
 from unittest.mock import Mock
 
 from flask import Flask, json
-from flask import request
 
-from .context import src
-from src import stocks_api
+from src.stocks import stocks_api
+
 
 class ApiTest(unittest.TestCase):
 

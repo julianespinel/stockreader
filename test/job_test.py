@@ -1,8 +1,8 @@
 import unittest
 from unittest.mock import Mock
 
-from .context import src
-from src import job
+from src.stocks import job
+
 
 class JobTest(unittest.TestCase):
 
