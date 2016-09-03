@@ -84,7 +84,7 @@ class Mongo:
                 query = { self.SYMBOL_KEY: quote }
                 stockCurrentDataCollection.replace_one(query, stockCurrentData, upsert=True)
             except DuplicateKeyError as err:
-                logger.error("saveStockCurrentData: %s", err)
+                logger.error("saveStockCurrentData: %s %s", quote, err)
 
     def getStockCurrentData(self, quote):
         stockCurrentDataCollection = self.db[self.STOCKS_CURRENT_DATA]
