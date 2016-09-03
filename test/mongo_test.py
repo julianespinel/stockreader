@@ -31,6 +31,20 @@ class MongoTest(unittest.TestCase):
         stockCount = len(self.mongo.readStocksFromStockList())
         self.assertEquals(len(stocks), stockCount)
 
+    def testSaveStockList_NOK_duplicateStock(self):
+        stockCount = len(self.mongo.readStocksFromStockList())
+        self.assertEquals(0, stockCount)
+        stocks = [
+            { "name": "Bank of America", "symbol": "BAC", "stockMarket": "NYSE" },
+            { "name": "Tesla", "symbol": "TSLA", "stockMarket": "NASDAQ" },
+            { "name": "Tesla", "symbol": "TSLA", "stockMarket": "NASDAQ" },
+            { "name": "Twitter", "symbol": "TWTR", "stockMarket": "NYSE" },
+            { "name": "Facebook", "symbol": "FB", "stockMarket": "NASDAQ" }
+        ]
+        self.mongo.saveStockList(stocks)
+        stockCount = len(self.mongo.readStocksFromStockList())
+        self.assertEquals(len(stocks) - 1, stockCount)
+
     def testStockExists_OK(self):
         stockCount = len(self.mongo.readStocksFromStockList())
         self.assertEquals(0, stockCount)
