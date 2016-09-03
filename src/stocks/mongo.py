@@ -1,8 +1,8 @@
 import pymongo
 from pymongo import MongoClient
 from pymongo.errors import DuplicateKeyError, BulkWriteError
-from infrastructure import log
 
+from infrastructure import log
 logger = log.getLogger("mongo")
 
 class Mongo:
