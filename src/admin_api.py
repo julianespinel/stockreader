@@ -1,11 +1,11 @@
-from flask import request
-from flask_restful import Resource
+from flask import Blueprint, jsonify
 
 import infrastructure as log
 
 logger = log.getLogger("admin_api")
 
-class AdminAPI(Resource):
-    def get(self):
-        response = { "message": "pong" }, 200
-        return response
+admin_api = Blueprint('admin_api', __name__)
+
+@admin_api.route('/ping')
+def ping():
+    return jsonify({ "message": "pong" }), 200

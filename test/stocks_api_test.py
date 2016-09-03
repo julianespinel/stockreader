@@ -3,7 +3,6 @@ from unittest.mock import Mock
 
 from flask import Flask, json
 from flask import request
-from flask_restful import Api
 
 from .context import src
 from src import stocks_api
@@ -13,12 +12,10 @@ class ApiTest(unittest.TestCase):
     def setUp(self):
         app = Flask(__name__)
         app.config['DEBUG'] = True
-        flaskApi = Api()
         self.domainMock = Mock()
         self.jobMock = Mock()
-        flaskApi.add_resource(stocks_api.StocksAPI, "/stockreader/api/stocks",
-                              resource_class_kwargs={"domain": self.domainMock, "job": self.jobMock})
-        flaskApi.init_app(app)
+        stocks_blueprint = stocks_api.get_stocks_blueprint(self.domainMock, self.jobMock)
+        app.register_blueprint(stocks_blueprint, url_prefix='/stockreader/api/stocks')
         self.client = app.test_client()
 
     def testAddStock_NOK_emptyRequestBody(self):

@@ -6,8 +6,8 @@ import read
 import mongo
 import domain
 import download
-from stocks_api import StocksAPI
-from admin_api import AdminAPI
+import stocks_api
+import admin_api
 
 import infrastructure as log
 
@@ -16,7 +16,6 @@ from tornado.httpserver import HTTPServer
 from tornado.ioloop import IOLoop
 
 from flask import Flask
-from flask_restful import Api
 
 from apscheduler.schedulers.background import BackgroundScheduler
 
@@ -65,9 +64,10 @@ job.scheduleStockUpdates()
 
 # Start the flask server
 app = Flask(__name__)
-api = Api(app)
-api.add_resource(StocksAPI, "/stockreader/api/stocks", resource_class_kwargs={"domain": domain, "job": job})
-api.add_resource(AdminAPI, "/stockreader/admin/ping")
+app.register_blueprint(admin_api, url_prefix='/stockreader/admin')
+stocks_api = stocks_api.get_stocks_blueprint(domain, job)
+app.register_blueprint(stocks_api, url_prefix='/stockreader/api/stocks')
+
 server = config["server"]
 host = server["host"]
 port = server["port"]
