@@ -1,6 +1,7 @@
+APScheduler==3.2.0
 Flask==0.11.1
 pymongo==3.2.1
 requests==2.10.0
 toml==0.9.1
-tornado==4.3
-apscheduler==3.2.0
+inflection==0.3.1
+tornado==4.4.1
