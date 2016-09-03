@@ -1,9 +1,9 @@
 import unittest
+from datetime import date
 from unittest.mock import Mock
-from datetime import date, timedelta
 
-from .context import src
-from src import domain
+from src.stocks import domain
+
 
 class DomainTest(unittest.TestCase):
 

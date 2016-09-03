@@ -2,14 +2,14 @@ import threading
 
 from flask import request, Blueprint, jsonify
 
-import infrastructure as log
+from infrastructure import log
 
 logger = log.getLogger("stocks_api")
 
 def get_stocks_blueprint(domain, job):
-    stocks_api = Blueprint('/stocks', __name__)
+    stocks_blueprint = Blueprint('stocks_api', __name__)
 
-    @stocks_api.route('', methods=['POST'])
+    @stocks_blueprint.route('', methods=['POST'])
     def add_stock():
         response = None
         newStock = request.get_json()
@@ -35,4 +35,4 @@ def get_stocks_blueprint(domain, job):
         response = jsonify({ "success": "The stock " + quote + " is being added" }), 202
         return response
 
-    return stocks_api
+    return stocks_blueprint

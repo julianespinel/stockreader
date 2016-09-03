@@ -1,8 +1,8 @@
 import datetime
 import unittest
 
-from .context import src
-from src import download
+from src.stocks import download
+
 
 class DownloadTest(unittest.TestCase):
 

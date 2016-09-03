@@ -1,7 +1,7 @@
 import unittest
 
-from .context import src
-from src import read
+from src.stocks import read
+
 
 class ReadTest(unittest.TestCase):
 

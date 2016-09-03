@@ -1,5 +1,5 @@
 import csv
-import infrastructure as log
+from infrastructure import log
 
 logger = log.getLogger("read")
 
