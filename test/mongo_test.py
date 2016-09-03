@@ -22,10 +22,10 @@ class MongoTest(unittest.TestCase):
         stockCount = len(self.mongo.readStocksFromStockList())
         self.assertEquals(0, stockCount)
         stocks = [
-            { "name": "Bank of America", "quote": "BAC", "stockMarket": "NYSE" },
-            { "name": "Tesla", "quote": "TSLA", "stockMarket": "NASDAQ" },
-            { "name": "Twitter", "quote": "TWTR", "stockMarket": "NYSE" },
-            { "name": "Facebook", "quote": "FB", "stockMarket": "NASDAQ" }
+            { "name": "Bank of America", "symbol": "BAC", "stockMarket": "NYSE" },
+            { "name": "Tesla", "symbol": "TSLA", "stockMarket": "NASDAQ" },
+            { "name": "Twitter", "symbol": "TWTR", "stockMarket": "NYSE" },
+            { "name": "Facebook", "symbol": "FB", "stockMarket": "NASDAQ" }
         ]
         self.mongo.saveStockList(stocks)
         stockCount = len(self.mongo.readStocksFromStockList())
@@ -35,8 +35,8 @@ class MongoTest(unittest.TestCase):
         stockCount = len(self.mongo.readStocksFromStockList())
         self.assertEquals(0, stockCount)
         stocks = [
-            {"name": "Twitter", "quote": "TWTR", "stockMarket": "NYSE"},
-            {"name": "Facebook", "quote": "FB", "stockMarket": "NASDAQ"}
+            {"name": "Twitter", "symbol": "TWTR", "stockMarket": "NYSE"},
+            {"name": "Facebook", "symbol": "FB", "stockMarket": "NASDAQ"}
         ]
         self.mongo.saveStockList(stocks)
         stockCount = len(self.mongo.readStocksFromStockList())
@@ -47,14 +47,14 @@ class MongoTest(unittest.TestCase):
         stockCount = len(self.mongo.readStocksFromStockList())
         self.assertEquals(0, stockCount)
         stocks = [
-            { "name": "Twitter", "quote": "TWTR", "stockMarket": "NYSE" },
-            { "name": "Facebook", "quote": "FB", "stockMarket": "NASDAQ" }
+            { "name": "Twitter", "symbol": "TWTR", "stockMarket": "NYSE" },
+            { "name": "Facebook", "symbol": "FB", "stockMarket": "NASDAQ" }
         ]
         self.mongo.saveStockList(stocks)
         stockCount = len(self.mongo.readStocksFromStockList())
         self.assertEquals(len(stocks), stockCount)
         expectedStock = stocks[0]
-        stockByQuote = self.mongo.getStockByQuote(expectedStock["quote"])
+        stockByQuote = self.mongo.getStockByQuote(expectedStock["symbol"])
         self.assertEquals(expectedStock, stockByQuote)
 
     def testSaveStockHistoricalData_OK(self):
