@@ -25,8 +25,6 @@ This recurring tasks guarantee that the system has the historical stock data of 
 
 ## How to install?
 
-In order to install Stockreader you only have to install the dependencies required by the system (docker and docker-compose) and then run 3 commands in the terminal.
-
 #### 1. Dependencies
 
 The only two dependencies stockreader needs to install are:
@@ -47,5 +45,5 @@ If you can see `pong` in the web browser, then Stockreader is being correctly in
 
 ## How to use?
 
-Stockreader has a simple HTTP API. Throught it you can request stock current data and historical data. <br>
+Stockreader has a simple HTTP API,  with it you can request stock current data and historical data. <br>
 Please refer to the API documentation. * link.
