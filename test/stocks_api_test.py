@@ -1,5 +1,6 @@
 import unittest
 from unittest.mock import Mock
+import test.factories as factories
 
 from flask import Flask, json
 
@@ -25,7 +26,7 @@ class ApiTest(unittest.TestCase):
         self.assertEquals(expectedErrorMessage, data["error"])
 
     def testAddStock_NOK_notValidStock(self):
-        stock = { "name": "Bank of America", "symbol": "", "stockMarket": "" }
+        stock = factories.getNotValidStockData()
         response = self.client.post("/stockreader/api/stocks", data=json.dumps(stock), content_type="application/json")
         self.assertEquals(response.status_code, 400)
         data = json.loads(response.data)
@@ -33,9 +34,9 @@ class ApiTest(unittest.TestCase):
         self.assertEquals(expectedErrorMessage, data["error"])
 
     def testAddStock_NOK_existingStock(self):
+        stock = factories.getStockData()
+        quote = stock["symbol"]
         self.domainMock.stockExists = Mock(return_value=True)
-        quote = "BAC"
-        stock = { "name": "Bank of America", "symbol": quote, "stockMarket": "NYSE" }
         response = self.client.post("/stockreader/api/stocks", data=json.dumps(stock), content_type="application/json")
         self.domainMock.stockExists.assert_called_once_with(quote)
         self.assertEquals(response.status_code, 409)
@@ -44,9 +45,9 @@ class ApiTest(unittest.TestCase):
         self.assertEquals(expectedErrorMessage, data["error"])
 
     def testAddStock_OK(self):
+        stock = factories.getStockData()
+        quote = stock["symbol"]
         self.domainMock.stockExists = Mock(return_value=False)
-        quote = "BAC"
-        stock = { "name": "Bank of America", "symbol": quote, "stockMarket": "NYSE" }
         response = self.client.post("/stockreader/api/stocks", data=json.dumps(stock), content_type="application/json")
         self.domainMock.stockExists.assert_called_once_with(quote)
         self.assertEquals(response.status_code, 202)
