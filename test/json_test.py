@@ -1,20 +1,13 @@
 import unittest
+import test.factories as factories
 
 from src.infrastructure import json
 
 class JsonTest(unittest.TestCase):
 
     def test_json_keys_to_lower_case_OK_single_element(self):
-        element = {
-            "Adj_Close": "13.79",
-            "Date": "2016-03-18",
-            "Close": "13.79",
-            "Volume": "145037500",
-            "Open": "13.68",
-            "Low": "13.55",
-            "High": "13.88",
-            "Symbol": "BAC"
-        }
+        historicalDataArray = factories.getStockHistoricalDataArray()
+        element = historicalDataArray[0]
         json_lower_case_keys = json.json_keys_to_lower_and_snake_case(element)
         # Check structure
         self.assertEqual(len(element.keys()), len(json_lower_case_keys.keys()))
@@ -30,22 +23,7 @@ class JsonTest(unittest.TestCase):
 
     def test_json_keys_to_lower_case_OK_single_element_with_duplicated_key(self):
         # The symbol and Symbol (lower and upper case) will be symbol after the method
-        element = {
-            "symbol": "YHOO",
-            "AverageDailyVolume": "11160200",
-            "Change": "+0.35",
-            "DaysLow": "43.08",
-            "DaysHigh": "43.60",
-            "YearLow": "26.15",
-            "YearHigh": "43.60",
-            "MarketCapitalization": "41.19B",
-            "LastTradePriceOnly": "43.28",
-            "DaysRange": "43.08 - 43.60",
-            "Name": "Yahoo! Inc.",
-            "Symbol": "YHOO",
-            "Volume": "7339013",
-            "StockExchange": "NMS"
-        }
+        element = factories.getStockCurrentData()
         json_lower_case_keys = json.json_keys_to_lower_and_snake_case(element)
         # Check structure
         self.assertEqual(len(element.keys()) - 1, len(json_lower_case_keys.keys()))
@@ -66,38 +44,7 @@ class JsonTest(unittest.TestCase):
         self.assertEqual(element["StockExchange"], json_lower_case_keys["stock_exchange"])
 
     def test_json_keys_to_lower_case_OK_list(self):
-        stockHistoricalDataArray = [
-            {
-                "Adj_Close": "13.79",
-                "Date": "2016-03-18",
-                "Close": "13.79",
-                "Volume": "145037500",
-                "Open": "13.68",
-                "Low": "13.55",
-                "High": "13.88",
-                "Symbol": "BAC"
-            },
-            {
-                "Adj_Close": "13.40",
-                "Date": "2016-03-17",
-                "Close": "13.40",
-                "Volume": "121732700",
-                "Open": "13.22",
-                "Low": "13.05",
-                "High": "13.48",
-                "Symbol": "BAC"
-            },
-            {
-                "Adj_Close": "13.31",
-                "Date": "2016-03-16",
-                "Close": "13.31",
-                "Volume": "148489100",
-                "Open": "13.51",
-                "Low": "13.09",
-                "High": "13.81",
-                "Symbol": "BAC"
-            }
-        ]
+        stockHistoricalDataArray = factories.getStockHistoricalDataArray()
         json_list = json.json_keys_to_lower_and_snake_case(stockHistoricalDataArray)
         self.assertEqual(len(stockHistoricalDataArray), len(json_list))
         self.assertEqual(stockHistoricalDataArray[0]["Symbol"], json_list[0]["symbol"])
