@@ -1,0 +1,60 @@
+FORMAT: 1A
+
+# Stockreader
+
+Stockreader is a system that reads stock data from the US Stock Market. <br>
+The base URL of the API is: http://\<host>\/stockreader/
+
+## Group Stocks
+
+## Stocks [/api/stocks]
+
+Operations related with stocks.
+
+### Add a new stock [POST]
+
+When a new stock is added, Stockreader performs two operations asynchronously:
+1. Download the current data
+2. Download the historical data (last 10 years).
+
++ Request (application/json)
+
+        {
+          "name": "Bank of America",
+          "symbol": "BAC",
+          "stockMarket": "NYSE"
+        }
+
++ Response 202 (application/json)
+
+        {
+          "success": "The stock BAC is being added"
+        }
+
++ Response 400 (application/json)
+
+        {
+          "error": "Please provide a valid stock. It should have a name, a symbol and a stock market"
+        }
+
++ Response 409 (application/json)
+
+        {
+          "error": "The given stock already exists"
+        }
+
+## Group Admin
+
+## ping [/admin/ping]
+
+Operations related with the system administration.
+
+### ping [GET]
+
+Tell if the system is up and running.
+
++ Response 200 (application/json)
+
+        {
+          "message": "pong"
+        }
