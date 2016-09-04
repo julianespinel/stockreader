@@ -1,6 +1,8 @@
 def getStockData():
-    stock = {"name": "Bank of America", "symbol": "BAC", "stockMarket": "NYSE"}
-    return stock
+    return {"name": "Bank of America", "symbol": "BAC", "stockMarket": "NYSE"}
+
+def getNotValidStockData():
+    return { "name": "Bank of America", "symbol": "", "stockMarket": "" }
 
 def getStockList():
     stockList = [
