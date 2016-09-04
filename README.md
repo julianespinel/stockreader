@@ -47,3 +47,12 @@ If you can see `pong` in the web browser, then Stockreader is being correctly in
 
 Stockreader has a simple HTTP API,  with it you can request stock current data and historical data. <br>
 Please refer to the API documentation. * link.
+
+## Generate API docs
+
+To generate API docs please follow this steps:
+
+1. `npm install -g aglio`
+2. `cd docs/`
+3. `aglio -i input.apib -s`
+4. `http://localhost:3000`
