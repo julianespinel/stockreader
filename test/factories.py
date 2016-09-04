@@ -4,6 +4,10 @@ def getStockData():
 
 def getStockList():
     stockList = [
+        {"name": "Bank of America", "symbol": "BAC", "stockMarket": "NYSE"},
+        {"name": "Tesla", "symbol": "TSLA", "stockMarket": "NASDAQ"},
+        {"name": "Twitter", "symbol": "TWTR", "stockMarket": "NYSE"},
+        {"name": "Facebook", "symbol": "FB", "stockMarket": "NASDAQ"},
         {"stockMarket": "nyse", "name": "Valspar", "symbol": "VAL"},
         {"stockMarket": "nyse", "name": "Trinseo", "symbol": "TSE"},
         {"stockMarket": "nyse", "name": "Celestica", "symbol": "CLS"}
