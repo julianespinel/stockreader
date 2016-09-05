@@ -1,11 +1,11 @@
-def getStockData():
+def get_stock_data():
     return {"name": "Bank of America", "symbol": "BAC", "stockMarket": "NYSE"}
 
-def getNotValidStockData():
+def get_not_valid_stock_data():
     return { "name": "Bank of America", "symbol": "", "stockMarket": "" }
 
-def getStockList():
-    stockList = [
+def get_stock_list():
+    stock_list = [
         {"name": "Bank of America", "symbol": "BAC", "stockMarket": "NYSE"},
         {"name": "Tesla", "symbol": "TSLA", "stockMarket": "NASDAQ"},
         {"name": "Twitter", "symbol": "TWTR", "stockMarket": "NYSE"},
@@ -14,10 +14,10 @@ def getStockList():
         {"stockMarket": "nyse", "name": "Trinseo", "symbol": "TSE"},
         {"stockMarket": "nyse", "name": "Celestica", "symbol": "CLS"}
     ]
-    return stockList
+    return stock_list
 
-def getStockCurrentData():
-    stockCurrentData = {
+def get_stock_current_data():
+    stock_current_data = {
         "symbol": "BAC",
         "DaysLow": "13.780",
         "StockExchange": "NYQ",
@@ -33,10 +33,10 @@ def getStockCurrentData():
         "Symbol": "BAC",
         "YearLow": "10.990"
     }
-    return stockCurrentData
+    return stock_current_data
 
-def getStockHistoricalDataArray():
-    stockHistoricalDataArray = [
+def get_stock_historical_data_array():
+    stock_historical_data_array = [
         {
             "Adj_Close": "13.79",
             "Date": "2016-03-18",
@@ -68,4 +68,4 @@ def getStockHistoricalDataArray():
             "Symbol": "BAC"
         }
     ]
-    return stockHistoricalDataArray
+    return stock_historical_data_array

@@ -7,80 +7,80 @@ from src.infrastructure import json
 
 class MongoTest(unittest.TestCase):
 
+    DB_HOST = "localhost"
+    DB_PORT = 27017
+    TEST_DB_NAME = "test_stockreader_db"
+
     def setUp(self):
-        dbHost = "localhost"
-        dbPort = 27017
-        testDBName = "test_stockreader_db"
-        self.mongo = mongo.Mongo(dbHost, dbPort, testDBName)
+        self.mongo = mongo.Mongo(self.DB_HOST, self.DB_PORT, self.TEST_DB_NAME)
 
     def tearDown(self):
-        testDBName = "test_stockreader_db"
-        mongoClient = pymongo.MongoClient()
-        mongoClient.drop_database(testDBName)
+        mongo_client = pymongo.MongoClient()
+        mongo_client.drop_database(self.TEST_DB_NAME)
 
-    def testSaveStockList_OK(self):
-        stockCount = len(self.mongo.readStocksFromStockList())
-        self.assertEquals(0, stockCount)
-        stocks = factories.getStockList()
-        self.mongo.saveStockList(stocks)
-        stockCount = len(self.mongo.readStocksFromStockList())
-        self.assertEquals(len(stocks), stockCount)
+    def test_save_stock_list_OK(self):
+        stock_count = len(self.mongo.read_stocks_from_stockList())
+        self.assertEquals(0, stock_count)
+        stocks = factories.get_stock_list()
+        self.mongo.save_stock_list(stocks)
+        stock_count = len(self.mongo.read_stocks_from_stockList())
+        self.assertEquals(len(stocks), stock_count)
 
-    def testSaveStockList_NOK_duplicateStock(self):
-        stockCount = len(self.mongo.readStocksFromStockList())
-        self.assertEquals(0, stockCount)
-        stocks = factories.getStockList()
+    def test_save_stock_list_NOK_duplicate_stock(self):
+        stock_count = len(self.mongo.read_stocks_from_stockList())
+        self.assertEquals(0, stock_count)
+        stocks = factories.get_stock_list()
         stocks.append(stocks[0])
-        self.mongo.saveStockList(stocks)
-        stockCount = len(self.mongo.readStocksFromStockList())
-        self.assertEquals(len(stocks) - 1, stockCount)
+        self.mongo.save_stock_list(stocks)
+        stock_count = len(self.mongo.read_stocks_from_stockList())
+        self.assertEquals(len(stocks) - 1, stock_count)
 
-    def testStockExists_OK(self):
-        stockCount = len(self.mongo.readStocksFromStockList())
-        self.assertEquals(0, stockCount)
-        stocks = factories.getStockList()
-        self.mongo.saveStockList(stocks)
-        stockCount = len(self.mongo.readStocksFromStockList())
-        self.assertEquals(len(stocks), stockCount)
-        self.assertTrue(self.mongo.stockExists("FB"))
+    def test_stock_exists_OK(self):
+        stock_count = len(self.mongo.read_stocks_from_stockList())
+        self.assertEquals(0, stock_count)
+        stocks = factories.get_stock_list()
+        self.mongo.save_stock_list(stocks)
+        stock_count = len(self.mongo.read_stocks_from_stockList())
+        self.assertEquals(len(stocks), stock_count)
+        self.assertTrue(self.mongo.stock_exists("FB"))
 
-    def testStockExists_NOK_emptyStockList(self):
-        stockCount = len(self.mongo.readStocksFromStockList())
-        self.assertEquals(0, stockCount)
+    def test_stock_exists_NOK_empty_stock_list(self):
+        stock_count = len(self.mongo.read_stocks_from_stockList())
+        self.assertEquals(0, stock_count)
         stocks = []
-        self.mongo.saveStockList(stocks)
-        stockCount = len(self.mongo.readStocksFromStockList())
-        self.assertEquals(len(stocks), stockCount)
-        self.assertFalse(self.mongo.stockExists("FB"))
+        self.mongo.save_stock_list(stocks)
+        stock_count = len(self.mongo.read_stocks_from_stockList())
+        self.assertEquals(len(stocks), stock_count)
+        self.assertFalse(self.mongo.stock_exists("FB"))
 
-    def testGetStockByQuote_OK(self):
-        stockCount = len(self.mongo.readStocksFromStockList())
-        self.assertEquals(0, stockCount)
-        stocks = factories.getStockList()
-        self.mongo.saveStockList(stocks)
-        stockCount = len(self.mongo.readStocksFromStockList())
-        self.assertEquals(len(stocks), stockCount)
-        expectedStock = stocks[0]
-        stockByQuote = self.mongo.getStockByQuote(expectedStock["symbol"])
-        self.assertEquals(expectedStock, stockByQuote)
+    def test_get_stock_by_quote_OK(self):
+        stock_count = len(self.mongo.read_stocks_from_stockList())
+        self.assertEquals(0, stock_count)
+        stocks = factories.get_stock_list()
+        self.mongo.save_stock_list(stocks)
+        stock_count = len(self.mongo.read_stocks_from_stockList())
+        self.assertEquals(len(stocks), stock_count)
+        expected_stock = stocks[0]
+        stock_by_quote = self.mongo.get_stock_by_quote(expected_stock["symbol"])
+        self.assertEquals(expected_stock, stock_by_quote)
 
-    def testSaveStockHistoricalData_OK(self):
+    def test_save_stock_historical_data_OK(self):
         quote = "BAC"
-        historicalStockEntries = len(self.mongo.getStockHistoricalData(quote))
-        self.assertEquals(0, historicalStockEntries)
-        stockHistoricalDataArray = factories.getStockHistoricalDataArray()
-        stockHistoricalDataArray = json.json_keys_to_lower_and_snake_case(stockHistoricalDataArray)
-        self.mongo.saveStockHistoricalData(quote, stockHistoricalDataArray)
-        historicalStockEntries = len(self.mongo.getStockHistoricalData(quote))
-        self.assertEquals(len(stockHistoricalDataArray), historicalStockEntries)
+        historical_stock_entries = len(self.mongo.get_stock_historical_data(quote))
+        self.assertEquals(0, historical_stock_entries)
+        stock_historical_data_array = factories.get_stock_historical_data_array()
+        stock_historical_data_array = json.json_keys_to_lower_and_snake_case(stock_historical_data_array)
+        self.mongo.save_stock_historical_data(quote, stock_historical_data_array)
+        historical_stock_entries = len(self.mongo.get_stock_historical_data(quote))
+        self.assertEquals(len(stock_historical_data_array), historical_stock_entries)
 
-    def testUpsertStockCurrentData_OK(self):
+    def test_upsert_stock_current_data_OK(self):
         quote = "BAC"
-        currentData = self.mongo.getStockCurrentData(quote)
-        self.assertIsNone(currentData)
-        stockCurrentData = factories.getStockCurrentData()
-        stockCurrentData = json.json_keys_to_lower_and_snake_case(stockCurrentData)
-        self.mongo.upsertStockCurrentData(quote, stockCurrentData)
-        currentData = self.mongo.getStockCurrentData(quote)
-        currentData.pop("_id") # Remove MongoDB generated ID to match with stockCurrentData
-        self.assertEquals(stockCurrentData, currentData)
+        current_data = self.mongo.get_stock_current_data(quote)
+        self.assertIsNone(current_data)
+        stock_current_data = factories.get_stock_current_data()
+        stock_current_data = json.json_keys_to_lower_and_snake_case(stock_current_data)
+        self.mongo.upsert_stock_current_data(quote, stock_current_data)
+        current_data = self.mongo.get_stock_current_data(quote)
+        current_data.pop("_id") # Remove MongoDB generated ID to match with stock_current_data
+        self.assertEquals(stock_current_data, current_data)

@@ -1,7 +1,7 @@
 from infrastructure import log
 from datetime import date, timedelta
 
-logger = log.getLogger("domain")
+logger = log.get_logger("domain")
 
 class Domain:
 
@@ -9,23 +9,23 @@ class Domain:
         self.mongo = mongo
         self.download = download
 
-    def downloadAndSaveStockCurrentData(self, stock):
+    def download_and_save_stock_current_data(self, stock):
         quote = stock["symbol"]
         logger.info("stock %s", quote)
-        stockCurrentData = self.download.getStockCurrentData(quote)
-        self.mongo.upsertStockCurrentData(quote, stockCurrentData)
+        stock_current_data = self.download.get_stock_current_data(quote)
+        self.mongo.upsert_stock_current_data(quote, stock_current_data)
 
-    def downloadAndSaveStockHistoricalData(self, initialDate, finalDate, stock):
+    def download_and_save_stock_historical_data(self, initialDate, finalDate, stock):
         quote = stock["symbol"]
         logger.info('stocks %s, %s, %s', initialDate, finalDate, quote)
-        stockHistoricalDataArray = self.download.getStockHistoricalData(initialDate, finalDate, quote)
-        self.mongo.saveStockHistoricalData(quote, stockHistoricalDataArray)
+        stock_historical_data_array = self.download.get_stock_historical_data(initialDate, finalDate, quote)
+        self.mongo.save_stock_historical_data(quote, stock_historical_data_array)
 
-    def stockExists(self, quote):
-        return self.mongo.stockExists(quote)
+    def stock_exists(self, quote):
+        return self.mongo.stock_exists(quote)
 
-    def getStockList(self):
-        return self.mongo.readStocksFromStockList()
+    def get_stock_list(self):
+        return self.mongo.read_stocks_from_stock_list()
 
-    def addStockToStockList(self, stock):
-        self.mongo.saveStockList([stock])
+    def add_stock_to_stock_list(self, stock):
+        self.mongo.save_stock_list([stock])

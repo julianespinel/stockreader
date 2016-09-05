@@ -16,27 +16,27 @@ from apscheduler.schedulers.background import BackgroundScheduler
 NYSE = "nyse"
 NASDAQ = "nasdaq"
 
-logger = log.getLogger("stockreader")
+logger = log.get_logger("stockreader")
 
-def getConfig():
+def get_config():
     # Read config parameters from a TOML file.
     config = None
-    configFilePath = sys.argv[1]
-    with open(configFilePath) as configFile:
-        config = toml.loads(configFile.read())
+    config_file_path = sys.argv[1]
+    with open(config_file_path) as config_file:
+        config = toml.loads(config_file.read())
     return config
 
-def readStocksFromExchangeFile(config, exchange):
-    exchangeFilePathList = config[exchange]
-    stocksFromExchange = read.readStocksFromMultipleFiles(exchangeFilePathList, exchange)
-    return stocksFromExchange
+def read_stocks_from_exchange_file(config, exchange):
+    exchange_file_path_list = config[exchange]
+    stocks_from_exchange = read.read_stocks_from_multiple_files(exchange_file_path_list, exchange)
+    return stocks_from_exchange
 
 # Initialize
-config = getConfig()
-mongoConfig = config["mongo"]
-dbHost = mongoConfig["host"]
-dbPort = mongoConfig["port"]
-dbName = mongoConfig["name"]
+config = get_config()
+mongo_config = config["mongo"]
+dbHost = mongo_config["host"]
+dbPort = mongo_config["port"]
+dbName = mongo_config["name"]
 
 mongo = mongo.Mongo(dbHost, dbPort, dbName)
 read = read.Read()
@@ -48,13 +48,13 @@ job = job.Job(domain, scheduler)
 
 # add stocks from files.
 exchanges = config["exchanges"]
-stocks = readStocksFromExchangeFile(exchanges, NYSE)
-stocks.extend(readStocksFromExchangeFile(exchanges, NASDAQ))
+stocks = read_stocks_from_exchange_file(exchanges, NYSE)
+stocks.extend(read_stocks_from_exchange_file(exchanges, NASDAQ))
 logger.info("stocks %s", len(stocks))
-job.addStocksListToStockreader(stocks)
+job.add_stocks_list_to_stockreader(stocks)
 
 # Schedule recurrent stock update jobs.
-job.scheduleStockUpdates()
+job.schedule_stock_updates()
 
 # Start the flask server
 app = Flask(__name__)
