@@ -1,7 +1,7 @@
 import csv
 from infrastructure import log
 
-logger = log.getLogger("read")
+logger = log.get_logger("read")
 
 class Read:
 

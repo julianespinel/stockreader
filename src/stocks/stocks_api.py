@@ -1,9 +1,9 @@
 import threading
 
 from flask import request, Blueprint, jsonify
-
 from infrastructure import log
-logger = log.getLogger("stocks_api")
+
+logger = log.get_logger("stocks_api")
 
 def get_stocks_blueprint(domain, job):
     stocks_blueprint = Blueprint('stocks_api', __name__)
