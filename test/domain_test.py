@@ -15,7 +15,7 @@ class DomainTest(unittest.TestCase):
         self.domain = domain.Domain(self.mongoMock, self.downloadMock)
 
     def testDownloadAndSaveStockCurrentData_OK(self):
-        stock = factories.getStockData()
+        stock = factories.get_stock_data()
         quote = stock["symbol"]
         stockCurrentData = factories.get_stock_current_data()
         self.downloadMock.get_stock_current_data = Mock(return_value=stockCurrentData)
@@ -25,7 +25,7 @@ class DomainTest(unittest.TestCase):
         self.mongoMock.upsert_stock_current_data.assert_called_once_with(quote, stockCurrentData)
 
     def testDownloadAndSaveStockCurrentData_NOK_emptyStockCurrentData(self):
-        stock = factories.getStockData()
+        stock = factories.get_stock_data()
         quote = stock["symbol"]
         stockCurrentData = None
         self.downloadMock.get_stock_current_data = Mock(return_value=stockCurrentData)
@@ -37,9 +37,9 @@ class DomainTest(unittest.TestCase):
     def testDownloadAndSaveStockHistoricalData_OK(self):
         initialDate = date(2006, 9, 1)
         finalDate = date(2016, 9, 1)
-        stock = factories.getStockData()
+        stock = factories.get_stock_data()
         quote = stock["symbol"]
-        stockHistoricalDataArray = factories.getStockHistoricalDataArray()
+        stockHistoricalDataArray = factories.get_stock_historical_data_array()
         self.downloadMock.get_stock_historical_data = Mock(return_value=stockHistoricalDataArray)
         self.mongoMock.save_stock_historical_data = Mock()
         self.domain.download_and_save_stock_historical_data(initialDate, finalDate, stock)
@@ -49,7 +49,7 @@ class DomainTest(unittest.TestCase):
     def testDownloadAndSaveStockHistoricalData_NOK_emptyStockHistoricalDataArray(self):
         initialDate = date(2006, 9, 1)
         finalDate = date(2016, 9, 1)
-        stock = factories.getStockData()
+        stock = factories.get_stock_data()
         quote = stock["symbol"]
         stockHistoricalDataArray = []
         self.downloadMock.get_stock_historical_data = Mock(return_value=stockHistoricalDataArray)
@@ -73,7 +73,7 @@ class DomainTest(unittest.TestCase):
         self.mongoMock.stock_exists.assert_called_once_with(quote)
 
     def testGetStockList_OK(self):
-        expectedStockList = factories.getStockList()
+        expectedStockList = factories.get_stock_list()
         self.mongoMock.read_stocks_from_stock_list = Mock(return_value=expectedStockList)
         stockList = self.domain.get_stock_list()
         self.assertEqual(len(expectedStockList), len(stockList))
@@ -87,7 +87,7 @@ class DomainTest(unittest.TestCase):
         self.mongoMock.read_stocks_from_stock_list.assert_called_once_with()
 
     def testAddStockToStockList_OK(self):
-        stock = factories.getStockData()
+        stock = factories.get_stock_data()
         self.mongoMock.save_stock_list = Mock()
         self.domain.add_stock_to_stock_list(stock)
         self.mongoMock.save_stock_list.assert_called_once_with([stock])

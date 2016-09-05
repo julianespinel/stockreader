@@ -26,7 +26,7 @@ class ApiTest(unittest.TestCase):
         self.assertEquals(expectedErrorMessage, data["error"])
 
     def testAddStock_NOK_notValidStock(self):
-        stock = factories.getNotValidStockData()
+        stock = factories.get_not_valid_stock_data()
         response = self.client.post("/stockreader/api/stocks", data=json.dumps(stock), content_type="application/json")
         self.assertEquals(response.status_code, 400)
         data = json.loads(response.data)
@@ -34,7 +34,7 @@ class ApiTest(unittest.TestCase):
         self.assertEquals(expectedErrorMessage, data["error"])
 
     def testAddStock_NOK_existingStock(self):
-        stock = factories.getStockData()
+        stock = factories.get_stock_data()
         quote = stock["symbol"]
         self.domainMock.stock_exists = Mock(return_value=True)
         response = self.client.post("/stockreader/api/stocks", data=json.dumps(stock), content_type="application/json")
@@ -45,7 +45,7 @@ class ApiTest(unittest.TestCase):
         self.assertEquals(expectedErrorMessage, data["error"])
 
     def testAddStock_OK(self):
-        stock = factories.getStockData()
+        stock = factories.get_stock_data()
         quote = stock["symbol"]
         self.domainMock.stock_exists = Mock(return_value=False)
         response = self.client.post("/stockreader/api/stocks", data=json.dumps(stock), content_type="application/json")

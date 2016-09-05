@@ -21,7 +21,7 @@ class MongoTest(unittest.TestCase):
     def testSaveStockList_OK(self):
         stockCount = len(self.mongo.read_stocks_from_stockList())
         self.assertEquals(0, stockCount)
-        stocks = factories.getStockList()
+        stocks = factories.get_stock_list()
         self.mongo.save_stock_list(stocks)
         stockCount = len(self.mongo.read_stocks_from_stockList())
         self.assertEquals(len(stocks), stockCount)
@@ -29,7 +29,7 @@ class MongoTest(unittest.TestCase):
     def testSaveStockList_NOK_duplicateStock(self):
         stockCount = len(self.mongo.read_stocks_from_stockList())
         self.assertEquals(0, stockCount)
-        stocks = factories.getStockList()
+        stocks = factories.get_stock_list()
         stocks.append(stocks[0])
         self.mongo.save_stock_list(stocks)
         stockCount = len(self.mongo.read_stocks_from_stockList())
@@ -38,7 +38,7 @@ class MongoTest(unittest.TestCase):
     def testStockExists_OK(self):
         stockCount = len(self.mongo.read_stocks_from_stockList())
         self.assertEquals(0, stockCount)
-        stocks = factories.getStockList()
+        stocks = factories.get_stock_list()
         self.mongo.save_stock_list(stocks)
         stockCount = len(self.mongo.read_stocks_from_stockList())
         self.assertEquals(len(stocks), stockCount)
@@ -56,7 +56,7 @@ class MongoTest(unittest.TestCase):
     def testGetStockByQuote_OK(self):
         stockCount = len(self.mongo.read_stocks_from_stockList())
         self.assertEquals(0, stockCount)
-        stocks = factories.getStockList()
+        stocks = factories.get_stock_list()
         self.mongo.save_stock_list(stocks)
         stockCount = len(self.mongo.read_stocks_from_stockList())
         self.assertEquals(len(stocks), stockCount)
@@ -68,7 +68,7 @@ class MongoTest(unittest.TestCase):
         quote = "BAC"
         historicalStockEntries = len(self.mongo.get_stock_historical_data(quote))
         self.assertEquals(0, historicalStockEntries)
-        stockHistoricalDataArray = factories.getStockHistoricalDataArray()
+        stockHistoricalDataArray = factories.get_stock_historical_data_array()
         stockHistoricalDataArray = json.json_keys_to_lower_and_snake_case(stockHistoricalDataArray)
         self.mongo.save_stock_historical_data(quote, stockHistoricalDataArray)
         historicalStockEntries = len(self.mongo.get_stock_historical_data(quote))
@@ -78,7 +78,7 @@ class MongoTest(unittest.TestCase):
         quote = "BAC"
         currentData = self.mongo.get_stock_current_data(quote)
         self.assertIsNone(currentData)
-        stockCurrentData = factories.getStockCurrentData()
+        stockCurrentData = factories.get_stock_current_data()
         stockCurrentData = json.json_keys_to_lower_and_snake_case(stockCurrentData)
         self.mongo.upsert_stock_current_data(quote, stockCurrentData)
         currentData = self.mongo.get_stock_current_data(quote)

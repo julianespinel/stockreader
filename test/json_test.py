@@ -6,7 +6,7 @@ from src.infrastructure import json
 class JsonTest(unittest.TestCase):
 
     def test_json_keys_to_lower_case_OK_single_element(self):
-        historicalDataArray = factories.getStockHistoricalDataArray()
+        historicalDataArray = factories.get_stock_historical_data_array()
         element = historicalDataArray[0]
         json_lower_case_keys = json.json_keys_to_lower_and_snake_case(element)
         # Check structure
@@ -23,7 +23,7 @@ class JsonTest(unittest.TestCase):
 
     def test_json_keys_to_lower_case_OK_single_element_with_duplicated_key(self):
         # The symbol and Symbol (lower and upper case) will be symbol after the method
-        element = factories.getStockCurrentData()
+        element = factories.get_stock_current_data()
         json_lower_case_keys = json.json_keys_to_lower_and_snake_case(element)
         # Check structure
         self.assertEqual(len(element.keys()) - 1, len(json_lower_case_keys.keys()))
@@ -44,7 +44,7 @@ class JsonTest(unittest.TestCase):
         self.assertEqual(element["StockExchange"], json_lower_case_keys["stock_exchange"])
 
     def test_json_keys_to_lower_case_OK_list(self):
-        stockHistoricalDataArray = factories.getStockHistoricalDataArray()
+        stockHistoricalDataArray = factories.get_stock_historical_data_array()
         json_list = json.json_keys_to_lower_and_snake_case(stockHistoricalDataArray)
         self.assertEqual(len(stockHistoricalDataArray), len(json_list))
         self.assertEqual(stockHistoricalDataArray[0]["Symbol"], json_list[0]["symbol"])
