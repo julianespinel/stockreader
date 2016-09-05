@@ -1,7 +1,7 @@
 from infrastructure import log
 from datetime import date, timedelta
 
-logger = log.getLogger("domain")
+logger = log.get_logger("domain")
 
 class Domain:
 

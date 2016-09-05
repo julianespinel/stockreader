@@ -1,8 +1,8 @@
 from datetime import date, timedelta
 from concurrent.futures import ThreadPoolExecutor
-
 from infrastructure import log
-logger = log.getLogger("job")
+
+logger = log.get_logger("job")
 
 class Job:
 

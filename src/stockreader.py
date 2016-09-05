@@ -16,7 +16,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 NYSE = "nyse"
 NASDAQ = "nasdaq"
 
-logger = log.getLogger("stockreader")
+logger = log.get_logger("stockreader")
 
 def get_config():
     # Read config parameters from a TOML file.
