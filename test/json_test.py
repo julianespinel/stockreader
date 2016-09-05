@@ -6,8 +6,8 @@ from src.infrastructure import json
 class JsonTest(unittest.TestCase):
 
     def test_json_keys_to_lower_case_OK_single_element(self):
-        historicalDataArray = factories.get_stock_historical_data_array()
-        element = historicalDataArray[0]
+        historical_data_array = factories.get_stock_historical_data_array()
+        element = historical_data_array[0]
         json_lower_case_keys = json.json_keys_to_lower_and_snake_case(element)
         # Check structure
         self.assertEqual(len(element.keys()), len(json_lower_case_keys.keys()))
@@ -44,7 +44,7 @@ class JsonTest(unittest.TestCase):
         self.assertEqual(element["StockExchange"], json_lower_case_keys["stock_exchange"])
 
     def test_json_keys_to_lower_case_OK_list(self):
-        stockHistoricalDataArray = factories.get_stock_historical_data_array()
-        json_list = json.json_keys_to_lower_and_snake_case(stockHistoricalDataArray)
-        self.assertEqual(len(stockHistoricalDataArray), len(json_list))
-        self.assertEqual(stockHistoricalDataArray[0]["Symbol"], json_list[0]["symbol"])
+        stock_historical_data_array = factories.get_stock_historical_data_array()
+        json_list = json.json_keys_to_lower_and_snake_case(stock_historical_data_array)
+        self.assertEqual(len(stock_historical_data_array), len(json_list))
+        self.assertEqual(stock_historical_data_array[0]["Symbol"], json_list[0]["symbol"])
