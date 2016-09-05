@@ -24,7 +24,7 @@ def get_stocks_blueprint(domain, job):
             response = jsonify({ "error": "Please provide a valid stock. It should have a name, a symbol and a stock market" }), 400
             return response
         # This validation (stockExistInDB) should be performed in the domain level, not in the API level.
-        stock_exist_in_db = domain.stockExists(quote)
+        stock_exist_in_db = domain.stock_exists(quote)
         if stock_exist_in_db:
             response = jsonify({ "error": "The given stock already exists" }), 409
             return response
