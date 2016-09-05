@@ -10,84 +10,84 @@ from src.stocks import domain
 class DomainTest(unittest.TestCase):
 
     def setUp(self):
-        self.mongoMock = Mock()
-        self.downloadMock = Mock()
-        self.domain = domain.Domain(self.mongoMock, self.downloadMock)
+        self.mongo_mock = Mock()
+        self.download_mock = Mock()
+        self.domain = domain.Domain(self.mongo_mock, self.download_mock)
 
-    def testDownloadAndSaveStockCurrentData_OK(self):
+    def test_download_and_save_stock_current_data_OK(self):
         stock = factories.get_stock_data()
         quote = stock["symbol"]
-        stockCurrentData = factories.get_stock_current_data()
-        self.downloadMock.get_stock_current_data = Mock(return_value=stockCurrentData)
-        self.mongoMock.upsert_stock_current_data = Mock()
+        stock_current_data = factories.get_stock_current_data()
+        self.download_mock.get_stock_current_data = Mock(return_value=stock_current_data)
+        self.mongo_mock.upsert_stock_current_data = Mock()
         self.domain.download_and_save_stock_current_data(stock)
-        self.downloadMock.get_stock_current_data.assert_called_once_with(quote)
-        self.mongoMock.upsert_stock_current_data.assert_called_once_with(quote, stockCurrentData)
+        self.download_mock.get_stock_current_data.assert_called_once_with(quote)
+        self.mongo_mock.upsert_stock_current_data.assert_called_once_with(quote, stock_current_data)
 
-    def testDownloadAndSaveStockCurrentData_NOK_emptyStockCurrentData(self):
+    def test_download_and_save_stock_current_data_NOK_empty_stock_current_data(self):
         stock = factories.get_stock_data()
         quote = stock["symbol"]
-        stockCurrentData = None
-        self.downloadMock.get_stock_current_data = Mock(return_value=stockCurrentData)
-        self.mongoMock.upsert_stock_current_data = Mock()
+        stock_current_data = None
+        self.download_mock.get_stock_current_data = Mock(return_value=stock_current_data)
+        self.mongo_mock.upsert_stock_current_data = Mock()
         self.domain.download_and_save_stock_current_data(stock)
-        self.downloadMock.get_stock_current_data.assert_called_once_with(quote)
-        self.mongoMock.upsert_stock_current_data.assert_called_once_with(quote, stockCurrentData)
+        self.download_mock.get_stock_current_data.assert_called_once_with(quote)
+        self.mongo_mock.upsert_stock_current_data.assert_called_once_with(quote, stock_current_data)
 
-    def testDownloadAndSaveStockHistoricalData_OK(self):
-        initialDate = date(2006, 9, 1)
-        finalDate = date(2016, 9, 1)
+    def test_download_and_save_stock_historical_data_OK(self):
+        initial_date = date(2006, 9, 1)
+        final_date = date(2016, 9, 1)
         stock = factories.get_stock_data()
         quote = stock["symbol"]
-        stockHistoricalDataArray = factories.get_stock_historical_data_array()
-        self.downloadMock.get_stock_historical_data = Mock(return_value=stockHistoricalDataArray)
-        self.mongoMock.save_stock_historical_data = Mock()
-        self.domain.download_and_save_stock_historical_data(initialDate, finalDate, stock)
-        self.downloadMock.get_stock_historical_data.assert_called_once_with(initialDate, finalDate, quote)
-        self.mongoMock.save_stock_historical_data.assert_called_once_with(quote, stockHistoricalDataArray)
+        stock_historical_data_array = factories.get_stock_historical_data_array()
+        self.download_mock.get_stock_historical_data = Mock(return_value=stock_historical_data_array)
+        self.mongo_mock.save_stock_historical_data = Mock()
+        self.domain.download_and_save_stock_historical_data(initial_date, final_date, stock)
+        self.download_mock.get_stock_historical_data.assert_called_once_with(initial_date, final_date, quote)
+        self.mongo_mock.save_stock_historical_data.assert_called_once_with(quote, stock_historical_data_array)
 
-    def testDownloadAndSaveStockHistoricalData_NOK_emptyStockHistoricalDataArray(self):
-        initialDate = date(2006, 9, 1)
-        finalDate = date(2016, 9, 1)
+    def test_download_and_save_stock_historical_data_NOK_empty_stock_historical_data_array(self):
+        initial_date = date(2006, 9, 1)
+        final_date = date(2016, 9, 1)
         stock = factories.get_stock_data()
         quote = stock["symbol"]
-        stockHistoricalDataArray = []
-        self.downloadMock.get_stock_historical_data = Mock(return_value=stockHistoricalDataArray)
-        self.mongoMock.save_stock_historical_data = Mock()
-        self.domain.download_and_save_stock_historical_data(initialDate, finalDate, stock)
-        self.downloadMock.get_stock_historical_data.assert_called_once_with(initialDate, finalDate, quote)
-        self.mongoMock.save_stock_historical_data.assert_called_once_with(quote, stockHistoricalDataArray)
+        stock_historical_data_array = []
+        self.download_mock.get_stock_historical_data = Mock(return_value=stock_historical_data_array)
+        self.mongo_mock.save_stock_historical_data = Mock()
+        self.domain.download_and_save_stock_historical_data(initial_date, final_date, stock)
+        self.download_mock.get_stock_historical_data.assert_called_once_with(initial_date, final_date, quote)
+        self.mongo_mock.save_stock_historical_data.assert_called_once_with(quote, stock_historical_data_array)
 
-    def testStockExists_OK(self):
+    def test_stock_exists_OK(self):
         quote = "BAC"
-        expectedResult = True
-        self.mongoMock.stock_exists = Mock(return_value=expectedResult)
-        self.assertEqual(expectedResult, self.domain.stock_exists(quote))
-        self.mongoMock.stock_exists.assert_called_once_with(quote)
+        expected_result = True
+        self.mongo_mock.stock_exists = Mock(return_value=expected_result)
+        self.assertEqual(expected_result, self.domain.stock_exists(quote))
+        self.mongo_mock.stock_exists.assert_called_once_with(quote)
 
-    def testStockExists_NOK_stockDoesNotExists(self):
+    def test_stock_exists_NOK_stock_does_not_exist(self):
         quote = "BAC"
-        expectedResult = False
-        self.mongoMock.stock_exists = Mock(return_value=expectedResult)
-        self.assertEqual(expectedResult, self.domain.stock_exists(quote))
-        self.mongoMock.stock_exists.assert_called_once_with(quote)
+        expected_result = False
+        self.mongo_mock.stock_exists = Mock(return_value=expected_result)
+        self.assertEqual(expected_result, self.domain.stock_exists(quote))
+        self.mongo_mock.stock_exists.assert_called_once_with(quote)
 
-    def testGetStockList_OK(self):
-        expectedStockList = factories.get_stock_list()
-        self.mongoMock.read_stocks_from_stock_list = Mock(return_value=expectedStockList)
-        stockList = self.domain.get_stock_list()
-        self.assertEqual(len(expectedStockList), len(stockList))
-        self.mongoMock.read_stocks_from_stock_list.assert_called_once_with()
+    def test_get_stock_list_OK(self):
+        expected_stock_list = factories.get_stock_list()
+        self.mongo_mock.read_stocks_from_stock_list = Mock(return_value=expected_stock_list)
+        stock_list = self.domain.get_stock_list()
+        self.assertEqual(len(expected_stock_list), len(stock_list))
+        self.mongo_mock.read_stocks_from_stock_list.assert_called_once_with()
 
-    def testGetStockList_NOK_emptyStockList(self):
-        expectedStockList = []
-        self.mongoMock.read_stocks_from_stock_list = Mock(return_value=expectedStockList)
-        stockList = self.domain.get_stock_list()
-        self.assertEqual(len(expectedStockList), len(stockList))
-        self.mongoMock.read_stocks_from_stock_list.assert_called_once_with()
+    def test_get_stock_list_NOK_empty_stock_list(self):
+        expected_stock_list = []
+        self.mongo_mock.read_stocks_from_stock_list = Mock(return_value=expected_stock_list)
+        stock_list = self.domain.get_stock_list()
+        self.assertEqual(len(expected_stock_list), len(stock_list))
+        self.mongo_mock.read_stocks_from_stock_list.assert_called_once_with()
 
-    def testAddStockToStockList_OK(self):
+    def test_add_stock_to_stock_list_OK(self):
         stock = factories.get_stock_data()
-        self.mongoMock.save_stock_list = Mock()
+        self.mongo_mock.save_stock_list = Mock()
         self.domain.add_stock_to_stock_list(stock)
-        self.mongoMock.save_stock_list.assert_called_once_with([stock])
+        self.mongo_mock.save_stock_list.assert_called_once_with([stock])
