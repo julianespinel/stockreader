@@ -20,49 +20,49 @@ class Job:
         self.domain = domain
         self.scheduler = scheduler
 
-    def getNumberOfWorkers(self, anyList):
+    def get_number_of_workers(self, anyList):
         return len(anyList) if len(anyList) < self.WORKERS else self.WORKERS
 
-    def downloadAndSaveStockCurrentDataInParallel(self, stocks):
-        numberOfWorkers = self.getNumberOfWorkers(stocks)
-        with ThreadPoolExecutor(max_workers=numberOfWorkers) as executor:
+    def download_and_save_stock_current_data_in_parallel(self, stocks):
+        number_of_workers = self.get_number_of_workers(stocks)
+        with ThreadPoolExecutor(max_workers=number_of_workers) as executor:
             for stock in stocks:
                 executor.submit(self.domain.download_and_save_stock_current_data, stock)
 
-    def downloadAndSaveStockWeeklyDataInParallel(self, stocks):
+    def download_and_save_stock_weekly_data_in_parallel(self, stocks):
         today = date.today()
-        initialDate = today - timedelta(weeks=self.WEEKS_AGO)
-        numberOfWorkers = self.getNumberOfWorkers(stocks)
-        with ThreadPoolExecutor(max_workers=numberOfWorkers) as executor:
+        initial_date = today - timedelta(weeks=self.WEEKS_AGO)
+        number_of_workers = self.get_number_of_workers(stocks)
+        with ThreadPoolExecutor(max_workers=number_of_workers) as executor:
             for stock in stocks:
-                executor.submit(self.domain.download_and_save_stock_historical_data, initialDate, today, stock)
+                executor.submit(self.domain.download_and_save_stock_historical_data, initial_date, today, stock)
 
-    def downloadAndSaveStockHistoricalDataInParallel(self, stocks):
+    def download_and_save_stock_historical_data_in_parallel(self, stocks):
         today = date.today()
         # Here always use more workers because we need to perform more than one call.
         with ThreadPoolExecutor(max_workers=self.WORKERS) as executor:
             for stock in stocks:
                 for index in range(self.YEARS_AGO):
-                    initialDate = today.replace(year=(today.year - (index + 1)))
-                    finalDate = today.replace(year=(today.year - index))
-                    executor.submit(self.domain.download_and_save_stock_historical_data, initialDate, finalDate, stock)
+                    initial_date = today.replace(year=(today.year - (index + 1)))
+                    final_date = today.replace(year=(today.year - index))
+                    executor.submit(self.domain.download_and_save_stock_historical_data, initial_date, final_date, stock)
 
-    def scheduleStockUpdates(self):
+    def schedule_stock_updates(self):
         stocks = self.domain.get_stock_list()
-        self.scheduler.add_job(self.downloadAndSaveStockCurrentDataInParallel, 'cron', args=[stocks], hour='*')
-        self.scheduler.add_job(self.downloadAndSaveStockWeeklyDataInParallel, 'cron', args=[stocks], hour=self.DAILY_UPDATE_HOUR)
-        self.scheduler.add_job(self.downloadAndSaveStockHistoricalDataInParallel, 'cron', args=[stocks], day='last', hour=self.MONTHLY_UPDATE_HOUR)
+        self.scheduler.add_job(self.download_and_save_stock_current_data_in_parallel, 'cron', args=[stocks], hour='*')
+        self.scheduler.add_job(self.download_and_save_stock_weekly_data_in_parallel, 'cron', args=[stocks], hour=self.DAILY_UPDATE_HOUR)
+        self.scheduler.add_job(self.download_and_save_stock_historical_data_in_parallel, 'cron', args=[stocks], day='last', hour=self.MONTHLY_UPDATE_HOUR)
         self.scheduler.start()
 
-    def addStockToStockreader(self, stock):
+    def add_stock_to_stockreader(self, stock):
         symbol = stock["symbol"]
         logger.info('adding stock %s', symbol)
         if not self.domain.stock_exists(symbol):
             self.domain.add_stock_to_stock_list(stock)
-            self.downloadAndSaveStockCurrentDataInParallel([stock])
-            self.downloadAndSaveStockWeeklyDataInParallel([stock])
-            self.downloadAndSaveStockHistoricalDataInParallel([stock])
+            self.download_and_save_stock_current_data_in_parallel([stock])
+            self.download_and_save_stock_weekly_data_in_parallel([stock])
+            self.download_and_save_stock_historical_data_in_parallel([stock])
 
-    def addStocksListToStockreader(self, stocks):
+    def add_stocks_list_to_stockreader(self, stocks):
         for stock in stocks:
-            self.addStockToStockreader(stock)
+            self.add_stock_to_stockreader(stock)
