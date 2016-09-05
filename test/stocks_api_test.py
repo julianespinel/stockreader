@@ -36,9 +36,9 @@ class ApiTest(unittest.TestCase):
     def testAddStock_NOK_existingStock(self):
         stock = factories.getStockData()
         quote = stock["symbol"]
-        self.domainMock.stockExists = Mock(return_value=True)
+        self.domainMock.stock_exists = Mock(return_value=True)
         response = self.client.post("/stockreader/api/stocks", data=json.dumps(stock), content_type="application/json")
-        self.domainMock.stockExists.assert_called_once_with(quote)
+        self.domainMock.stock_exists.assert_called_once_with(quote)
         self.assertEquals(response.status_code, 409)
         data = json.loads(response.data)
         expectedErrorMessage = "The given stock already exists"
@@ -47,9 +47,9 @@ class ApiTest(unittest.TestCase):
     def testAddStock_OK(self):
         stock = factories.getStockData()
         quote = stock["symbol"]
-        self.domainMock.stockExists = Mock(return_value=False)
+        self.domainMock.stock_exists = Mock(return_value=False)
         response = self.client.post("/stockreader/api/stocks", data=json.dumps(stock), content_type="application/json")
-        self.domainMock.stockExists.assert_called_once_with(quote)
+        self.domainMock.stock_exists.assert_called_once_with(quote)
         self.assertEquals(response.status_code, 202)
         data = json.loads(response.data)
         expectedMessage = "The stock " + quote + " is being added"
