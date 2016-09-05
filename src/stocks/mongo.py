@@ -36,57 +36,57 @@ class Mongo:
         self.create_regular_collection_if_not_exists(self.STOCKS_CURRENT_DATA, self.SYMBOL_KEY)
 
     # Do not use map and filter for side effects: http://stackoverflow.com/a/18433519/2420718
-    def saveStockList(self, stocks):
+    def save_stock_list(self, stocks):
         if len(stocks) > 0:
             try:
-                stocklistCollection = self.db[self.STOCK_LIST]
-                stocklistCollection.insert_many(stocks, ordered=False)
+                stocklist_collection = self.db[self.STOCK_LIST]
+                stocklist_collection.insert_many(stocks, ordered=False)
             except (DuplicateKeyError, BulkWriteError) as err:
-                logger.error("saveStockList: %i %s", len(stocks), err)
+                logger.error("save_stock_list: %i %s", len(stocks), err)
 
-    def readStocksFromStockList(self):
+    def read_stocks_from_stockList(self):
         stocks = []
-        stocklistCollection = self.db[self.STOCK_LIST]
-        cursor = stocklistCollection.find()
+        stocklist_collection = self.db[self.STOCK_LIST]
+        cursor = stocklist_collection.find()
         for stock in cursor:
             stocks.append(stock)
         return stocks
 
-    def stockExists(self, quote):
-        stockCurrentDataCollection = self.db[self.STOCK_LIST]
-        cursor = stockCurrentDataCollection.find({ self.SYMBOL_KEY: quote }).limit(1)
+    def stock_exists(self, quote):
+        stock_current_data_collection = self.db[self.STOCK_LIST]
+        cursor = stock_current_data_collection.find({ self.SYMBOL_KEY: quote }).limit(1)
         return (cursor.count() > 0)
 
-    def getStockByQuote(self, quote):
-        stocklistCollection = self.db[self.STOCK_LIST]
-        stock = stocklistCollection.find_one({ self.SYMBOL_KEY: quote })
+    def get_stock_by_quote(self, quote):
+        stocklist_collection = self.db[self.STOCK_LIST]
+        stock = stocklist_collection.find_one({ self.SYMBOL_KEY: quote })
         return stock
 
-    def saveStockHistoricalData(self, quote, stockHistoricalDataArray):
-        if len(stockHistoricalDataArray) > 0:
+    def save_stock_historical_data(self, quote, stock_historical_data_array):
+        if len(stock_historical_data_array) > 0:
             try:
                 collection_name = quote + self.HISTORICAL_DATA_SUFIX
                 self.create_historical_collection_if_not_exists(collection_name)
-                stockHistoricalDataCollection = self.db[collection_name]
-                stockHistoricalDataCollection.insert_many(stockHistoricalDataArray, ordered=False)
+                stock_historical_data_collection = self.db[collection_name]
+                stock_historical_data_collection.insert_many(stock_historical_data_array, ordered=False)
             except (DuplicateKeyError, BulkWriteError) as err:
-                logger.error("saveStockHistoricalData: %s %i %s", quote, len(stockHistoricalDataArray), err)
+                logger.error("save_stock_historical_data: %s %i %s", quote, len(stock_historical_data_array), err)
 
-    def getStockHistoricalData(self, quote):
-        stockHistoricalDataCollection = self.db[quote + self.HISTORICAL_DATA_SUFIX]
-        cursor = stockHistoricalDataCollection.find({ self.SYMBOL_KEY: quote }).limit(self.TRADING_DAYS_PER_YEAR)
+    def get_stock_historical_data(self, quote):
+        stock_historical_data_collection = self.db[quote + self.HISTORICAL_DATA_SUFIX]
+        cursor = stock_historical_data_collection.find({ self.SYMBOL_KEY: quote }).limit(self.TRADING_DAYS_PER_YEAR)
         return list(cursor)
 
-    def upsertStockCurrentData(self, quote, stockCurrentData):
-        if stockCurrentData is not None:
+    def upsert_stock_current_data(self, quote, stock_current_data):
+        if stock_current_data is not None:
             try:
-                stockCurrentDataCollection = self.db[self.STOCKS_CURRENT_DATA]
+                stock_current_data_collection = self.db[self.STOCKS_CURRENT_DATA]
                 query = { self.SYMBOL_KEY: quote }
-                stockCurrentDataCollection.replace_one(query, stockCurrentData, upsert=True)
+                stock_current_data_collection.replace_one(query, stock_current_data, upsert=True)
             except DuplicateKeyError as err:
-                logger.error("saveStockCurrentData: %s %s", quote, err)
+                logger.error("upsert_stock_current_data: %s %s", quote, err)
 
-    def getStockCurrentData(self, quote):
+    def get_stock_current_data(self, quote):
         stockCurrentDataCollection = self.db[self.STOCKS_CURRENT_DATA]
         stock = stockCurrentDataCollection.find_one({ self.SYMBOL_KEY: quote })
         return stock
