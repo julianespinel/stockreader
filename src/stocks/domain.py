@@ -25,7 +25,7 @@ class Domain:
         return self.mongo.stock_exists(quote)
 
     def get_stock_list(self):
-        return self.mongo.read_stocks_from_stockList()
+        return self.mongo.read_stocks_from_stock_list()
 
     def add_stock_to_stock_list(self, stock):
         self.mongo.save_stock_list([stock])
