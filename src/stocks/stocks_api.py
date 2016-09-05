@@ -11,25 +11,25 @@ def get_stocks_blueprint(domain, job):
     @stocks_blueprint.route('', methods=['POST'])
     def add_stock():
         response = None
-        newStock = request.get_json()
-        if newStock is None:
+        new_stock = request.get_json()
+        if new_stock is None:
             response = jsonify({ "error": "Please provide a stock in the request body. It should have a name, a symbol and a stock market" }), 400
             return response
-        name = newStock.get("name", None)
-        quote = newStock.get("symbol", None)
-        logger.info("post: %s", newStock)
-        stockMarket = newStock.get("stockMarket", None)
-        isValidStock = name and quote and stockMarket
-        if not isValidStock:
+        name = new_stock.get("name", None)
+        quote = new_stock.get("symbol", None)
+        logger.info("post: %s", new_stock)
+        stock_market = new_stock.get("stockMarket", None)
+        is_valid_stock = name and quote and stock_market
+        if not is_valid_stock:
             response = jsonify({ "error": "Please provide a valid stock. It should have a name, a symbol and a stock market" }), 400
             return response
         # This validation (stockExistInDB) should be performed in the domain level, not in the API level.
-        stockExistInDB = domain.stockExists(quote)
-        if stockExistInDB:
+        stock_exist_in_db = domain.stockExists(quote)
+        if stock_exist_in_db:
             response = jsonify({ "error": "The given stock already exists" }), 409
             return response
         # Add stock async
-        thread = threading.Thread(target=job.addStockToStockreader, args=(newStock, )) # Why args should be a tuple?
+        thread = threading.Thread(target=job.addStockToStockreader, args=(new_stock, )) # Why args should be a tuple?
         thread.start()
         response = jsonify({ "success": "The stock " + quote + " is being added" }), 202
         return response
