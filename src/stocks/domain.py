@@ -9,23 +9,23 @@ class Domain:
         self.mongo = mongo
         self.download = download
 
-    def downloadAndSaveStockCurrentData(self, stock):
+    def download_and_save_stock_current_data(self, stock):
         quote = stock["symbol"]
         logger.info("stock %s", quote)
-        stockCurrentData = self.download.getStockCurrentData(quote)
-        self.mongo.upsertStockCurrentData(quote, stockCurrentData)
+        stock_current_data = self.download.getStockCurrentData(quote)
+        self.mongo.upsertStockCurrentData(quote, stock_current_data)
 
-    def downloadAndSaveStockHistoricalData(self, initialDate, finalDate, stock):
+    def download_and_save_stock_historical_data(self, initialDate, finalDate, stock):
         quote = stock["symbol"]
         logger.info('stocks %s, %s, %s', initialDate, finalDate, quote)
-        stockHistoricalDataArray = self.download.getStockHistoricalData(initialDate, finalDate, quote)
-        self.mongo.saveStockHistoricalData(quote, stockHistoricalDataArray)
+        stock_historical_data_array = self.download.getStockHistoricalData(initialDate, finalDate, quote)
+        self.mongo.saveStockHistoricalData(quote, stock_historical_data_array)
 
-    def stockExists(self, quote):
-        return self.mongo.stockExists(quote)
+    def stock_exists(self, quote):
+        return self.mongo.stock_exists(quote)
 
-    def getStockList(self):
+    def get_stock_list(self):
         return self.mongo.readStocksFromStockList()
 
-    def addStockToStockList(self, stock):
+    def add_stock_to_stock_list(self, stock):
         self.mongo.saveStockList([stock])
