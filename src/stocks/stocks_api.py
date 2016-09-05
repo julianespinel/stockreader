@@ -29,7 +29,7 @@ def get_stocks_blueprint(domain, job):
             response = jsonify({ "error": "The given stock already exists" }), 409
             return response
         # Add stock async
-        thread = threading.Thread(target=job.addStockToStockreader, args=(new_stock, )) # Why args should be a tuple?
+        thread = threading.Thread(target=job.add_stock_to_stockreader, args=(new_stock,)) # Why args should be a tuple?
         thread.start()
         response = jsonify({ "success": "The stock " + quote + " is being added" }), 202
         return response

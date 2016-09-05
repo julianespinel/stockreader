@@ -13,10 +13,10 @@ class JobTest(unittest.TestCase):
 
     def testGetNumberOfWorkers_OK_listLessThanWorkersConstant(self):
         anyList = [1, 2, 3]
-        numberOfWorkers = self.job.getNumberOfWorkers(anyList)
+        numberOfWorkers = self.job.get_number_of_workers(anyList)
         self.assertEqual(len(anyList), numberOfWorkers)
 
     def testGetNumberOfWorkers_OK_listGreaterThanWorkersConstant(self):
         anyList = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
-        numberOfWorkers = self.job.getNumberOfWorkers(anyList)
+        numberOfWorkers = self.job.get_number_of_workers(anyList)
         self.assertEqual(self.job.WORKERS, numberOfWorkers)

@@ -51,10 +51,10 @@ exchanges = config["exchanges"]
 stocks = read_stocks_from_exchange_file(exchanges, NYSE)
 stocks.extend(read_stocks_from_exchange_file(exchanges, NASDAQ))
 logger.info("stocks %s", len(stocks))
-job.addStocksListToStockreader(stocks)
+job.add_stocks_list_to_stockreader(stocks)
 
 # Schedule recurrent stock update jobs.
-job.scheduleStockUpdates()
+job.schedule_stock_updates()
 
 # Start the flask server
 app = Flask(__name__)
