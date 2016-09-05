@@ -13,7 +13,7 @@ class DownloadTest(unittest.TestCase):
         initialDate = datetime.date(2016, 7, 1)
         finalDate = datetime.date(2016, 7, 30)
         quote = "BAC"
-        stockHistoricalDataArray = self.download.getStockHistoricalData(initialDate, finalDate, quote)
+        stockHistoricalDataArray = self.download.get_stock_historical_data(initialDate, finalDate, quote)
         self.assertIsNot(0, len(stockHistoricalDataArray))
         historicalData = stockHistoricalDataArray[0]
         # Check one element structure
@@ -28,7 +28,7 @@ class DownloadTest(unittest.TestCase):
 
     def testGetStockCurrentData_OK(self):
         quote = "BAC"
-        stockCurrentData = self.download.getStockCurrentData(quote)
+        stockCurrentData = self.download.get_stock_current_data(quote)
         self.assertIsNotNone(stockCurrentData)
         # Check current data structure
         self.assertIsNotNone(stockCurrentData["symbol"])
