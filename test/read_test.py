@@ -11,7 +11,7 @@ class ReadTest(unittest.TestCase):
     def testReadStocksFromFile_OK(self):
         filePath = "resources/NYSE-Volume-Percentage-Movers-2016-03-21.csv"
         stockMarket = "nyse"
-        stocks = self.read.readStocksFromFile(filePath, stockMarket)
+        stocks = self.read.read_stocks_from_file(filePath, stockMarket)
         self.assertIsNot(0, len(stocks))
         stock = stocks[0]
         # Check stock structure
@@ -27,7 +27,7 @@ class ReadTest(unittest.TestCase):
             "resources/NYSE-Biggest-Percentage-Decliners-2016-03-21.csv"
         ]
         stockMarket = "nyse"
-        stocks = self.read.readStocksFromMultipleFiles(filePathList, stockMarket)
+        stocks = self.read.read_stocks_from_multiple_files(filePathList, stockMarket)
         self.assertIsNot(0, len(stocks))
         stock = stocks[0]
         # Check stock structure

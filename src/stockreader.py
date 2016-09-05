@@ -28,7 +28,7 @@ def get_config():
 
 def read_stocks_from_exchange_file(config, exchange):
     exchange_file_path_list = config[exchange]
-    stocks_from_exchange = read.readStocksFromMultipleFiles(exchange_file_path_list, exchange)
+    stocks_from_exchange = read.read_stocks_from_multiple_files(exchange_file_path_list, exchange)
     return stocks_from_exchange
 
 # Initialize
