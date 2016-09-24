@@ -19,46 +19,46 @@ class MongoTest(unittest.TestCase):
         mongo_client.drop_database(self.TEST_DB_NAME)
 
     def test_save_stock_list_OK(self):
-        stock_count = len(self.mongo.read_stocks_from_stockList())
+        stock_count = len(self.mongo.read_stocks_from_stock_list())
         self.assertEquals(0, stock_count)
         stocks = factories.get_stock_list()
         self.mongo.save_stock_list(stocks)
-        stock_count = len(self.mongo.read_stocks_from_stockList())
+        stock_count = len(self.mongo.read_stocks_from_stock_list())
         self.assertEquals(len(stocks), stock_count)
 
     def test_save_stock_list_NOK_duplicate_stock(self):
-        stock_count = len(self.mongo.read_stocks_from_stockList())
+        stock_count = len(self.mongo.read_stocks_from_stock_list())
         self.assertEquals(0, stock_count)
         stocks = factories.get_stock_list()
         stocks.append(stocks[0])
         self.mongo.save_stock_list(stocks)
-        stock_count = len(self.mongo.read_stocks_from_stockList())
+        stock_count = len(self.mongo.read_stocks_from_stock_list())
         self.assertEquals(len(stocks) - 1, stock_count)
 
     def test_stock_exists_OK(self):
-        stock_count = len(self.mongo.read_stocks_from_stockList())
+        stock_count = len(self.mongo.read_stocks_from_stock_list())
         self.assertEquals(0, stock_count)
         stocks = factories.get_stock_list()
         self.mongo.save_stock_list(stocks)
-        stock_count = len(self.mongo.read_stocks_from_stockList())
+        stock_count = len(self.mongo.read_stocks_from_stock_list())
         self.assertEquals(len(stocks), stock_count)
         self.assertTrue(self.mongo.stock_exists("FB"))
 
     def test_stock_exists_NOK_empty_stock_list(self):
-        stock_count = len(self.mongo.read_stocks_from_stockList())
+        stock_count = len(self.mongo.read_stocks_from_stock_list())
         self.assertEquals(0, stock_count)
         stocks = []
         self.mongo.save_stock_list(stocks)
-        stock_count = len(self.mongo.read_stocks_from_stockList())
+        stock_count = len(self.mongo.read_stocks_from_stock_list())
         self.assertEquals(len(stocks), stock_count)
         self.assertFalse(self.mongo.stock_exists("FB"))
 
     def test_get_stock_by_quote_OK(self):
-        stock_count = len(self.mongo.read_stocks_from_stockList())
+        stock_count = len(self.mongo.read_stocks_from_stock_list())
         self.assertEquals(0, stock_count)
         stocks = factories.get_stock_list()
         self.mongo.save_stock_list(stocks)
-        stock_count = len(self.mongo.read_stocks_from_stockList())
+        stock_count = len(self.mongo.read_stocks_from_stock_list())
         self.assertEquals(len(stocks), stock_count)
         expected_stock = stocks[0]
         stock_by_quote = self.mongo.get_stock_by_quote(expected_stock["symbol"])

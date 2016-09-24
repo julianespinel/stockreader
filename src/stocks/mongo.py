@@ -44,7 +44,7 @@ class Mongo:
             except (DuplicateKeyError, BulkWriteError) as err:
                 logger.error("save_stock_list: %i %s", len(stocks), err)
 
-    def read_stocks_from_stockList(self):
+    def read_stocks_from_stock_list(self):
         stocks = []
         stocklist_collection = self.db[self.STOCK_LIST]
         cursor = stocklist_collection.find()
