@@ -1,5 +1,6 @@
 import sys
 import toml
+import threading
 
 from infrastructure import log
 from admin import admin_api
@@ -51,7 +52,9 @@ exchanges = config["exchanges"]
 stocks = read_stocks_from_exchange_file(exchanges, NYSE)
 stocks.extend(read_stocks_from_exchange_file(exchanges, NASDAQ))
 logger.info("stocks %s", len(stocks))
-job.add_stocks_list_to_stockreader(stocks)
+# Download all stocks data asynchronously on startup.
+thread = threading.Thread(target=job.add_stocks_list_to_stockreader, args=[stocks])
+thread.start()
 
 # Schedule recurrent stock update jobs.
 job.schedule_stock_updates()
