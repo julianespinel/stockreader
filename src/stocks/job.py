@@ -64,5 +64,7 @@ class Job:
             self.download_and_save_stock_historical_data_in_parallel([stock])
 
     def add_stocks_list_to_stockreader(self, stocks):
-        for stock in stocks:
-            self.add_stock_to_stockreader(stock)
+        number_of_workers = self.get_number_of_workers(stocks)
+        with ThreadPoolExecutor(max_workers=number_of_workers) as executor:
+            for stock in stocks:
+                executor.submit(self.add_stock_to_stockreader, stock)
