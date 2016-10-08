@@ -5,3 +5,4 @@ requests==2.10.0
 toml==0.9.1
 inflection==0.3.1
 tornado==4.4.1
+influxdb==3.0.0
