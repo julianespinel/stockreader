@@ -5,7 +5,7 @@ from infrastructure import log
 
 logger = log.get_logger("stocks_api")
 
-def get_stocks_blueprint(domain, job):
+def get_stocks_blueprint(domain, job, time_series):
     stocks_blueprint = Blueprint('stocks_api', __name__)
 
     @stocks_blueprint.route('', methods=['POST'])
@@ -29,6 +29,7 @@ def get_stocks_blueprint(domain, job):
             response = jsonify({ "error": "The given stock already exists" }), 409
             return response
         # Add stock async
+        time_series.save_async("API", {}, { "method": "add_stock", "stock": new_stock })
         thread = threading.Thread(target=job.add_stock_to_stockreader, args=(new_stock,)) # Why args should be a tuple?
         thread.start()
         response = jsonify({ "success": "The stock " + quote + " is being added" }), 202
