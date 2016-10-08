@@ -12,12 +12,12 @@ def get_stocks_blueprint(domain, job):
     def add_stock():
         response = None
         new_stock = request.get_json()
+        logger.info("post: %s", new_stock)
         if new_stock is None:
             response = jsonify({ "error": "Please provide a stock in the request body. It should have a name, a symbol and a stock market" }), 400
             return response
         name = new_stock.get("name", None)
         quote = new_stock.get("symbol", None)
-        logger.info("post: %s", new_stock)
         stock_market = new_stock.get("stockMarket", None)
         is_valid_stock = name and quote and stock_market
         if not is_valid_stock:
