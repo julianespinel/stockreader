@@ -14,7 +14,8 @@ class ApiTest(unittest.TestCase):
         app.config['DEBUG'] = True
         self.domain_mock = Mock()
         self.job_mock = Mock()
-        stocks_blueprint = stocks_api.get_stocks_blueprint(self.domain_mock, self.job_mock)
+        self.time_series_mock = Mock()
+        stocks_blueprint = stocks_api.get_stocks_blueprint(self.domain_mock, self.job_mock, self.time_series_mock)
         app.register_blueprint(stocks_blueprint, url_prefix='/stockreader/api/stocks')
         self.client = app.test_client()
 
