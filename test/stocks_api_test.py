@@ -25,6 +25,7 @@ class ApiTest(unittest.TestCase):
         self.domain_mock.stock_exists = Mock(return_value=False)
         response = self.client.post("/stockreader/api/stocks", data=json.dumps(stock), content_type="application/json")
         self.domain_mock.stock_exists.assert_called_once_with(quote)
+        self.time_series_mock.save_async.assert_called_once_with("API", {}, { "method": "add_stock", "stock": quote })
         self.assertEquals(response.status_code, 202)
         data = json.loads(response.data)
         expected_message = "The stock " + quote + " is being added"
@@ -32,6 +33,8 @@ class ApiTest(unittest.TestCase):
 
     def test_add_stock_NOK_empty_request_body(self):
         response = self.client.post("/stockreader/api/stocks")
+        self.domain_mock.stock_exists.assert_not_called()
+        self.time_series_mock.save_async.assert_not_called()
         self.assertEquals(response.status_code, 400)
         data = json.loads(response.data)
         expected_error_message = "Please provide a stock in the request body. It should have a name, a symbol and a stock market"
@@ -40,6 +43,8 @@ class ApiTest(unittest.TestCase):
     def test_add_stock_NOK_not_valid_stock(self):
         stock = factories.get_not_valid_stock_data()
         response = self.client.post("/stockreader/api/stocks", data=json.dumps(stock), content_type="application/json")
+        self.domain_mock.stock_exists.assert_not_called()
+        self.time_series_mock.save_async.assert_not_called()
         self.assertEquals(response.status_code, 400)
         data = json.loads(response.data)
         expected_error_message = "Please provide a valid stock. It should have a name, a symbol and a stock market"
@@ -51,6 +56,7 @@ class ApiTest(unittest.TestCase):
         self.domain_mock.stock_exists = Mock(return_value=True)
         response = self.client.post("/stockreader/api/stocks", data=json.dumps(stock), content_type="application/json")
         self.domain_mock.stock_exists.assert_called_once_with(quote)
+        self.time_series_mock.save_async.assert_not_called()
         self.assertEquals(response.status_code, 409)
         data = json.loads(response.data)
         expected_error_message = "The given stock already exists"
