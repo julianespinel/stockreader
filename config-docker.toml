@@ -4,7 +4,7 @@ port = 5000
 debug = false
 
 [mongo]
-host = "db"
+host = "mongodb"
 port = 27017
 name = "stockreaderdb"
 
