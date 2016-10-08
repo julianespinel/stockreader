@@ -4,10 +4,20 @@ api:
   ports:
     - "5000:5000"
   links:
-    - db
-db:
+    - mongodb
+    - influxdb
+
+mongodb:
   image: mongo:3
   ports:
     - "27017:27017"
   volumes:
     - /data/db/:/data/db
+
+influxdb:
+  image: influxdb:1.0.2
+  ports:
+    - "8083:8083"
+    - "8086:8086"
+  volumes:
+    - /var/lib/influxdb:/var/lib/influxdb
