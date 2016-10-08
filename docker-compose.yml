@@ -3,8 +3,6 @@ api:
   command: python3 src/stockreader.py config-docker.toml
   ports:
     - "5000:5000"
-  volumes:
-    - .:/mongo_data
   links:
     - db
 db:
