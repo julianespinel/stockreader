@@ -2,9 +2,11 @@ import sys
 import toml
 import threading
 
-from infrastructure import log
+from infrastructure import log, time_series
 from admin import admin_api
 from stocks import job, read, mongo, domain, download, stocks_api
+
+from influxdb import InfluxDBClient
 
 from tornado.wsgi import WSGIContainer
 from tornado.httpserver import HTTPServer
@@ -33,13 +35,23 @@ def read_stocks_from_exchange_file(config, exchange):
     return stocks_from_exchange
 
 # Initialize
+
+## Mongo
 config = get_config()
 mongo_config = config["mongo"]
 dbHost = mongo_config["host"]
 dbPort = mongo_config["port"]
 dbName = mongo_config["name"]
-
 mongo = mongo.Mongo(dbHost, dbPort, dbName)
+
+## Influx
+influx_config = config["influx"]
+inf_host = influx_config["host"]
+inf_port = influx_config["port"]
+inf_dbname = influx_config["name"]
+influx_client = InfluxDBClient(inf_host, inf_port, inf_dbname)
+time_series = time_series.TimeSeries(influx_client)
+
 read = read.Read()
 download = download.Download()
 domain = domain.Domain(mongo, download)
@@ -61,9 +73,9 @@ job.schedule_stock_updates()
 
 # Start the flask server
 app = Flask(__name__)
-admin_blueprint = admin_api.get_admin_blueprint()
+admin_blueprint = admin_api.get_admin_blueprint(time_series)
 app.register_blueprint(admin_blueprint, url_prefix='/stockreader/admin')
-stocks_api = stocks_api.get_stocks_blueprint(domain, job)
+stocks_api = stocks_api.get_stocks_blueprint(domain, job, time_series)
 app.register_blueprint(stocks_api, url_prefix='/stockreader/api/stocks')
 
 server = config["server"]
