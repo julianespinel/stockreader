@@ -9,7 +9,8 @@ class JobTest(unittest.TestCase):
     def setUp(self):
         self.domain_mock = Mock()
         self.scheduler_mock = Mock()
-        self.job = job.Job(self.domain_mock, self.scheduler_mock)
+        self.time_series_mock = Mock()
+        self.job = job.Job(self.domain_mock, self.scheduler_mock, self.time_series_mock)
 
     def test_get_number_of_workers_OK_list_less_than_workers_constant(self):
         any_list = [1, 2, 3]
