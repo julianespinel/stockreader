@@ -4,8 +4,13 @@ port = 5000
 debug = false
 
 [mongo]
-host = "db"
+host = "mongodb"
 port = 27017
+name = "stockreaderdb"
+
+[influx]
+host = "influxdb"
+port = 8086
 name = "stockreaderdb"
 
 [exchanges]

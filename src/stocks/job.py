@@ -16,20 +16,23 @@ class Job:
     DAILY_UPDATE_HOUR = 18
     MONTHLY_UPDATE_HOUR = 23
 
-    def __init__(self, domain, scheduler):
+    def __init__(self, domain, scheduler, time_series):
         self.domain = domain
         self.scheduler = scheduler
+        self.time_series = time_series
 
     def get_number_of_workers(self, anyList):
         return len(anyList) if len(anyList) < self.WORKERS else self.WORKERS
 
     def download_and_save_stock_current_data_in_parallel(self, stocks):
+        self.time_series.save_async("JOB", {}, { "method": "download_and_save_stock_current_data_in_parallel", "stocks": len(stocks) })
         number_of_workers = self.get_number_of_workers(stocks)
         with ThreadPoolExecutor(max_workers=number_of_workers) as executor:
             for stock in stocks:
                 executor.submit(self.domain.download_and_save_stock_current_data, stock)
 
     def download_and_save_stock_weekly_data_in_parallel(self, stocks):
+        self.time_series.save_async("JOB", {}, { "method": "download_and_save_stock_weekly_data_in_parallel", "stocks": len(stocks) })
         today = date.today()
         initial_date = today - timedelta(weeks=self.WEEKS_AGO)
         number_of_workers = self.get_number_of_workers(stocks)
@@ -38,6 +41,7 @@ class Job:
                 executor.submit(self.domain.download_and_save_stock_historical_data, initial_date, today, stock)
 
     def download_and_save_stock_historical_data_in_parallel(self, stocks):
+        self.time_series.save_async("JOB", {}, { "method": "download_and_save_stock_historical_data_in_parallel", "stocks": len(stocks) })
         today = date.today()
         # Here always use more workers because we need to perform more than one call.
         with ThreadPoolExecutor(max_workers=self.WORKERS) as executor:
