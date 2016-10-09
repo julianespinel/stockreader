@@ -3,7 +3,7 @@ import unittest
 
 from src.stocks import download
 
-
+@unittest.skip("skip integration test cases")
 class DownloadTest(unittest.TestCase):
 
     def setUp(self):
