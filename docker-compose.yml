@@ -21,3 +21,10 @@ influxdb:
     - "8086:8086"
   volumes:
     - /var/lib/influxdb:/var/lib/influxdb
+
+grafana:
+  image: grafana/grafana:latest
+  ports:
+    - 3000:3000
+  volumes:
+    - /var/lib/grafana:/var/lib/grafana
