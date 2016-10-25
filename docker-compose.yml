@@ -21,3 +21,12 @@ influxdb:
     - "8086:8086"
   volumes:
     - /var/lib/influxdb:/var/lib/influxdb
+
+grafana:
+  image: grafana/grafana:3.1.1-1470047149
+  ports:
+    - 3000:3000
+  volumes:
+    - /var/lib/grafana:/var/lib/grafana
+  environment:
+    GF_USERS_ALLOW_SIGN_UP: "false"
