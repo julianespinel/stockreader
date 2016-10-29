@@ -23,7 +23,7 @@ Additionally the system repeat the following tasks in different period of times:
 
 This recurring tasks guarantee that the system has the historical stock data of at least the last 10 years.
 
-## How to install?
+## Installation
 
 #### 1. Dependencies
 
@@ -53,7 +53,7 @@ If you can see `pong` in the web browser, then Stockreader is being correctly in
 Stockreader has a simple HTTP API,  with it you can request stock current data and historical data. <br>
 Please refer to the API documentation. * link.
 
-## Generate API docs
+## API docs
 
 To generate API docs please follow this steps:
 
