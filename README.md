@@ -23,7 +23,7 @@ Additionally the system repeat the following tasks in different period of times:
 
 This recurring tasks guarantee that the system has the historical stock data of at least the last 10 years.
 
-## How to install?
+## Installation
 
 #### 1. Dependencies
 
@@ -43,12 +43,17 @@ Please copy and paste this commands in the terminal:
 Now open a web browser and go to: `http://localhost:5000/stockreader/admin/ping` <br>
 If you can see `pong` in the web browser, then Stockreader is being correctly installed.
 
+## Tests
+
+1. Run all Tests: `nosetests`
+1. Run a single test file: `nosetests test/job_test.py`
+
 ## How to use?
 
 Stockreader has a simple HTTP API,  with it you can request stock current data and historical data. <br>
 Please refer to the API documentation. * link.
 
-## Generate API docs
+## API docs
 
 To generate API docs please follow this steps:
 
