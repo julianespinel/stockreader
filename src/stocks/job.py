@@ -30,6 +30,7 @@ class Job:
 
     def download_and_save_stock_current_data_in_parallel(self, stocks):
         self.time_series.save_async("JOB", {}, { "method": "download_and_save_stock_current_data_in_parallel", "stocks": len(stocks) })
+        stocks = self.get_stocks_if_empty_list(stocks)
         number_of_workers = self.get_number_of_workers(stocks)
         with ThreadPoolExecutor(max_workers=number_of_workers) as executor:
             for stock in stocks:
@@ -39,6 +40,7 @@ class Job:
         self.time_series.save_async("JOB", {}, { "method": "download_and_save_stock_weekly_data_in_parallel", "stocks": len(stocks) })
         today = date.today()
         initial_date = today - timedelta(weeks=self.WEEKS_AGO)
+        stocks = self.get_stocks_if_empty_list(stocks)
         number_of_workers = self.get_number_of_workers(stocks)
         with ThreadPoolExecutor(max_workers=number_of_workers) as executor:
             for stock in stocks:
@@ -47,6 +49,7 @@ class Job:
     def download_and_save_stock_historical_data_in_parallel(self, stocks):
         self.time_series.save_async("JOB", {}, { "method": "download_and_save_stock_historical_data_in_parallel", "stocks": len(stocks) })
         today = date.today()
+        stocks = self.get_stocks_if_empty_list(stocks)
         # Here always use more workers because we need to perform more than one call.
         with ThreadPoolExecutor(max_workers=self.WORKERS) as executor:
             for stock in stocks:
@@ -57,9 +60,9 @@ class Job:
 
     def schedule_stock_updates(self):
         stocks = self.domain.get_stock_list()
-        self.scheduler.add_job(self.download_and_save_stock_current_data_in_parallel, 'cron', args=[stocks], hour='*')
-        self.scheduler.add_job(self.download_and_save_stock_weekly_data_in_parallel, 'cron', args=[stocks], hour=self.DAILY_UPDATE_HOUR)
-        self.scheduler.add_job(self.download_and_save_stock_historical_data_in_parallel, 'cron', args=[stocks], day='last', hour=self.MONTHLY_UPDATE_HOUR)
+        self.scheduler.add_job(self.download_and_save_stock_current_data_in_parallel, 'cron', args=[], hour='*')
+        self.scheduler.add_job(self.download_and_save_stock_weekly_data_in_parallel, 'cron', args=[], hour=self.DAILY_UPDATE_HOUR)
+        self.scheduler.add_job(self.download_and_save_stock_historical_data_in_parallel, 'cron', args=[], day='last', hour=self.MONTHLY_UPDATE_HOUR)
         self.scheduler.start()
 
     def add_stock_to_stockreader(self, stock):
