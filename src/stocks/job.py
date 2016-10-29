@@ -59,10 +59,10 @@ class Job:
                     executor.submit(self.domain.download_and_save_stock_historical_data, initial_date, final_date, stock)
 
     def schedule_stock_updates(self):
-        stocks = self.domain.get_stock_list()
-        self.scheduler.add_job(self.download_and_save_stock_current_data_in_parallel, 'cron', args=[], hour='*')
-        self.scheduler.add_job(self.download_and_save_stock_weekly_data_in_parallel, 'cron', args=[], hour=self.DAILY_UPDATE_HOUR)
-        self.scheduler.add_job(self.download_and_save_stock_historical_data_in_parallel, 'cron', args=[], day='last', hour=self.MONTHLY_UPDATE_HOUR)
+        stocks = []
+        self.scheduler.add_job(self.download_and_save_stock_current_data_in_parallel, 'cron', args=[stocks], hour='*')
+        self.scheduler.add_job(self.download_and_save_stock_weekly_data_in_parallel, 'cron', args=[stocks], hour=self.DAILY_UPDATE_HOUR)
+        self.scheduler.add_job(self.download_and_save_stock_historical_data_in_parallel, 'cron', args=[stocks], day='last', hour=self.MONTHLY_UPDATE_HOUR)
         self.scheduler.start()
 
     def add_stock_to_stockreader(self, stock):
