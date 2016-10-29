@@ -19,8 +19,19 @@ influxdb:
   ports:
     - "8083:8083"
     - "8086:8086"
+    - "25826:25826/udp"
   volumes:
     - /var/lib/influxdb:/var/lib/influxdb
+    - /usr/share/collectd:/usr/share/collectd
+  environment:
+    INFLUXDB_COLLECTD_ENABLED: "true"
+    INFLUXDB_COLLECTD_BIND_ADDRESS: ":25826"
+    INFLUXDB_COLLECTD_DATABASE: "collectddb"
+    INFLUXDB_COLLECTD_TYPESDB: "/usr/share/collectd/types.db"
+    INFLUXDB_COLLECTD_BATCH_SIZE: 5000
+    INFLUXDB_COLLECTD_BATCH_PENDING: 10
+    INFLUXDB_COLLECTD_BATCH_TIMEOUT: "10s"
+    INFLUXDB_COLLECTD_READ_BUFFER: 0
 
 grafana:
   image: grafana/grafana:3.1.1-1470047149
