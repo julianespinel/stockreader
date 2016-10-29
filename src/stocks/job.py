@@ -21,8 +21,8 @@ class Job:
         self.scheduler = scheduler
         self.time_series = time_series
 
-    def get_number_of_workers(self, anyList):
-        return len(anyList) if len(anyList) < self.WORKERS else self.WORKERS
+    def get_number_of_workers(self, any_list):
+        return len(any_list) if len(any_list) < self.WORKERS else self.WORKERS
 
     def get_stocks_if_empty_list(self, stocks):
         stocks = stocks if stocks else self.domain.get_stock_list()
