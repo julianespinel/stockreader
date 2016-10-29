@@ -24,6 +24,10 @@ class Job:
     def get_number_of_workers(self, anyList):
         return len(anyList) if len(anyList) < self.WORKERS else self.WORKERS
 
+    def get_stocks_if_empty_list(self, stocks):
+        stocks = stocks if stocks else self.domain.get_stock_list()
+        return stocks
+
     def download_and_save_stock_current_data_in_parallel(self, stocks):
         self.time_series.save_async("JOB", {}, { "method": "download_and_save_stock_current_data_in_parallel", "stocks": len(stocks) })
         number_of_workers = self.get_number_of_workers(stocks)
