@@ -7,5 +7,5 @@ import System.Environment
 -- stack run "resources/US_LIST_OF_SYMBOLS.csv"
 main :: IO ()
 main = do
-    args <- getArgs
-    printStocks $ head args
+  args <- getArgs
+  readStocks (head args) >>= print
