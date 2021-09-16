@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Lib (printStocks) where
+module Lib (readStocks) where
 
 import Control.Monad
 import qualified Data.ByteString.Lazy as BL
@@ -48,9 +48,11 @@ removeHeaders = snd
 -- Given a list, return only the elements with instrumentType "Common Stock"
 filterStocks :: V.Vector FinancialInstrument -> V.Vector FinancialInstrument
 filterStocks = V.filter isStock
+  where
+    isStock :: FinancialInstrument -> Bool
+    isStock stock = instrumentType stock == "Common Stock"
 
--- Print the stocks from the CSV file
-printStocks :: FilePath -> IO ()
-printStocks filePath =
-  parseCSV filePath
-    >>= print . fmap (filterStocks . removeHeaders)
+-- Read stocks from a CSV file
+readStocks :: FilePath -> IO (Either ErrorMsg (V.Vector FinancialInstrument))
+readStocks filePath =
+  (fmap . fmap) (filterStocks . removeHeaders) (parseCSV filePath)
