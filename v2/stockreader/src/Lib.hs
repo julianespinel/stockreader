@@ -7,8 +7,8 @@ import qualified Data.ByteString.Lazy as BL
 import Data.Csv
 import qualified Data.Vector as V
 
--- data type to model a stock
-data Stock = Stock
+-- data type to model a FinancialInstrument
+data FinancialInstrument = FinancialInstrument
   { code :: String,
     name :: String,
     country :: String,
@@ -18,9 +18,11 @@ data Stock = Stock
   }
   deriving (Show)
 
-instance FromNamedRecord Stock where
+-- Define how to get a FinancialInstrument from a record (CSV row),
+-- by implementing the FromNamedRecord typeclass
+instance FromNamedRecord FinancialInstrument where
   parseNamedRecord record =
-    Stock
+    FinancialInstrument
       <$> record .: "Code"
       <*> record .: "Name"
       <*> record .: "Country"
@@ -31,7 +33,7 @@ instance FromNamedRecord Stock where
 -- type synonyms to handle the CSV contents
 type ErrorMsg = String
 
-type CsvData = (Header, V.Vector Stock)
+type CsvData = (Header, V.Vector FinancialInstrument)
 
 -- Function to read the CSV
 parseCSV :: FilePath -> IO (Either ErrorMsg CsvData)
@@ -40,14 +42,11 @@ parseCSV filePath = do
   return $ decodeByName contents
 
 -- Discard headers from CsvData
-removeHeaders :: CsvData -> V.Vector Stock
+removeHeaders :: CsvData -> V.Vector FinancialInstrument
 removeHeaders = snd
 
--- Check if the given element is a Common Stock
-isStock :: Stock -> Bool
-isStock stock = instrumentType stock == "Common Stock"
-
-filterStocks :: V.Vector Stock -> V.Vector Stock
+-- Given a list, return only the elements with instrumentType "Common Stock"
+filterStocks :: V.Vector FinancialInstrument -> V.Vector FinancialInstrument
 filterStocks = V.filter isStock
 
 -- Print the stocks from the CSV file
