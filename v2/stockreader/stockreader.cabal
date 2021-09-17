@@ -25,7 +25,7 @@ source-repository head
 
 library
   exposed-modules:
-      Lib
+      Csv
   other-modules:
       Paths_stockreader
   hs-source-dirs:

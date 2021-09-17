@@ -1,6 +1,7 @@
 module Main where
 
-import Lib
+-- import Lib
+import Csv
 import System.Environment
 
 -- How to run?

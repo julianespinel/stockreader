@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Lib (readStocks) where
+module Csv (readStocks) where
 
 import Control.Monad
 import qualified Data.ByteString.Lazy as BL
