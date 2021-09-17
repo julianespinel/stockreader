@@ -50,7 +50,7 @@ filterStocks :: V.Vector FinancialInstrument -> V.Vector FinancialInstrument
 filterStocks = V.filter isStock
   where
     isStock :: FinancialInstrument -> Bool
-    isStock stock = instrumentType stock == "Common Stock"
+    isStock instrument = instrumentType instrument == "Common Stock"
 
 -- Read stocks from a CSV file
 readStocks :: FilePath -> IO (Either ErrorMsg (V.Vector FinancialInstrument))
