@@ -6,6 +6,8 @@ import Control.Monad
 import qualified Data.ByteString.Lazy as BL
 import Data.Csv
 import qualified Data.Vector as V
+import System.Directory (doesFileExist)
+import Text.Printf
 
 -- data type to model a FinancialInstrument
 data FinancialInstrument = FinancialInstrument
@@ -36,10 +38,12 @@ type ErrorMsg = String
 type CsvData = (Header, V.Vector FinancialInstrument)
 
 -- Function to read the CSV
-parseCSV :: FilePath -> IO (Either ErrorMsg CsvData)
-parseCSV filePath = do
-  contents <- BL.readFile filePath
-  return $ decodeByName contents
+parseCsv :: FilePath -> IO (Either ErrorMsg CsvData)
+parseCsv filePath = do
+  fileExists <- doesFileExist filePath
+  if fileExists
+    then decodeByName <$> BL.readFile filePath
+    else return . Left $ printf "The file %s does not exist" filePath
 
 -- Discard headers from CsvData
 removeHeaders :: CsvData -> V.Vector FinancialInstrument
@@ -55,4 +59,4 @@ filterStocks = V.filter isStock
 -- Read stocks from a CSV file
 readStocks :: FilePath -> IO (Either ErrorMsg (V.Vector FinancialInstrument))
 readStocks filePath =
-  (fmap . fmap) (filterStocks . removeHeaders) (parseCSV filePath)
+  (fmap . fmap) (filterStocks . removeHeaders) (parseCsv filePath)

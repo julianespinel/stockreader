@@ -34,6 +34,7 @@ library
       base >=4.7 && <5
     , bytestring
     , cassava
+    , directory
     , vector
   default-language: Haskell2010
 
@@ -48,6 +49,7 @@ executable stockreader-exe
       base >=4.7 && <5
     , bytestring
     , cassava
+    , directory
     , stockreader
     , vector
   default-language: Haskell2010
