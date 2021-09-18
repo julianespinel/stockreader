@@ -50,3 +50,6 @@ tests:
     - -with-rtsopts=-N
     dependencies:
     - stockreader
+    - hspec
+    - QuickCheck
+    - hspec-expectations
