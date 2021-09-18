@@ -30,6 +30,14 @@ The system will do the following:
          3. Per year
 4. Send an email to a list of recipients with the stock analysis every day.
 
+## Test
+
+1. `git clone git@github.com:julianespinel/stockreader.git`
+2. `cd stockreader`
+3. `git checkout v2/update-code`
+4. `cd v2/stockreader`
+5. `stack test`
+
 ## Run
 
 To run the project please follow these steps:
