@@ -18,7 +18,7 @@ data FinancialInstrument = FinancialInstrument
     currency :: String,
     instrumentType :: String
   }
-  deriving (Show)
+  deriving (Show, Eq)
 
 -- Define how to get a FinancialInstrument from a record (CSV row),
 -- by implementing the FromNamedRecord typeclass
