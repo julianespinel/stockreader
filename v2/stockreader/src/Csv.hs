@@ -20,8 +20,8 @@ data FinancialInstrument = FinancialInstrument
   }
   deriving (Show, Eq)
 
--- Define how to get a FinancialInstrument from a record (CSV row),
--- by implementing the FromNamedRecord typeclass
+-- Define how to get a FinancialInstrument from a record (CSV row)
+-- by implementing the FromNamedRecord type class
 instance FromNamedRecord FinancialInstrument where
   parseNamedRecord record =
     FinancialInstrument
