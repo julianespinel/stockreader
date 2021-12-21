@@ -1,3 +1,11 @@
+[iex]
 environment = ""
 version = ""
 api_key = ""
+
+[database]
+username = ""
+password = ""
+host = ""
+port = ""
+name = ""
