@@ -1,9 +1,13 @@
+#[macro_use]
+extern crate diesel;
+
 use anyhow::Result;
 
 mod client;
 mod models;
 mod repository;
 mod config;
+mod schema;
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -12,6 +16,6 @@ async fn main() -> Result<()> {
 
     let iex_client = client::IEXClient { host: &host, api_key: &config.api_key };
     let symbols = iex_client.get_symbols().await?;
-    repository::write_to_csv(symbols)?;
+    repository::save_symbols(&db_url, symbols)?;
     Ok(())
 }
