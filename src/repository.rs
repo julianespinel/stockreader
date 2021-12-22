@@ -1,24 +1,38 @@
 use diesel::insert_into;
 use diesel::pg::PgConnection;
 use diesel::prelude::*;
+use diesel::result::Error;
 
 use crate::models::Symbol;
 
-// private functions
+use crate::schema::symbols;
+use crate::schema::symbols::dsl::*;
 
-fn get_connection(database_url: &str) -> PgConnection {
-    PgConnection::establish(database_url)
-        .expect(&format!("Error connecting to {}", database_url))
+pub(super) struct Repository<'a> {
+    pub db_url: &'a str,
 }
 
-// public functions
+impl<'a> Repository<'a> {
+    // private functions
 
-pub fn save_symbols(database_url: &str, symbols: Vec<Symbol>) -> Result<(), diesel::result::Error> {
-    use crate::schema::symbols;
+    fn get_connection(&self) -> PgConnection {
+        PgConnection::establish(self.db_url)
+            .expect(&format!("Error connecting to {}", self.db_url))
+    }
 
-    let conn = get_connection(database_url);
-    insert_into(symbols::table)
-        .values(symbols)
-        .execute(&conn)?;
-    Ok(())
+    // public functions
+
+    pub fn save_symbols(&self, new_symbols: &Vec<Symbol>) -> Result<(), Error> {
+        let conn = self.get_connection();
+        insert_into(symbols::table)
+            .values(new_symbols)
+            .execute(&conn)?;
+        Ok(())
+    }
+
+    pub fn get_symbols(&self) -> Result<Vec<Symbol>, Error> {
+        let conn = self.get_connection();
+        let symbols_from_db = symbols.load::<Symbol>(&conn)?;
+        Ok(symbols_from_db)
+    }
 }
