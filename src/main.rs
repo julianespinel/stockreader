@@ -5,12 +5,14 @@ use log::{info};
 use log4rs;
 
 use anyhow::Result;
+use crate::service::Service;
 
 mod client;
 mod models;
 mod repository;
 mod config;
 mod schema;
+mod service;
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -24,7 +26,13 @@ async fn main() -> Result<()> {
     info!("configuration was read");
 
     let iex_client = client::IEXClient { host: &host, api_key: &config.iex.api_key };
-    let symbols = iex_client.get_symbols().await?;
-    repository::save_symbols(&db_url, symbols)?;
+    let repository = repository::Repository { db_url: &db_url };
+    let service = Service{ iex_client: &iex_client, repository: &repository };
+    info!("startup is done");
+
+    info!("start: getting symbols");
+    service.get_symbols().await?;
+    info!("done: getting symbols");
+    info!("done");
     Ok(())
 }
