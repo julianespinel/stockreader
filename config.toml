@@ -7,5 +7,5 @@ api_key = ""
 username = ""
 password = ""
 host = ""
-port = ""
+port = 0
 name = ""

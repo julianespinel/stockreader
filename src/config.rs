@@ -15,7 +15,7 @@ pub(super) struct DatabaseConfig {
     pub host: String,
     pub username: String,
     pub password: String,
-    pub port: String,
+    pub port: u32,
     pub name: String,
 }
 
