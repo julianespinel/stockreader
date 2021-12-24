@@ -22,7 +22,7 @@ async fn main() -> Result<()> {
     info!("start");
     let config = config::read_config("config-dev.toml")?;
     let host = config::get_iex_host(&config.iex);
-    let db_url = config::get_database_url(config.database);
+    let db_url = config::get_database_url(&config.database);
     info!("configuration was read");
 
     let iex_client = client::IEXClient { host: &host, api_key: &config.iex.api_key };
