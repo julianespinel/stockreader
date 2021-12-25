@@ -57,7 +57,9 @@ pub(super) fn get_database_url(db_config: &DatabaseConfig) -> String {
 mod tests {
     use crate::config::{DatabaseConfig, get_database_url, get_iex_host, IEXConfig};
 
+    //-------------------------------------------------------------------------
     // get_iex_host tests
+    //-------------------------------------------------------------------------
 
     #[test]
     fn get_iex_host_returns_valid_host() {
@@ -68,7 +70,7 @@ mod tests {
         let iex_config = IEXConfig {
             api_key: api_key.to_string(),
             version: version.to_string(),
-            environment: environment.to_string()
+            environment: environment.to_string(),
         };
         let expected_host = "https://beta.iexapis.com/v1.0.0";
         // act
@@ -87,7 +89,7 @@ mod tests {
         let iex_config = IEXConfig {
             api_key: api_key.to_string(),
             version: version.to_string(),
-            environment: environment.to_string()
+            environment: environment.to_string(),
         };
         // act
         get_iex_host(&iex_config);
@@ -103,13 +105,15 @@ mod tests {
         let iex_config = IEXConfig {
             api_key: api_key.to_string(),
             version: version.to_string(),
-            environment: environment.to_string()
+            environment: environment.to_string(),
         };
         // act
         get_iex_host(&iex_config);
     }
 
+    //-------------------------------------------------------------------------
     // get_database_url tests
+    //-------------------------------------------------------------------------
 
     #[test]
     fn get_database_url_returns_valid_url() {
