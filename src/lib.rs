@@ -19,7 +19,9 @@ pub async fn download_symbols() -> Result<()> {
     let db_url = config::get_database_url(&config.database);
     info!("configuration was read");
 
-    let iex_client = client::IEXClient { host: &host, api_key: &config.iex.api_key };
+
+
+    let iex_client = client::IEXClient::new(&config.iex.api_key, &host);
     let repository = repository::Repository { db_url: &db_url };
     let service = Service { iex_client: &iex_client, repository: &repository };
     info!("startup is done");

@@ -1,11 +1,17 @@
 use crate::models::Symbol;
 
 pub(super) struct IEXClient<'a> {
-    pub host: &'a str,
     pub api_key: &'a str,
+    pub host: &'a str,
 }
 
 impl<'a> IEXClient<'a> {
+    pub fn new(api_key: &'a str, host: &'a str) -> IEXClient<'a> {
+        if api_key.is_empty() { panic!("api_key must not be empty") }
+        if host.is_empty() { panic!("host must not be empty") }
+        IEXClient { api_key, host }
+    }
+
     pub async fn get_symbols(&self) -> Result<Vec<Symbol>, reqwest::Error> {
         let url = format!("{}/ref-data/symbols?token={}", self.host, self.api_key);
         let symbols = reqwest::get(&url).await?.json::<Vec<Symbol>>().await?;
@@ -20,10 +26,43 @@ mod tests {
 
     use crate::client::IEXClient;
 
-//-------------------------------------------------------------------------
+    // new() tests
+
+    #[test]
+    fn new_given_api_key_and_host_returns_iex_client() {
+        // arrange
+        let api_key = "ak";
+        let host = "http://localhost";
+        // act
+        let client = IEXClient::new(api_key, host);
+        // assert
+        assert_eq!(client.api_key, api_key);
+        assert_eq!(client.host, host);
+    }
+
+    #[test]
+    #[should_panic(expected = "api_key must not be empty")]
+    fn new_given_empty_api_key_it_panics() {
+        // arrange
+        let api_key = "";
+        let host = "http://localhost";
+        // act
+        IEXClient::new(api_key, host);
+    }
+
+    #[test]
+    #[should_panic(expected = "host must not be empty")]
+    fn new_given_empty_host_it_panics() {
+        // arrange
+        let api_key = "ak";
+        let host = "";
+        // act
+        IEXClient::new(api_key, host);
+    }
+
+    //-------------------------------------------------------------------------
     // get_iex_host tests
     //-------------------------------------------------------------------------
-
 
     #[tokio::test]
     async fn get_symbols_returns_200() {
