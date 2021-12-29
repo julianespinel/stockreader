@@ -61,7 +61,7 @@ mod tests {
     }
 
     //-------------------------------------------------------------------------
-    // get_iex_host tests
+    // get_symbols() tests
     //-------------------------------------------------------------------------
 
     #[tokio::test]
@@ -79,7 +79,7 @@ mod tests {
                 .query_param("token", client.api_key);
             then.status(200)
                 .header("content-type", "application/json")
-                .body_from_file("tests/httpmock_files/symbols.json");
+                .body_from_file("tests/resources/httpmock_files/symbols.json");
         });
 
         // act
