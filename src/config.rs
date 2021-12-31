@@ -1,17 +1,17 @@
 use std::fs::read_to_string;
 use std::io::Error;
 
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
-#[derive(Default, Deserialize)]
-pub(super) struct IEXConfig {
+#[derive(Default, Deserialize, Serialize, Clone)]
+pub struct IEXConfig {
     pub environment: String,
     pub version: String,
     pub api_key: String,
 }
 
-#[derive(Default, Deserialize)]
-pub(super) struct DatabaseConfig {
+#[derive(Default, Deserialize, Serialize)]
+pub struct DatabaseConfig {
     pub host: String,
     pub username: String,
     pub password: String,
@@ -19,13 +19,13 @@ pub(super) struct DatabaseConfig {
     pub name: String,
 }
 
-#[derive(Default, Deserialize)]
-pub(super) struct Configuration {
+#[derive(Default, Deserialize, Serialize)]
+pub struct Configuration {
     pub iex: IEXConfig,
     pub database: DatabaseConfig,
 }
 
-pub(super) fn read_config(config_path: &str) -> Result<Configuration, Error> {
+pub fn read_config(config_path: &str) -> Result<Configuration, Error> {
     let content = read_to_string(config_path)?;
     let config = toml::from_str(&content)?;
     Ok(config)
