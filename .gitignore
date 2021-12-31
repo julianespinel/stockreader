@@ -17,3 +17,4 @@ Cargo.lock
 .idea
 *.csv
 config-*.toml
+!config-test.toml
