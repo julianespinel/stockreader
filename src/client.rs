@@ -1,6 +1,8 @@
 use std::ops::Not;
+
 use anyhow::anyhow;
-use log::error;
+use log::{debug, error};
+
 use crate::models::Symbol;
 
 pub(super) struct IEXClient<'a> {
@@ -26,6 +28,7 @@ impl<'a> IEXClient<'a> {
         }
 
         let symbols = response.json::<Vec<Symbol>>().await?;
+        debug!("got {} symbols from IEX", &symbols.len());
         Ok(symbols)
     }
 }
@@ -37,7 +40,7 @@ mod tests {
 
     use crate::client::IEXClient;
 
-    // new() tests
+// new() tests
 
     #[test]
     fn new_given_api_key_and_host_returns_iex_client() {

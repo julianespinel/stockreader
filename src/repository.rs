@@ -2,6 +2,7 @@ use diesel::insert_into;
 use diesel::pg::PgConnection;
 use diesel::prelude::*;
 use diesel::result::Error;
+use log::debug;
 
 use crate::models::Symbol;
 
@@ -24,15 +25,17 @@ impl<'a> Repository<'a> {
 
     pub fn save_symbols(&self, new_symbols: &Vec<Symbol>) -> Result<(), Error> {
         let conn = self.get_connection();
-        insert_into(symbols::table)
+        let affected_rows = insert_into(symbols::table)
             .values(new_symbols)
             .execute(&conn)?;
+        debug!("saved {} symbols in DB", affected_rows);
         Ok(())
     }
 
     pub fn get_symbols(&self) -> Result<Vec<Symbol>, Error> {
         let conn = self.get_connection();
         let symbols_from_db = symbols.load::<Symbol>(&conn)?;
+        debug!("got {} symbols from database", &symbols_from_db.len());
         Ok(symbols_from_db)
     }
 }
