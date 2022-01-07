@@ -9,6 +9,7 @@ services:
     environment:
       POSTGRES_USER: username
       POSTGRES_PASSWORD: password
+      POSTGRES_DB: stockreader_db
     ports:
       - 5432:5432
 
