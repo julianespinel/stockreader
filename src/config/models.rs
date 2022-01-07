@@ -1,16 +1,13 @@
-use std::fs::read_to_string;
-use std::io::Error;
-
 use serde::{Deserialize, Serialize};
 
-#[derive(Default, Deserialize, Serialize, Clone)]
+#[derive(Default, Deserialize, Serialize, Clone, Debug)]
 pub struct IEXConfig {
     pub environment: String,
     pub version: String,
     pub api_key: String,
 }
 
-#[derive(Default, Deserialize, Serialize)]
+#[derive(Default, Deserialize, Serialize, Debug)]
 pub struct DatabaseConfig {
     pub host: String,
     pub username: String,
@@ -25,41 +22,43 @@ pub struct Configuration {
     pub database: DatabaseConfig,
 }
 
-pub fn read_config(config_path: &str) -> Result<Configuration, Error> {
-    let content = read_to_string(config_path)?;
-    let config = toml::from_str(&content)?;
-    Ok(config)
+
+impl IEXConfig {
+
+    pub fn get_host(&self) -> String {
+        if self.version.is_empty() { panic!("IEX version is empty") }
+        if self.environment.is_empty() { panic!("IEX environment is empty") }
+        format!("https://{}.iexapis.com/{}", self.environment, self.version)
+    }
 }
 
-pub(super) fn get_iex_host(iex_config: &IEXConfig) -> String {
-    if iex_config.version.is_empty() { panic!("IEX version is empty") }
-    if iex_config.environment.is_empty() { panic!("IEX environment is empty") }
-    format!("https://{}.iexapis.com/{}", iex_config.environment, iex_config.version)
-}
+impl DatabaseConfig {
 
-pub(super) fn get_database_url(db_config: &DatabaseConfig) -> String {
-    if db_config.username.is_empty() { panic!("Database username is empty") }
-    if db_config.password.is_empty() { panic!("Database password is empty") }
-    if db_config.host.is_empty() { panic!("Database host is empty") }
-    if db_config.port < 1 { panic!("Database port is < 1") }
-    if db_config.name.is_empty() { panic!("Database name is empty") }
-    format!(
-        "postgres://{}:{}@{}:{}/{}",
-        db_config.username,
-        db_config.password,
-        db_config.host,
-        db_config.port,
-        db_config.name
-    )
+    pub fn get_url(&self) -> String {
+        if self.username.is_empty() { panic!("Database username is empty") }
+        if self.password.is_empty() { panic!("Database password is empty") }
+        if self.host.is_empty() { panic!("Database host is empty") }
+        if self.port < 1 { panic!("Database port is < 1") }
+        if self.name.is_empty() { panic!("Database name is empty") }
+        format!(
+            "postgres://{}:{}@{}:{}/{}",
+            self.username,
+            self.password,
+            self.host,
+            self.port,
+            self.name
+        )
+    }
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::config::{DatabaseConfig, get_database_url, get_iex_host, IEXConfig};
 
-    //-------------------------------------------------------------------------
-    // get_iex_host tests
-    //-------------------------------------------------------------------------
+//-------------------------------------------------------------------------
+// get_iex_host tests
+//-------------------------------------------------------------------------
+
+    use crate::config::models::{DatabaseConfig, IEXConfig};
 
     #[test]
     fn get_iex_host_returns_valid_host() {
@@ -74,7 +73,7 @@ mod tests {
         };
         let expected_host = "https://beta.iexapis.com/v1.0.0";
         // act
-        let real_host = get_iex_host(&iex_config);
+        let real_host = iex_config.get_host();
         // assert
         assert_eq!(expected_host, real_host);
     }
@@ -92,7 +91,7 @@ mod tests {
             environment: environment.to_string(),
         };
         // act
-        get_iex_host(&iex_config);
+        iex_config.get_host();
     }
 
     #[test]
@@ -108,12 +107,12 @@ mod tests {
             environment: environment.to_string(),
         };
         // act
-        get_iex_host(&iex_config);
+        iex_config.get_host();
     }
 
-    //-------------------------------------------------------------------------
-    // get_database_url tests
-    //-------------------------------------------------------------------------
+//-------------------------------------------------------------------------
+// get_database_url tests
+//-------------------------------------------------------------------------
 
     #[test]
     fn get_database_url_returns_valid_url() {
@@ -127,7 +126,7 @@ mod tests {
         };
         let expected_url = "postgres://username:password@localhost:5432/test_db";
         // act
-        let real_url = get_database_url(&db_config);
+        let real_url = db_config.get_url();
         // assert
         assert_eq!(expected_url, real_url);
     }
@@ -144,7 +143,7 @@ mod tests {
             name: "test_db".to_string(),
         };
         // act
-        get_database_url(&db_config);
+        db_config.get_url();
     }
 
     #[test]
@@ -159,6 +158,6 @@ mod tests {
             name: "test_db".to_string(),
         };
         // act
-        get_database_url(&db_config);
+        db_config.get_url();
     }
 }
