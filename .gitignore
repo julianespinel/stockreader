@@ -16,5 +16,5 @@ Cargo.lock
 # Extras
 .idea
 *.csv
-config-*.toml
-!config-test.toml
+.env
+*.zip
