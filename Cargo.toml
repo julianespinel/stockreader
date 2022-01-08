@@ -14,13 +14,13 @@ serde_json = "1.0.74"
 csv = "1.1.6"
 toml = "0.5.8"
 diesel = { version = "1.4.8", features = ["postgres"] }
+diesel_migrations = "1.4.0"
 log = "0.4.14"
 env_logger = "0.9.0"
 aws-config = "0.3.0"
 aws-sdk-secretsmanager = "0.3.0"
 
 [dev-dependencies]
-diesel_migrations = "1.4.0"
 httpmock = "0.6.5"
 postgres = "0.19.2"
 testcontainers = "0.12.0"
