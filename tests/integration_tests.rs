@@ -1,7 +1,7 @@
 #[macro_use]
 extern crate diesel_migrations;
 
-use std::fs::write;
+use std::env::set_var;
 
 use diesel::{Connection, PgConnection};
 use diesel_migrations::embed_migrations;
@@ -10,7 +10,8 @@ use testcontainers::clients::Cli;
 use testcontainers::images::generic::{GenericImage, WaitFor};
 use tokio_postgres::Client;
 
-use stockreader::config::{Configuration, DatabaseConfig};
+use stockreader::config::models::Configuration;
+use stockreader::config::read_config;
 
 embed_migrations!("migrations/");
 
@@ -23,18 +24,18 @@ const POSTGRES_CONTAINER_PORT: u16 = 5432;
 /// Integration test for the function `download_symbols`.
 ///
 /// This test case does the following:
-/// 1. Reads a config file for the test environment.
+/// 1. Reads the configuration file from environment variables.
 /// 1. Creates a docker container with an empty Postgres test database.
 /// 1. Runs the Diesel migrations into the test database.
-/// 1. Updates the host port of the docker container in the test config file.
-/// 1. Executes the `download_symbols` function using the test config file.
-/// 1. Checks that the symbols has been inserted into the database.
+/// 1. Updates the host port of the docker container in the environment variable.
+/// 1. Executes the `download_symbols` function using the given configuration.
+/// 1. Checks that the symbols has been inserted in the database.
 #[tokio::test]
 async fn download_symbols_adds_symbols_to_database() {
     // arrange
-    let config_file_path = "config-test.toml";
-    let config = &stockreader::config::read_config(config_file_path)
-        .expect(&format!("error reading config file: {}", config_file_path));
+    let environment = "test";
+    let config = stockreader::config::read_config(environment).await
+        .expect("error getting configuration values");
 
     let docker = clients::Cli::default();
     let container = start_postgres_container(&config, &docker);
@@ -42,10 +43,10 @@ async fn download_symbols_adds_symbols_to_database() {
     let db_url = get_test_db_url(&config, &host_port);
 
     execute_db_migrations(&db_url);
-    update_database_port_in_config_file(config, host_port, config_file_path);
+    let updated_config = get_config_with_correct_port(environment, host_port).await;
 
     // act
-    stockreader::download_symbols(config_file_path).await
+    stockreader::download_symbols(&updated_config).await
         .expect("Expected to download symbols");
 
     // assert
@@ -107,20 +108,8 @@ fn start_postgres_container<'a>(config: &Configuration, docker: &'a Cli) -> Cont
     container
 }
 
-fn update_database_port_in_config_file(config: &Configuration, host_port: u16, file_path: &str) {
-    let db_config = &config.database;
-    let updated_config = Configuration {
-        iex: config.iex.clone(),
-        database: DatabaseConfig {
-            username: db_config.username.to_string(),
-            password: db_config.password.to_string(),
-            host: db_config.host.to_string(),
-            port: u32::from(host_port),
-            name: db_config.name.to_string(),
-        },
-    };
-    let contents = toml::to_string(&updated_config)
-        .expect("error converting configuration to string");
-    write(file_path, contents)
-        .expect("error writing updated configuration file");
+async fn get_config_with_correct_port(environment: &str, host_port: u16) -> Configuration {
+    // Update port with the one used by the container
+    set_var("DB_PORT", host_port.to_string());
+    read_config(environment).await.expect("error reading updated configuration")
 }
