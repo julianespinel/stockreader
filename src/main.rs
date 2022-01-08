@@ -1,38 +1,32 @@
-#[macro_use]
-extern crate diesel_migrations;
+extern crate openssl;
 
 use std::env;
 
-use diesel::{Connection, PgConnection};
-use diesel_migrations::embed_migrations;
+use lambda_runtime::{Context, Error, handler_fn};
 use log::info;
+use serde_json::{json, Value};
 
 use stockreader::config;
 
-embed_migrations!("migrations/");
-
 #[tokio::main]
-async fn main() -> Result<(), anyhow::Error> {
+async fn main() -> Result<(), Error> {
+    let func = handler_fn(func);
+    lambda_runtime::run(func).await?;
+    Ok(())
+}
+
+async fn func(event: Value, ctx: Context) -> Result<Value, Error> {
     env_logger::init();
 
     let environment = env::var("ENV")
         .expect("ENV environment variable is not set");
     let config = config::read_config(&environment).await?;
-    let db_url = config.database.get_url();
     info!("configuration was read");
 
-    // Run database migrations
-    let conn = PgConnection::establish(&db_url)
-        .expect(&format!("Cannot connect to database: {}", db_url));
-    embedded_migrations::run_with_output(&conn, &mut std::io::stdout())?;
-    info!("startup is done");
+    let action = event["job"].as_str().unwrap_or("ping");
 
-    // let func = handler_fn(func);
-    // lambda_runtime::run(func).await?;
-    // Ok(())
-
-    info!("start");
-    stockreader::download_symbols(&config).await?;
-    info!("done");
-    Ok(())
+    info!("start, request_id: {}, action: {}", ctx.request_id, action);
+    stockreader::execute(action, &config).await?;
+    info!("done, request_id: {}", ctx.request_id);
+    Ok(json!({ "message": format!("Hello {}", action) }))
 }

@@ -19,6 +19,8 @@ log = "0.4.14"
 env_logger = "0.9.0"
 aws-config = "0.3.0"
 aws-sdk-secretsmanager = "0.3.0"
+lambda_runtime = "0.4.1"
+openssl = "0.10.38"
 
 [dev-dependencies]
 httpmock = "0.6.5"
