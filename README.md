@@ -22,11 +22,28 @@ cargo test --lib
 
 To run all the tests (unit and integration), please do the following:
 
-1. In the file `.env_test` add your IEXCloud sandbox API key into the variable `IEX_API_KEY`:
+1. In the root folder of the repository, create a the file `.env_test` with the following content:
+```bash
+ENV="local"
+RUST_LOG="info"
+
+IEX_ENVIRONMENT="sandbox"
+IEX_VERSION="stable"
+IEX_API_KEY=""
+
+DB_USERNAME=username
+DB_PASSWORD=password
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=stockreader_db
+```
+
+2. In the file `.env_test` add your IEXCloud sandbox API key into the variable `IEX_API_KEY`:
 ```bash
 IEX_API_KEY="" # add your sandbox api key here
 ```
-2. Then execute the tests:
+
+3. Then execute the tests:
 ```bash
 cd scripts
 sh test.sh
