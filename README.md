@@ -118,6 +118,10 @@ You should get the following response:
     2. Add permissions to access Secrets manager
     3. Deploy the lambda in VPC X, using private subnets only (subnets B and C)
 
+This is how the required infrastructure looks like:
+
+![Infrastructure view](docs/stockreader-deploy-aws.jpg "Infrastructure view")
+
 #### Why do we need this setup?
 
 1. Because the Aurora serverless database is created in a private subnet with no
