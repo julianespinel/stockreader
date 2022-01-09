@@ -1,2 +1,3 @@
 cd ..
-nosetests --nocapture
+export $(cat .env | xargs);
+cargo test

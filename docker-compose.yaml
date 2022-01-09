@@ -1,0 +1,31 @@
+version: '3.1'
+
+services:
+
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: username
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: stockreader_db
+    ports:
+      - 5432:5432
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+
+  lambda:
+    image: lambci/lambda:provided.al2
+    env_file:
+      - .env
+    environment:
+      DOCKER_LAMBDA_STAY_OPEN: 1
+      DB_HOST: db
+    volumes:
+      - /tmp/lambda:/var/task:ro,delegated
+    ports:
+      - 9001:9001
