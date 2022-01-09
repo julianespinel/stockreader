@@ -22,7 +22,7 @@ cargo test --lib
 
 To run all the tests (unit and integration), please do the following:
 
-1. In the root folder of the repository, create a the file `.env_test` with the following content:
+1. In the root folder of the repository, create the file `.env` with the following content:
 ```bash
 ENV="local"
 RUST_LOG="info"
@@ -38,7 +38,7 @@ DB_PORT=5432
 DB_NAME=stockreader_db
 ```
 
-2. In the file `.env_test` add your IEXCloud sandbox API key into the variable `IEX_API_KEY`:
+2. In the file `.env` add your IEXCloud sandbox API key into the variable `IEX_API_KEY`:
 ```bash
 IEX_API_KEY="" # add your sandbox api key here
 ```
@@ -71,9 +71,9 @@ This program runs as an AWS Lambda.
 
 We need to set some environment variables first:
 
-1. In the file `.env_test` add your IEXCloud sandbox API key into the variable `IEX_API_KEY`:
+1. In the file `.env` add your IEXCloud sandbox API key into the variable `IEX_API_KEY`:
 ```bash
-IEX_API_KEY="" # add your sandbox api key here
+IEX_API_KEY="" # add your sandbox API key here
 ```
 2. To run the program please execute the following commands:
 ```bash

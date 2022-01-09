@@ -21,7 +21,7 @@ services:
   lambda:
     image: lambci/lambda:provided.al2
     env_file:
-      - .env_test
+      - .env
     environment:
       DOCKER_LAMBDA_STAY_OPEN: 1
       DB_HOST: db

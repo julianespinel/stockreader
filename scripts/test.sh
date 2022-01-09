@@ -1,3 +1,3 @@
 cd ..
-export $(cat .env_test | xargs);
+export $(cat .env | xargs);
 cargo test
