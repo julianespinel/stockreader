@@ -6,9 +6,9 @@ extern crate diesel_migrations;
 use anyhow::Result;
 use diesel::{Connection, PgConnection};
 use diesel_migrations::embed_migrations;
-use log::info;
-use crate::config::models::Configuration;
+use log::{info, warn};
 
+use crate::config::models::Configuration;
 use crate::service::Service;
 
 embed_migrations!("migrations/");
@@ -25,7 +25,7 @@ pub async fn execute(action: &str, config: &Configuration) -> Result<()> {
     match action {
         "migrate" => run_db_migrations(config)?,
         "download_symbols" => download_symbols(config).await?,
-        _ => ()
+        _ => warn!("Unknown action: {}", action)
     }
     Ok(())
 }
