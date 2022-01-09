@@ -1,12 +1,13 @@
-# StockReader
+# Stockreader
 
-StockReader is a program that downloads US stock market data and stores it in a database.
+Stockreader is a program that downloads US stock market data and stores it in a database.
 
-The following data is downloaded automatically at these times:
+It currently supports the following operations:
 
-| Job name         | Description                        | Time                  | Cron expression |
-|------------------|------------------------------------|-----------------------|-----------------|
-| download_symbols | Downloads stocks symbols and names | Every day at 00:00 ET |                 |
+| Job name         | Description                        |
+|------------------|------------------------------------|
+| migrate          | Execute database schema changes    |
+| download_symbols | Downloads stocks symbols and names |
 
 ## Test
 
@@ -53,8 +54,10 @@ sh test.sh
 
 ### DB migrations
 
+Stockreader uses Diesel for database migrations.
+
 If you want to create new database migrations or run them without running
-the program you can do it following these steps:
+the whole program you can do it following these steps:
 
 1. Start the database: `docker-compose up -d`
 2. Setup Diesel migrations: `diesel setup --database-url postgres://username:password@localhost:5432/stockreader_db`
@@ -63,7 +66,7 @@ the program you can do it following these steps:
 Run the following commands if you need to change the database schema:
 
 1. Add migration: `diesel migration generate <migration_name>`
-2. Run down.sql and then up.sql (Do not run this in prod): `diesel migration redo`
+2. Run down.sql and then up.sql **(do not run this in prod)**: `diesel migration redo`
 
 ### Local
 
@@ -100,6 +103,31 @@ You should get the following response:
 
 ## Deployment (AWS Lambda)
 
+### AWS Setup
+
+1. Create a VPC (VPC X), with:
+    1. At least 1 public subnet (subnet A)
+        1. Route table: 0.0.0.0/0 -> internet gateway
+    2. Create a NAT gateway in the public subnet (subnet A)
+    3. At least 2 private subnets (subnet B and C) to deploy the lambdas in different AZ
+        1. Route table: 0.0.0.0/0 -> NAT gateway
+2. Create an RDS database (Aurora serverless) in the VPC X
+3. Create RDS database credentials as a secret in AWS Secrets Manager
+4. Create Lambda function
+    1. Add permissions to access RDS
+    2. Add permissions to access Secrets manager
+    3. Deploy the lambda in VPC X, using private subnets only (subnets B and C)
+
+#### Why do we need this setup?
+
+1. Because the Aurora serverless database is created in a private subnet with no
+   internet access.
+2. The only way to access the database is deploying the lambda function in a 
+   private subnet within the same VPC of the database.
+3. The lambda function needs internet access, that's why we need the NAT gateway.
+
+### Deploy as a lambda function
+
 We need to set some environment variables first the AWS Lambda console:
 
  ```bash
@@ -119,4 +147,4 @@ DB_SECRET_ARN="" # add value here
 cd scripts
 sh package.sh
 ```
-2. Upload `lambda.zip` to AWS Lambda console
+2. Upload `lambda.zip` using the AWS Lambda console
