@@ -31,8 +31,8 @@ pub(super) async fn get_prod_config() -> Result<Configuration, anyhow::Error> {
 
     let iex_secret_arn = get_env_variable("IEX_SECRET_ARN");
     let db_secret_arn = get_env_variable("DB_SECRET_ARN");
-    let prod_config = read_config_from_aws(&iex_secret_arn, &db_secret_arn).await?;
-    Ok(prod_config)
+    let config = read_config_from_aws(&iex_secret_arn, &db_secret_arn).await?;
+    Ok(config)
 }
 
 async fn read_config_from_aws(iex_secret_arn: &str, db_secret_arn: &str) -> Result<Configuration, anyhow::Error> {
