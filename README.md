@@ -4,7 +4,7 @@ Stockreader is a program that downloads US stock market data and stores it in a 
 
 It currently supports the following operations:
 
-| Job name         | Description                        |
+| Action           | Description                        |
 |------------------|------------------------------------|
 | migrate          | Execute database schema changes    |
 | download_symbols | Downloads stocks symbols and names |

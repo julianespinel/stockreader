@@ -23,7 +23,7 @@ async fn func(event: Value, ctx: Context) -> Result<Value, Error> {
     let config = config::read_config(&environment).await?;
     info!("configuration was read");
 
-    let action = event["job"].as_str().unwrap_or("ping");
+    let action = event["action"].as_str().unwrap_or("ping");
 
     info!("start, request_id: {}, action: {}", ctx.request_id, action);
     stockreader::execute(action, &config).await?;
