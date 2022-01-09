@@ -39,12 +39,12 @@ DB_PORT=5432
 DB_NAME=stockreader_db
 ```
 
-2. In the file `.env` add your IEXCloud sandbox API key into the variable `IEX_API_KEY`:
+2. In the file `.env` add your IEX Cloud sandbox API key into the variable `IEX_API_KEY`:
 ```bash
 IEX_API_KEY="" # add your sandbox api key here
 ```
 
-3. Then execute the tests:
+3. Execute the tests:
 ```bash
 cd scripts
 sh test.sh
@@ -78,13 +78,13 @@ Run the following commands if you need to change the database schema:
 1. Add migration: `diesel migration generate <migration_name>`
 2. Test your migrations can be reverted **(do not run this in prod)**: `diesel migration redo`
 
-### Local
+### Run Locally
 
 This program runs as an AWS Lambda.
 
 We need to set some environment variables first:
 
-1. In the file `.env` add your IEXCloud sandbox API key into the variable `IEX_API_KEY`:
+1. In the file `.env` add your IEX Cloud sandbox API key into the variable `IEX_API_KEY`:
 ```bash
 IEX_API_KEY="" # add your sandbox API key here
 ```
@@ -101,7 +101,7 @@ This lambda function supports two actions:
 ```bash
 curl -d '{ "action": "migrate" }' http://localhost:9001/2015-03-31/functions/myfunction/invocations
 ```
-2. download_symbols: download stock symbols from IEXCloud
+2. download_symbols: download stock symbols from IEX Cloud
 ```bash
 curl -d '{ "action": "download_symbols" }' http://localhost:9001/2015-03-31/functions/myfunction/invocations
 ```
@@ -114,6 +114,8 @@ You should get the following response:
 ## Deployment (AWS Lambda)
 
 ### AWS Setup
+
+We need to perform the following steps to create the required infrastructure:
 
 1. Create a VPC (VPC X), with:
     1. At least 1 public subnet (subnet A)
@@ -137,12 +139,13 @@ This is how the required infrastructure looks like:
 1. Because the Aurora serverless database is created in a private subnet with no
    internet access.
 2. The only way to access the database is deploying the lambda function in a 
-   private subnet within the same VPC of the database.
-3. The lambda function needs internet access, that's why we need the NAT gateway.
+   private subnet within the same VPC that the database is deployed on.
+3. The lambda function needs internet access to get data from IEX Cloud,
+   that's why we need the NAT gateway.
 
 ### Deploy as a lambda function
 
-We need to set some environment variables first the AWS Lambda console:
+We need to set these environment variables in the AWS Lambda console:
 
  ```bash
 ENV="prod"
