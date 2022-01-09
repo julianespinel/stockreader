@@ -56,17 +56,27 @@ sh test.sh
 
 Stockreader uses Diesel for database migrations.
 
-If you want to create new database migrations or run them without running
-the whole program you can do it following these steps:
+You need to install Diesel CLI to be able to perform the following steps,
+you can install it using this command:
+
+```bash
+cargo install diesel_cli --no-default-features --features postgres
+```
+
+If you want to create new database migration or run them (locally) without
+running the whole program you can do it following these steps:
 
 1. Start the database: `docker-compose up -d`
-2. Setup Diesel migrations: `diesel setup --database-url postgres://username:password@localhost:5432/stockreader_db`
+2. Setup Diesel migrations:
+```bash
+diesel setup --database-url postgres://username:password@localhost:5432/stockreader_db
+```
 3. Run migrations: `diesel migration run`
 
 Run the following commands if you need to change the database schema:
 
 1. Add migration: `diesel migration generate <migration_name>`
-2. Run down.sql and then up.sql **(do not run this in prod)**: `diesel migration redo`
+2. Test your migrations can be reverted **(do not run this in prod)**: `diesel migration redo`
 
 ### Local
 
