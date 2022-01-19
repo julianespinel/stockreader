@@ -23,9 +23,9 @@ pub(super) struct Stats {
     pub ttm_eps: BigDecimal,
     pub ttm_dividend_rate: BigDecimal,
     pub dividend_yield: BigDecimal,
-    pub next_dividend_date: NaiveDate,
-    pub ex_dividend_date: NaiveDate,
-    pub next_earnings_date: NaiveDate,
+    pub next_dividend_date: Option<NaiveDate>,
+    pub ex_dividend_date: Option<NaiveDate>,
+    pub next_earnings_date: Option<NaiveDate>,
     pub pe_ratio: BigDecimal,
     pub beta: BigDecimal,
 }
