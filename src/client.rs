@@ -261,7 +261,7 @@ mod tests {
                 .query_param("token", client.api_key);
             then.status(200)
                 .header("content-type", "application/json")
-                .body_from_file("tests/resources/httpmock_files/json_not_valid.json");
+                .body_from_file("tests/resources/httpmock_files/not_valid.json");
         });
 
         // act
