@@ -1,4 +1,5 @@
 use std::ops::Not;
+
 use anyhow::anyhow;
 use bigdecimal::BigDecimal;
 use chrono::{NaiveDate, Utc};
@@ -101,7 +102,7 @@ fn date_from_string(string: &String) -> Option<NaiveDate> {
         Err(_) => {
             error!("Error parsing date: {}", string);
             None
-        },
+        }
     };
     option
 }
@@ -242,6 +243,34 @@ mod tests {
         let date = NaiveDate::parse_from_str("2022-01-21", DATE_FORMAT)
             .expect("Error parsing date");
         assert_eq!(stats.next_earnings_date, Some(date));
+    }
 
+    #[tokio::test]
+    async fn get_stats_returns_error() {
+        // arrange
+        let server = MockServer::start();
+
+        let api_key = "ak";
+        let host = server.base_url();
+        let client = IEXClient { api_key, host: &host };
+        let symbol = "AAPL";
+
+        let get_stats_mock = server.mock(|when, then| {
+            when.method(GET)
+                .path(format!("/stock/{}/stats", symbol))
+                .query_param("token", client.api_key);
+            then.status(200)
+                .header("content-type", "application/json")
+                .body_from_file("tests/resources/httpmock_files/json_not_valid.json");
+        });
+
+        // act
+        let stats = client
+            .get_stats(symbol.to_string())
+            .await;
+        // assert
+        get_stats_mock.assert();
+        assert!(stats.is_err());
+        assert!(stats.err().unwrap().to_string().contains("error decoding response body"));
     }
 }
