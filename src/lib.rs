@@ -43,7 +43,7 @@ pub async fn download_symbols(config: &Configuration) -> Result<()> {
     let db_url = config.database.get_url();
 
     let iex_client = client::IEXClient::new(&config.iex.api_key, &host);
-    let repository = repository::Repository { db_url: &db_url };
+    let repository = repository::Repository::new(&db_url);
     let service = Service { iex_client: &iex_client, repository: &repository };
 
     info!("start: getting symbols");
