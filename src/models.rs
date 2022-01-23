@@ -7,14 +7,14 @@ use super::schema::{symbols, stats};
 
 #[derive(Debug, Deserialize, Insertable, Queryable, Clone)]
 #[table_name = "symbols"]
-pub(super) struct Symbol {
+pub struct Symbol {
     pub symbol: String,
     pub name: String,
 }
 
 #[derive(Debug, Deserialize, Insertable, Queryable, Clone)]
 #[table_name = "stats"]
-pub(super) struct Stats {
+pub struct Stats {
     pub symbol: String,
     pub created_at: NaiveDateTime,
     pub marketcap: i64,

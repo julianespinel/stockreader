@@ -14,9 +14,9 @@ use crate::service::Service;
 embed_migrations!("migrations/");
 
 pub mod config;
+pub mod models;
 
 mod client;
-mod models;
 mod repository;
 mod schema;
 mod service;
