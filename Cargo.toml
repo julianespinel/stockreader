@@ -26,7 +26,7 @@ openssl = "0.10.38"
 rand = "0.8.4"
 
 [dev-dependencies]
-httpmock = "0.6.5"
+httpmock = "0.6.6"
 postgres = "0.19.2"
 testcontainers = "0.12.0"
 tokio-postgres = "0.7.5"
