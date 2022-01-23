@@ -2,9 +2,8 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Default, Deserialize, Serialize, Clone, Debug)]
 pub struct IEXConfig {
-    pub environment: String,
-    pub version: String,
     pub api_key: String,
+    pub base_url: String,
 }
 
 #[derive(Default, Deserialize, Serialize, Debug)]
@@ -20,16 +19,6 @@ pub struct DatabaseConfig {
 pub struct Configuration {
     pub iex: IEXConfig,
     pub database: DatabaseConfig,
-}
-
-
-impl IEXConfig {
-
-    pub fn get_host(&self) -> String {
-        if self.version.is_empty() { panic!("IEX version is empty") }
-        if self.environment.is_empty() { panic!("IEX environment is empty") }
-        format!("https://{}.iexapis.com/{}", self.environment, self.version)
-    }
 }
 
 impl DatabaseConfig {
@@ -55,64 +44,10 @@ impl DatabaseConfig {
 mod tests {
 
 //-------------------------------------------------------------------------
-// get_iex_host tests
-//-------------------------------------------------------------------------
-
-    use crate::config::models::{DatabaseConfig, IEXConfig};
-
-    #[test]
-    fn get_iex_host_returns_valid_host() {
-        // arrange
-        let api_key = "ak";
-        let version = "v1.0.0";
-        let environment = "beta";
-        let iex_config = IEXConfig {
-            api_key: api_key.to_string(),
-            version: version.to_string(),
-            environment: environment.to_string(),
-        };
-        let expected_host = "https://beta.iexapis.com/v1.0.0";
-        // act
-        let real_host = iex_config.get_host();
-        // assert
-        assert_eq!(expected_host, real_host);
-    }
-
-    #[test]
-    #[should_panic(expected = "IEX version is empty")]
-    fn get_iex_host_panics_on_missing_version() {
-        // arrange
-        let api_key = "ak";
-        let version = "";
-        let environment = "beta";
-        let iex_config = IEXConfig {
-            api_key: api_key.to_string(),
-            version: version.to_string(),
-            environment: environment.to_string(),
-        };
-        // act
-        iex_config.get_host();
-    }
-
-    #[test]
-    #[should_panic(expected = "IEX environment is empty")]
-    fn get_iex_host_panics_on_missing_environment() {
-        // arrange
-        let api_key = "ak";
-        let version = "v1.0.0";
-        let environment = "";
-        let iex_config = IEXConfig {
-            api_key: api_key.to_string(),
-            version: version.to_string(),
-            environment: environment.to_string(),
-        };
-        // act
-        iex_config.get_host();
-    }
-
-//-------------------------------------------------------------------------
 // get_database_url tests
 //-------------------------------------------------------------------------
+
+    use crate::config::models::DatabaseConfig;
 
     #[test]
     fn get_database_url_returns_valid_url() {

@@ -8,6 +8,7 @@ It currently supports the following operations:
 |------------------|------------------------------------|
 | migrate          | Execute database schema changes    |
 | download_symbols | Downloads stocks symbols and names |
+| download_stats   | Downloads basic stats from stocks  |
 
 ## Test
 
@@ -28,9 +29,8 @@ To run all the tests (unit and integration), please do the following:
 ENV="local"
 RUST_LOG="info"
 
-IEX_ENVIRONMENT="sandbox"
-IEX_VERSION="stable"
-IEX_API_KEY=""
+IEX_BASE_URL="http://localhost/stable"
+IEX_API_KEY="ak"
 
 DB_USERNAME=username
 DB_PASSWORD=password
@@ -71,12 +71,25 @@ running the whole program you can do it following these steps:
 ```bash
 diesel setup --database-url postgres://username:password@localhost:5432/stockreader_db
 ```
-3. Run migrations: `diesel migration run`
+3. Run migrations
+```bash
+diesel migration run --database-url postgres://username:password@localhost:5432/stockreader_db
+````
 
 Run the following commands if you need to change the database schema:
 
 1. Add migration: `diesel migration generate <migration_name>`
 2. Test your migrations can be reverted **(do not run this in prod)**: `diesel migration redo`
+
+If you want to revert the latest migration please do:
+```bash
+diesel migration revert --database-url postgres://username:password@localhost:5432/stockreader_db
+```
+
+If you want to print the schema please do:
+```bash
+diesel print-schema --database-url postgres://username:password@localhost:5432/stockreader_db
+```
 
 ### Run Locally
 

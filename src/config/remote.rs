@@ -8,9 +8,8 @@ use crate::config::models::{Configuration, DatabaseConfig, IEXConfig};
 /// Structure to describe IEX secret returned by AWS
 #[derive(Debug, Deserialize)]
 struct IEXSecret {
-    pub environment: String,
-    pub version: String,
     pub api_key: String,
+    pub base_url: String,
 }
 
 /// Structure to describe database secret returned by AWS
@@ -38,9 +37,8 @@ pub(super) async fn get_prod_config() -> Result<Configuration, anyhow::Error> {
 async fn read_config_from_aws(iex_secret_arn: &str, db_secret_arn: &str) -> Result<Configuration, anyhow::Error> {
     let iex_secret = get_iex_secret(iex_secret_arn).await?;
     let iex_config = IEXConfig {
-        environment: iex_secret.environment,
-        version: iex_secret.version,
         api_key: iex_secret.api_key,
+        base_url: iex_secret.base_url,
     };
 
     let db_secret = get_db_secret(db_secret_arn).await?;

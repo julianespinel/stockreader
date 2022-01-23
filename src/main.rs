@@ -16,7 +16,7 @@ async fn main() -> Result<(), Error> {
 }
 
 async fn func(event: Value, ctx: Context) -> Result<Value, Error> {
-    env_logger::try_init();
+    let _ = env_logger::try_init();
 
     let environment = env::var("ENV")
         .expect("ENV environment variable is not set");

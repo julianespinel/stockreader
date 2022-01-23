@@ -21,6 +21,18 @@ impl<'a> Service<'a> {
         info!("get_symbols: returned {} symbols", &symbols_from_db.len());
         return Ok(symbols_from_db);
     }
+
+    pub async fn download_stats(&self) -> Result<(), anyhow::Error> {
+        let symbols = self.repository.get_symbols()?;
+        let mut stats_list = vec![];
+        for symbol in symbols {
+            let stats = self.iex_client.get_stats(symbol.symbol).await?;
+            stats_list.push(stats);
+        }
+        self.repository.save_stats(stats_list)?;
+        info!("download_stats: done");
+        Ok(())
+    }
 }
 
 fn get_symbols_not_in_db(symbols_from_db: &Vec<Symbol>, symbols_from_iex: &Vec<Symbol>) -> Vec<Symbol> {
@@ -38,5 +50,3 @@ fn get_symbols_not_in_db(symbols_from_db: &Vec<Symbol>, symbols_from_iex: &Vec<S
     debug!("got {} new symbols", &new_symbols.len());
     new_symbols
 }
-
-
