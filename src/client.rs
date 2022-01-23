@@ -12,9 +12,10 @@ const DATE_FORMAT: &str = "%Y-%m-%d";
 
 pub(super) struct IEXClient<'a> {
     pub api_key: &'a str,
-    pub host: &'a str,
+    pub base_url: &'a str,
 }
 
+/// Object given by IEX to represent stats from a stock
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 struct IEXStats {
@@ -33,14 +34,14 @@ struct IEXStats {
 }
 
 impl<'a> IEXClient<'a> {
-    pub fn new(api_key: &'a str, host: &'a str) -> IEXClient<'a> {
+    pub fn new(api_key: &'a str, base_url: &'a str) -> IEXClient<'a> {
         if api_key.is_empty() { panic!("api_key must not be empty") }
-        if host.is_empty() { panic!("host must not be empty") }
-        IEXClient { api_key, host }
+        if base_url.is_empty() { panic!("base_url must not be empty") }
+        IEXClient { api_key, base_url }
     }
 
     pub async fn get_symbols(&self) -> Result<Vec<Symbol>, anyhow::Error> {
-        let url = format!("{}/ref-data/symbols?token={}", self.host, self.api_key);
+        let url = format!("{}/ref-data/symbols?token={}", self.base_url, self.api_key);
         let response = reqwest::get(&url).await?;
 
         if response.status().is_success().not() {
@@ -55,7 +56,7 @@ impl<'a> IEXClient<'a> {
     }
 
     pub async fn get_stats(&self, symbol: String) -> Result<Stats, anyhow::Error> {
-        let url = format!("{}/stock/{}/stats?token={}", self.host, symbol, self.api_key);
+        let url = format!("{}/stock/{}/stats?token={}", self.base_url, symbol, self.api_key);
         let response = reqwest::get(&url).await?;
 
         if response.status().is_success().not() {
@@ -121,15 +122,15 @@ mod tests {
 //-------------------------------------------------------------------------
 
     #[test]
-    fn new_given_api_key_and_host_returns_iex_client() {
+    fn new_given_api_key_and_base_url_returns_iex_client() {
         // arrange
         let api_key = "ak";
-        let host = "http://localhost";
+        let base_url = "http://localhost";
         // act
-        let client = IEXClient::new(api_key, host);
+        let client = IEXClient::new(api_key, base_url);
         // assert
         assert_eq!(client.api_key, api_key);
-        assert_eq!(client.host, host);
+        assert_eq!(client.base_url, base_url);
     }
 
     #[test]
@@ -137,19 +138,19 @@ mod tests {
     fn new_given_empty_api_key_it_panics() {
         // arrange
         let api_key = "";
-        let host = "http://localhost";
+        let base_url = "http://localhost";
         // act
-        IEXClient::new(api_key, host);
+        IEXClient::new(api_key, base_url);
     }
 
     #[test]
-    #[should_panic(expected = "host must not be empty")]
-    fn new_given_empty_host_it_panics() {
+    #[should_panic(expected = "base_url must not be empty")]
+    fn new_given_empty_base_url_it_panics() {
         // arrange
         let api_key = "ak";
-        let host = "";
+        let base_url = "";
         // act
-        IEXClient::new(api_key, host);
+        IEXClient::new(api_key, base_url);
     }
 
 //-------------------------------------------------------------------------
@@ -162,8 +163,8 @@ mod tests {
         let server = MockServer::start();
 
         let api_key = "ak";
-        let host = server.base_url();
-        let client = IEXClient { api_key, host: &host };
+        let base_url = server.base_url();
+        let client = IEXClient { api_key, base_url: &base_url };
 
         let get_symbols_mock = server.mock(|when, then| {
             when.method(GET)
@@ -188,8 +189,8 @@ mod tests {
         let server = MockServer::start();
 
         let api_key = "";
-        let host = server.base_url();
-        let client = IEXClient { api_key, host: &host };
+        let base_url = server.base_url();
+        let client = IEXClient { api_key, base_url: &base_url };
 
         let get_symbols_mock = server.mock(|when, then| {
             when.method(GET)
@@ -216,8 +217,8 @@ mod tests {
         let server = MockServer::start();
 
         let api_key = "ak";
-        let host = server.base_url();
-        let client = IEXClient { api_key, host: &host };
+        let base_url = server.base_url();
+        let client = IEXClient { api_key, base_url: &base_url };
         let symbol = "AAPL";
 
         let get_stats_mock = server.mock(|when, then| {
@@ -251,8 +252,8 @@ mod tests {
         let server = MockServer::start();
 
         let api_key = "ak";
-        let host = server.base_url();
-        let client = IEXClient { api_key, host: &host };
+        let base_url = server.base_url();
+        let client = IEXClient { api_key, base_url: &base_url };
         let symbol = "AAPL";
 
         let get_stats_mock = server.mock(|when, then| {

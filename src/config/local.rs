@@ -26,14 +26,12 @@ fn get_local_database_config() -> DatabaseConfig {
 }
 
 fn get_local_iex_config() -> IEXConfig {
-    let iex_environment = get_env_variable("IEX_ENVIRONMENT");
-    let iex_version = get_env_variable("IEX_VERSION");
     let iex_api_key = get_env_variable("IEX_API_KEY");
+    let iex_base_url = get_env_variable("IEX_BASE_URL");
 
     let iex_config = IEXConfig {
-        environment: iex_environment,
-        version: iex_version,
         api_key: iex_api_key,
+        base_url: iex_base_url,
     };
     iex_config
 }

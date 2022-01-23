@@ -28,9 +28,8 @@ To run all the tests (unit and integration), please do the following:
 ENV="local"
 RUST_LOG="info"
 
-IEX_ENVIRONMENT="sandbox"
-IEX_VERSION="stable"
-IEX_API_KEY=""
+IEX_BASE_URL="http://localhost/stable"
+IEX_API_KEY="ak"
 
 DB_USERNAME=username
 DB_PASSWORD=password

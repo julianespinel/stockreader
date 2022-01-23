@@ -39,10 +39,10 @@ pub fn run_db_migrations(config: &Configuration) -> Result<()> {
 }
 
 pub async fn download_symbols(config: &Configuration) -> Result<()> {
-    let host = config.iex.get_host();
+    let base_url = &config.iex.base_url;
     let db_url = config.database.get_url();
 
-    let iex_client = client::IEXClient::new(&config.iex.api_key, &host);
+    let iex_client = client::IEXClient::new(&config.iex.api_key, &base_url);
     let repository = repository::Repository::new(&db_url);
     let service = Service { iex_client: &iex_client, repository: &repository };
 
