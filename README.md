@@ -70,12 +70,25 @@ running the whole program you can do it following these steps:
 ```bash
 diesel setup --database-url postgres://username:password@localhost:5432/stockreader_db
 ```
-3. Run migrations: `diesel migration run`
+3. Run migrations
+```bash
+diesel migration run --database-url postgres://username:password@localhost:5432/stockreader_db
+````
 
 Run the following commands if you need to change the database schema:
 
 1. Add migration: `diesel migration generate <migration_name>`
 2. Test your migrations can be reverted **(do not run this in prod)**: `diesel migration redo`
+
+If you want to revert the latest migration please do:
+```bash
+diesel migration revert --database-url postgres://username:password@localhost:5432/stockreader_db
+```
+
+If you want to print the schema please do:
+```bash
+diesel print-schema --database-url postgres://username:password@localhost:5432/stockreader_db
+```
 
 ### Run Locally
 
