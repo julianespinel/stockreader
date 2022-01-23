@@ -8,6 +8,7 @@ It currently supports the following operations:
 |------------------|------------------------------------|
 | migrate          | Execute database schema changes    |
 | download_symbols | Downloads stocks symbols and names |
+| download_stats   | Downloads basic stats from stocks  |
 
 ## Test
 
