@@ -25,7 +25,7 @@ mod service;
 
 pub async fn execute(action: &str, config: &Configuration) -> Result<()> {
     match action {
-        "migrate" => run_db_migrations(config)?,
+        "migrate_db_schema" => run_db_migrations(config)?,
         "download_symbols" => download_symbols(config).await?,
         "download_stats" => download_stats(config).await?,
         _ => warn!("Unknown action: {}", action)
