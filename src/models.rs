@@ -3,7 +3,7 @@ use chrono::{NaiveDate, NaiveDateTime};
 use diesel::{Insertable, Queryable};
 use serde::Deserialize;
 
-use super::schema::{symbols, stats};
+use super::schema::{symbols, stats, historical_prices};
 
 #[derive(Debug, Deserialize, Insertable, Queryable, Clone)]
 #[table_name = "symbols"]
@@ -28,4 +28,20 @@ pub struct Stats {
     pub next_earnings_date: Option<NaiveDate>,
     pub pe_ratio: BigDecimal,
     pub beta: BigDecimal,
+}
+
+#[derive(Debug, Deserialize, Insertable, Queryable, Clone)]
+#[table_name = "historical_prices"]
+pub struct HistoricalPrice {
+    pub symbol: String,
+    pub date: NaiveDate,
+    pub open: BigDecimal,
+    pub close: BigDecimal,
+    pub high: BigDecimal,
+    pub low: BigDecimal,
+    pub volume: i64,
+    pub change: BigDecimal,
+    pub change_percent: BigDecimal,
+    pub created_at: NaiveDateTime,
+    pub updated_at: NaiveDateTime,
 }
