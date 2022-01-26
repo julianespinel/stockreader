@@ -1,4 +1,5 @@
 use diesel::insert_into;
+use diesel::pg::upsert::excluded;
 use diesel::pg::PgConnection;
 use diesel::prelude::*;
 use diesel::result::Error;
@@ -34,6 +35,9 @@ impl<'a> Repository<'a> {
         let conn = self.get_connection();
         let affected_rows = insert_into(symbols::table)
             .values(new_symbols)
+            .on_conflict(symbols::symbol)
+            .do_update()
+            .set(symbols::name.eq(excluded(symbols::name)))
             .execute(&conn)?;
         debug!("saved {} symbols in DB", affected_rows);
         Ok(())
@@ -59,6 +63,7 @@ mod tests {
     use testcontainers::clients;
 
     use crate::config::models::DatabaseConfig;
+    use crate::models::Symbol;
     use crate::repository::Repository;
 
     const POSTGRES_CONTAINER_PORT: u16 = 5432;
@@ -152,6 +157,46 @@ mod tests {
         // assert
         let symbols_from_db = repository.get_symbols().expect("error getting symbols");
         assert_eq!(symbols_from_db.len(), list_size as usize);
+    }
+
+    #[test]
+    fn save_symbols_given_repeated_symbols_updates_symbol_name() {
+        // arrange
+        let db_config = get_db_config_for_tests();
+        let docker = clients::Cli::default();
+        let container = containers::start_postgres_container(&db_config, &docker);
+        let host_port = container.get_host_port(POSTGRES_CONTAINER_PORT).unwrap();
+        let db_url = containers::get_test_db_url(&db_config, &host_port);
+
+        containers::execute_db_migrations(&db_url);
+        let repository = Repository::new(&db_url);
+        let list_size = 5;
+        let symbols = test_factories::get_symbols_list(list_size);
+
+        repository
+            .save_symbols(&symbols)
+            .expect("error saving symbols");
+
+        let original_symbol = &symbols[0].symbol;
+        let new_name = "Apple Inc";
+        let duplicated_symbol = Symbol {
+            symbol: original_symbol.to_string(),
+            name: new_name.to_string()
+        };
+        // act
+        repository
+            .save_symbols(&vec![duplicated_symbol])
+            .expect("error saving duplicated symbol");
+
+        // assert
+        let symbols_from_db = repository.get_symbols().expect("error getting symbols");
+        assert_eq!(symbols_from_db.len(), list_size as usize);
+
+        let updated_symbol = repository.get_symbol(original_symbol)
+            .expect("error getting single symbol");
+
+        assert_eq!(updated_symbol.symbol, original_symbol.to_string());
+        assert_eq!(updated_symbol.name, new_name.to_string());
     }
 
     /// Module for using containers in tests
