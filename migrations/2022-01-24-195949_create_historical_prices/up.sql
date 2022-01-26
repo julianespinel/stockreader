@@ -1,7 +1,7 @@
 -- Your SQL goes here
 CREATE TABLE historical_prices
 (
-    symbol         VARCHAR PRIMARY KEY,
+    symbol         VARCHAR,
     date           DATE      NOT NULL,
     open           DECIMAL   NOT NULL DEFAULT 0,
     close          DECIMAL   NOT NULL DEFAULT 0,
@@ -13,8 +13,7 @@ CREATE TABLE historical_prices
     created_at     TIMESTAMP NOT NULL,
     updated_at     TIMESTAMP NOT NULL,
 
+    PRIMARY KEY (symbol, date),
     FOREIGN KEY (symbol) REFERENCES symbols (symbol)
 );
-
-CREATE UNIQUE INDEX idx_historical_prices_symbol_date ON historical_prices(symbol, date);
 -- Your SQL goes here

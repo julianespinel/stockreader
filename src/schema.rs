@@ -1,5 +1,5 @@
 table! {
-    historical_prices (symbol) {
+    historical_prices (symbol, date) {
         symbol -> Varchar,
         date -> Date,
         open -> Numeric,
