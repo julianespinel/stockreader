@@ -33,6 +33,16 @@ impl<'a> Service<'a> {
         info!("download_stats: done");
         Ok(())
     }
+
+    pub async fn download_historical_prices(&self) -> Result<(), anyhow::Error> {
+        let symbols = self.repository.get_symbols()?;
+        for symbol in symbols {
+            let historical_prices = self.iex_client.get_historical_prices_last_five_years(symbol.symbol).await?;
+            self.repository.save_historical_prices(historical_prices)?;
+        }
+        info!("download_historical_prices: done");
+        Ok(())
+    }
 }
 
 fn get_symbols_not_in_db(symbols_from_db: &Vec<Symbol>, symbols_from_iex: &Vec<Symbol>) -> Vec<Symbol> {

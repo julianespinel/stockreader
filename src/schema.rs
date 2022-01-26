@@ -1,4 +1,20 @@
 table! {
+    historical_prices (symbol, date) {
+        symbol -> Varchar,
+        date -> Date,
+        open -> Numeric,
+        close -> Numeric,
+        high -> Numeric,
+        low -> Numeric,
+        volume -> Int8,
+        change -> Numeric,
+        change_percent -> Numeric,
+        created_at -> Timestamp,
+        updated_at -> Timestamp,
+    }
+}
+
+table! {
     stats (symbol) {
         symbol -> Varchar,
         created_at -> Timestamp,
@@ -23,9 +39,11 @@ table! {
     }
 }
 
+joinable!(historical_prices -> symbols (symbol));
 joinable!(stats -> symbols (symbol));
 
 allow_tables_to_appear_in_same_query!(
+    historical_prices,
     stats,
     symbols,
 );

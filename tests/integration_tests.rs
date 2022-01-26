@@ -95,27 +95,28 @@ async fn download_stats_adds_stats_to_database() {
     let server = MockServer::start();
     let iex_base_url = server.base_url();
 
-    let mut symbols = vec![];
-    symbols.push(Symbol {
+    let a_symbol = Symbol {
         symbol: "A".to_string(),
         name: "A Inc".to_string(),
-    });
-    symbols.push(Symbol {
+    };
+    databases::insert_symbol(&db_url, &a_symbol).await;
+    let aa_symbol = Symbol {
         symbol: "AA".to_string(),
         name: "AA Inc".to_string(),
-    });
-    symbols.push(Symbol {
+    };
+    databases::insert_symbol(&db_url, &aa_symbol).await;
+    let aaa_symbol = Symbol {
         symbol: "AAA".to_string(),
         name: "AAA Inc".to_string(),
-    });
-    databases::insert_symbols(&db_url, &symbols).await;
+    };
+    databases::insert_symbol(&db_url, &aaa_symbol).await;
 
     let get_a_stats_mock =
-        http_mocks::configure_iex_to_return_stats(&server, &config.iex, &symbols[0].symbol);
+        http_mocks::configure_iex_to_return_stats(&server, &config.iex, &a_symbol.symbol);
     let get_aa_stats_mock =
-        http_mocks::configure_iex_to_return_stats(&server, &config.iex, &symbols[1].symbol);
+        http_mocks::configure_iex_to_return_stats(&server, &config.iex, &aa_symbol.symbol);
     let get_aaa_stats_mock =
-        http_mocks::configure_iex_to_return_stats(&server, &config.iex, &symbols[2].symbol);
+        http_mocks::configure_iex_to_return_stats(&server, &config.iex, &aaa_symbol.symbol);
 
     let updated_config = configs::get_config_with_correct_db_port_and_iex_base_url(
         environment,
@@ -134,7 +135,67 @@ async fn download_stats_adds_stats_to_database() {
     get_aa_stats_mock.assert();
     get_aaa_stats_mock.assert();
     let stats_count = databases::get_stats_count(&db_url).await;
-    assert_eq!(stats_count, symbols.len() as i64);
+    assert_eq!(stats_count, 3);
+}
+
+/// Integration test for the function `download_historical_prices`.
+///
+/// This test case does the following:
+/// 1. Reads the configuration file from environment variables.
+/// 1. Creates a docker container with an empty Postgres test database.
+/// 1. Runs the Diesel migrations into the test database.
+/// 1. Creates a http mock server to mock the IEX Cloud API.
+/// 1. Updates the environment variables to use Postgres and HTTPMock:
+///     1. Updates the database port of the docker container in the environment variable.
+///     1. Updates the base_url of the IEX client in the environment variable.
+/// 1. Inserts one symbol into the database.
+/// 1. Executes the `download_historical_prices` function using the given configuration.
+/// 1. Checks that the historical prices have been inserted in the database.
+#[tokio::test]
+async fn download_historical_prices_adds_historical_prices_to_the_database() {
+    // arrange
+    let environment = "test";
+    let config = stockreader::config::read_config(environment)
+        .await
+        .expect("error getting configuration values");
+
+    let docker = clients::Cli::default();
+    let container = containers::start_postgres_container(&config.database, &docker);
+    let db_port = container.get_host_port(POSTGRES_CONTAINER_PORT).unwrap();
+    let db_url = databases::get_test_db_url(&config.database, &db_port);
+    databases::execute_db_migrations(&db_url);
+
+    let server = MockServer::start();
+    let iex_base_url = server.base_url();
+
+    let apple = Symbol {
+        symbol: "AAPL".to_string(),
+        name: "Apple Inc".to_string(),
+    };
+    databases::insert_symbol(&db_url, &apple).await;
+
+    let get_apple_historical_prices_mock = http_mocks::configure_iex_to_return_historical_prices(
+        &server,
+        &config.iex,
+        &apple.symbol,
+    );
+
+    let updated_config = configs::get_config_with_correct_db_port_and_iex_base_url(
+        environment,
+        db_port,
+        &iex_base_url,
+    )
+    .await;
+
+    // act
+    stockreader::download_historical_prices(&updated_config)
+        .await
+        .expect("Error downloading historical prices");
+
+    // assert
+    get_apple_historical_prices_mock.assert();
+    let historical_prices_count = databases::get_historical_prices_count(&db_url).await;
+    assert_eq!(historical_prices_count, 5);
 }
 
 //------------------------------------------------------------------------------
@@ -220,26 +281,31 @@ mod databases {
             .query_one("select count(*) from stats", &[])
             .await
             .expect("error counting stats");
-        let symbols_count: i64 = row.get(0);
-        symbols_count
+        let stats_count: i64 = row.get(0);
+        stats_count
     }
 
-    pub(crate) async fn insert_symbols(db_url: &str, symbols: &Vec<Symbol>) {
+    pub(super) async fn get_historical_prices_count(db_url: &String) -> i64 {
+        let pg_client = get_postgres_client(&db_url).await;
+        let row = pg_client
+            .query_one("select count(*) from historical_prices", &[])
+            .await
+            .expect("error counting historical prices");
+        let historical_prices_count: i64 = row.get(0);
+        historical_prices_count
+    }
+
+    pub(crate) async fn insert_symbol(db_url: &str, symbol: &Symbol) {
         let pg_client = get_postgres_client(db_url).await;
         let insert_statement = pg_client
-            .prepare(
-                "INSERT INTO symbols (symbol, name) VALUES \
-                ($1, $2), ($3, $4), ($5, $6)",
-            )
+            .prepare("INSERT INTO symbols (symbol, name) VALUES ($1, $2)")
             .await
             .expect("Error creating insert statement");
 
         let mut params: Vec<&(dyn ToSql + Sync)> = Vec::new();
-        for symbol in symbols {
-            // let param = , &symbol.name];
-            params.push(&symbol.symbol);
-            params.push(&symbol.name);
-        }
+        params.push(&symbol.symbol);
+        params.push(&symbol.name);
+
         pg_client
             .execute(&insert_statement, &params)
             .await
@@ -275,6 +341,25 @@ mod http_mocks {
     ) -> Mock<'a> {
         let endpoint_path = format!("/stock/{}/stats", &symbol);
         let file_path = format!("tests/resources/httpmock_files/{}_stats.json", symbol);
+        let get_symbols_mock = server.mock(|when, then| {
+            when.method(GET)
+                .path(endpoint_path)
+                .query_param("token", &iex_config.api_key);
+            then.status(200)
+                .header("content-type", "application/json")
+                .body_from_file(file_path);
+        });
+        get_symbols_mock
+    }
+
+    pub(super) fn configure_iex_to_return_historical_prices<'a>(
+        server: &'a MockServer,
+        iex_config: &'a IEXConfig,
+        symbol: &'a str,
+    ) -> Mock<'a> {
+        let time_interval = "5y";
+        let endpoint_path = format!("/stock/{}/chart/{}", symbol, time_interval);
+        let file_path = "tests/resources/httpmock_files/aapl_historical_prices.json";
         let get_symbols_mock = server.mock(|when, then| {
             when.method(GET)
                 .path(endpoint_path)

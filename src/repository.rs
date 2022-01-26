@@ -1,13 +1,16 @@
 use diesel::insert_into;
 use diesel::pg::PgConnection;
+use diesel::pg::upsert::excluded;
 use diesel::prelude::*;
 use diesel::result::Error;
 use log::debug;
 use reqwest::Url;
 
-use crate::models::{Stats, Symbol};
+use crate::models::{HistoricalPrice, Stats, Symbol};
+use crate::schema::{historical_prices, stats, symbols};
+use crate::schema::historical_prices::dsl::*;
+use crate::schema::stats::dsl::*;
 use crate::schema::symbols::dsl::*;
-use crate::schema::{stats, symbols};
 
 pub(super) struct Repository<'a> {
     pub db_url: &'a str,
@@ -18,6 +21,31 @@ impl<'a> Repository<'a> {
 
     fn get_connection(&self) -> PgConnection {
         PgConnection::establish(self.db_url).expect(&format!("Error connecting to {}", self.db_url))
+    }
+
+    fn get_symbol(&self, some_symbol: &String) -> Result<Symbol, Error> {
+        let conn = self.get_connection();
+        let symbol_from_db: Symbol = symbols
+            .filter(symbols::symbol.eq(some_symbol))
+            .first(&conn)?;
+        debug!("got {} symbol from database", &symbol_from_db.symbol);
+        Ok(symbol_from_db)
+    }
+
+    fn get_stats(&self) -> Result<Vec<Stats>, Error> {
+        let conn = self.get_connection();
+        let stats_from_db = stats.load::<Stats>(&conn)?;
+        debug!("got {} stats from database", &stats_from_db.len());
+        Ok(stats_from_db)
+    }
+
+    fn get_historical_prices(&self, some_symbol: &String) -> Result<Vec<HistoricalPrice>, Error> {
+        let conn = self.get_connection();
+        let historical_prices_from_db = historical_prices
+            .filter(historical_prices::symbol.eq(some_symbol))
+            .load::<HistoricalPrice>(&conn)?;
+        debug!("got {} historical prices from database", &historical_prices_from_db.len());
+        Ok(historical_prices_from_db)
     }
 
     // public functions
@@ -34,6 +62,9 @@ impl<'a> Repository<'a> {
         let conn = self.get_connection();
         let affected_rows = insert_into(symbols::table)
             .values(new_symbols)
+            .on_conflict(symbols::symbol)
+            .do_update()
+            .set(symbols::name.eq(excluded(symbols::name)))
             .execute(&conn)?;
         debug!("saved {} symbols in DB", affected_rows);
         Ok(())
@@ -48,8 +79,50 @@ impl<'a> Repository<'a> {
 
     pub fn save_stats(&self, new_stats: Vec<Stats>) -> Result<(), Error> {
         let conn = self.get_connection();
-        let affected_rows = insert_into(stats::table).values(new_stats).execute(&conn)?;
+        let affected_rows = insert_into(stats::table)
+            .values(new_stats)
+            .on_conflict(stats::symbol)
+            .do_update()
+            .set((
+                stats::created_at.eq(excluded(stats::created_at)),
+                stats::marketcap.eq(excluded(stats::marketcap)),
+                stats::shares_outstanding.eq(excluded(stats::shares_outstanding)),
+                stats::employees.eq(excluded(stats::employees)),
+                stats::ttm_eps.eq(excluded(stats::ttm_eps)),
+                stats::ttm_dividend_rate.eq(excluded(stats::ttm_dividend_rate)),
+                stats::dividend_yield.eq(excluded(stats::dividend_yield)),
+                stats::next_dividend_date.eq(excluded(stats::next_dividend_date)),
+                stats::ex_dividend_date.eq(excluded(stats::ex_dividend_date)),
+                stats::next_earnings_date.eq(excluded(stats::next_earnings_date)),
+                stats::pe_ratio.eq(excluded(stats::pe_ratio)),
+                stats::beta.eq(excluded(stats::beta)),
+            ))
+            .execute(&conn)?;
         debug!("saved {} stats in DB", affected_rows);
+        Ok(())
+    }
+
+    pub fn save_historical_prices(
+        &self,
+        new_historical_prices: Vec<HistoricalPrice>,
+    ) -> Result<(), Error> {
+        let conn = self.get_connection();
+        let affected_rows = insert_into(historical_prices::table)
+            .values(new_historical_prices)
+            .on_conflict((historical_prices::symbol, historical_prices::date))
+            .do_update()
+            .set((
+                historical_prices::open.eq(excluded(historical_prices::open)),
+                historical_prices::close.eq(excluded(historical_prices::close)),
+                historical_prices::high.eq(excluded(historical_prices::high)),
+                historical_prices::low.eq(excluded(historical_prices::low)),
+                historical_prices::volume.eq(excluded(historical_prices::volume)),
+                historical_prices::change.eq(excluded(historical_prices::change)),
+                historical_prices::change_percent.eq(excluded(historical_prices::change_percent)),
+                historical_prices::updated_at.eq(excluded(historical_prices::updated_at)),
+            ))
+            .execute(&conn)?;
+        debug!("saved {} historical prices in DB", affected_rows);
         Ok(())
     }
 }
@@ -59,6 +132,7 @@ mod tests {
     use testcontainers::clients;
 
     use crate::config::models::DatabaseConfig;
+    use crate::models::Symbol;
     use crate::repository::Repository;
 
     const POSTGRES_CONTAINER_PORT: u16 = 5432;
@@ -154,12 +228,189 @@ mod tests {
         assert_eq!(symbols_from_db.len(), list_size as usize);
     }
 
+    #[test]
+    fn save_symbols_given_repeated_symbols_updates_symbol_name() {
+        // arrange
+        let db_config = get_db_config_for_tests();
+        let docker = clients::Cli::default();
+        let container = containers::start_postgres_container(&db_config, &docker);
+        let host_port = container.get_host_port(POSTGRES_CONTAINER_PORT).unwrap();
+        let db_url = containers::get_test_db_url(&db_config, &host_port);
+
+        containers::execute_db_migrations(&db_url);
+        let repository = Repository::new(&db_url);
+        let list_size = 5;
+        let symbols = test_factories::get_symbols_list(list_size);
+
+        repository
+            .save_symbols(&symbols)
+            .expect("error saving symbols");
+
+        let original_symbol = &symbols[0].symbol;
+        let new_name = "Apple Inc";
+        let duplicated_symbol = Symbol {
+            symbol: original_symbol.to_string(),
+            name: new_name.to_string()
+        };
+        // act
+        repository
+            .save_symbols(&vec![duplicated_symbol])
+            .expect("error saving duplicated symbol");
+
+        // assert
+        let symbols_from_db = repository.get_symbols().expect("error getting symbols");
+        assert_eq!(symbols_from_db.len(), list_size as usize);
+
+        let updated_symbol = repository.get_symbol(original_symbol)
+            .expect("error getting single symbol");
+
+        assert_eq!(updated_symbol.symbol, original_symbol.to_string());
+        assert_eq!(updated_symbol.name, new_name.to_string());
+    }
+
+    //-------------------------------------------------------------------------
+    // save_stats() tests
+    //-------------------------------------------------------------------------
+
+    #[test]
+    fn save_stats_given_non_empty_list_saves_stats() {
+        // arrange
+        let db_config = get_db_config_for_tests();
+        let docker = clients::Cli::default();
+        let container = containers::start_postgres_container(&db_config, &docker);
+        let host_port = container.get_host_port(POSTGRES_CONTAINER_PORT).unwrap();
+        let db_url = containers::get_test_db_url(&db_config, &host_port);
+
+        containers::execute_db_migrations(&db_url);
+        let repository = Repository::new(&db_url);
+        let list_size = 1;
+        let symbols = test_factories::get_symbols_list(list_size);
+
+        repository
+            .save_symbols(&symbols)
+            .expect("error saving symbols");
+
+        let symbol = &symbols[0];
+        let symbol_stats = test_factories::get_symbol_stats(&symbol.symbol, 0);
+        // act
+        repository.save_stats(vec![symbol_stats])
+            .expect("error saving stats");
+        // assert
+        let stats_from_db = repository.get_stats()
+            .expect("error getting stats");
+        assert_eq!(stats_from_db.len(), 1);
+    }
+
+    #[test]
+    fn save_stats_given_repeated_stats_updates_stats() {
+        // arrange
+        let db_config = get_db_config_for_tests();
+        let docker = clients::Cli::default();
+        let container = containers::start_postgres_container(&db_config, &docker);
+        let host_port = container.get_host_port(POSTGRES_CONTAINER_PORT).unwrap();
+        let db_url = containers::get_test_db_url(&db_config, &host_port);
+
+        containers::execute_db_migrations(&db_url);
+        let repository = Repository::new(&db_url);
+        let list_size = 1;
+        let symbols = test_factories::get_symbols_list(list_size);
+
+        repository
+            .save_symbols(&symbols)
+            .expect("error saving symbols");
+
+        let symbol = &symbols[0];
+        let original_symbol_stats = test_factories::get_symbol_stats(&symbol.symbol, 0);
+        repository.save_stats(vec![original_symbol_stats.clone()])
+            .expect("error saving stats");
+
+        let updated_symbol_stats = test_factories::get_symbol_stats(&symbol.symbol, 1);
+        // act
+        repository.save_stats(vec![updated_symbol_stats.clone()])
+            .expect("error saving stats");
+        // assert
+        let stats_from_db = repository.get_stats()
+            .expect("error getting stats");
+        assert_eq!(stats_from_db.len(), 1);
+        assert_eq!(stats_from_db[0].marketcap, original_symbol_stats.marketcap + 1)
+    }
+
+    //-------------------------------------------------------------------------
+    // save_historical_prices() tests
+    //-------------------------------------------------------------------------
+
+    #[test]
+    fn save_historical_prices_given_non_empty_list_saves_historical_prices() {
+        // arrange
+        let db_config = get_db_config_for_tests();
+        let docker = clients::Cli::default();
+        let container = containers::start_postgres_container(&db_config, &docker);
+        let host_port = container.get_host_port(POSTGRES_CONTAINER_PORT).unwrap();
+        let db_url = containers::get_test_db_url(&db_config, &host_port);
+
+        containers::execute_db_migrations(&db_url);
+        let repository = Repository::new(&db_url);
+        let list_size = 1;
+        let symbols = test_factories::get_symbols_list(list_size);
+
+        repository
+            .save_symbols(&symbols)
+            .expect("error saving symbols");
+
+        let symbol = &symbols[0];
+        let quantity = 1;
+        let symbol_historical_prices = test_factories::get_symbol_historical_prices(&symbol.symbol, quantity);
+        // act
+        repository.save_historical_prices(symbol_historical_prices)
+            .expect("error saving historical prices");
+        // assert
+        let prices_from_db = repository.get_historical_prices(&symbol.symbol)
+            .expect("error getting symbol historical prices");
+        assert_eq!(prices_from_db.len(), 1);
+    }
+
+    #[test]
+    fn save_historical_prices_given_repeated_prices_updates_historical_prices() {
+        // arrange
+        let db_config = get_db_config_for_tests();
+        let docker = clients::Cli::default();
+        let container = containers::start_postgres_container(&db_config, &docker);
+        let host_port = container.get_host_port(POSTGRES_CONTAINER_PORT).unwrap();
+        let db_url = containers::get_test_db_url(&db_config, &host_port);
+
+        containers::execute_db_migrations(&db_url);
+        let repository = Repository::new(&db_url);
+        let list_size = 1;
+        let symbols = test_factories::get_symbols_list(list_size);
+
+        repository
+            .save_symbols(&symbols)
+            .expect("error saving symbols");
+
+        let symbol = &symbols[0];
+        let original_price = test_factories::get_symbol_historical_price(&symbol.symbol, 0);
+        let original_prices = vec![original_price.clone()];
+        repository.save_historical_prices(original_prices)
+            .expect("error saving historical prices");
+
+        let updated_price = test_factories::get_symbol_historical_price(&symbol.symbol, 1);
+        let updated_prices = vec![updated_price.clone()];
+        // act
+        repository.save_historical_prices(updated_prices)
+            .expect("error saving historical prices");
+        // assert
+        let prices_from_db = repository.get_historical_prices(&symbol.symbol)
+            .expect("error getting symbol historical prices");
+        assert_eq!(prices_from_db.len(), 1);
+        assert_eq!(prices_from_db[0].volume, original_price.volume + 1);
+    }
+
     /// Module for using containers in tests
     mod containers {
         use diesel::{Connection, PgConnection};
+        use testcontainers::{Container, Docker, images};
         use testcontainers::clients::Cli;
         use testcontainers::images::generic::{GenericImage, WaitFor};
-        use testcontainers::{images, Container, Docker};
 
         use crate::config::models::DatabaseConfig;
         use crate::embedded_migrations;
@@ -202,10 +453,12 @@ mod tests {
     mod test_factories {
         use std::iter;
 
+        use bigdecimal::BigDecimal;
+        use chrono::Utc;
+        use rand::{Rng, thread_rng};
         use rand::distributions::Alphanumeric;
-        use rand::{thread_rng, Rng};
 
-        use crate::models::Symbol;
+        use crate::models::{HistoricalPrice, Stats, Symbol};
 
         fn get_random_string() -> String {
             let mut rng = thread_rng();
@@ -231,6 +484,50 @@ mod tests {
                 symbols.push(symbol);
             }
             symbols
+        }
+
+        pub(super) fn get_symbol_stats(symbol: &String, index: i64) -> Stats {
+            Stats {
+                symbol: symbol.to_string(),
+                created_at: Utc::now().naive_utc(),
+                marketcap: index + 1,
+                shares_outstanding: index + 2,
+                employees: index + 3,
+                ttm_eps: BigDecimal::from(index + 4),
+                ttm_dividend_rate: BigDecimal::from(index + 5),
+                dividend_yield: BigDecimal::from(index + 6),
+                next_dividend_date: Option::None,
+                ex_dividend_date: Option::None,
+                next_earnings_date: Option::None,
+                pe_ratio: BigDecimal::from(index + 7),
+                beta: BigDecimal::from(index + 8),
+            }
+        }
+
+        pub(super) fn get_symbol_historical_price(symbol: &String, index: i64) -> HistoricalPrice {
+            let now = Utc::now();
+            HistoricalPrice {
+                symbol: symbol.to_string(),
+                date: now.date().naive_utc(),
+                open: BigDecimal::from(index + 1),
+                close: BigDecimal::from(index + 2),
+                high: BigDecimal::from(index + 3),
+                low: BigDecimal::from(index + 4),
+                volume: index + 5,
+                change: BigDecimal::from(index + 6),
+                change_percent: BigDecimal::from(index + 7),
+                created_at: now.naive_utc(),
+                updated_at: now.naive_utc(),
+            }
+        }
+
+        pub(super) fn get_symbol_historical_prices(symbol: &String, quantity: i64) -> Vec<HistoricalPrice> {
+            let mut symbol_prices = vec![];
+            for i in 0..quantity {
+                let price = get_symbol_historical_price(symbol, i);
+                symbol_prices.push(price);
+            }
+            symbol_prices
         }
     }
 }
