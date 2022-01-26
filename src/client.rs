@@ -101,7 +101,7 @@ impl<'a> IEXClient<'a> {
 
     pub async fn get_historical_prices_last_five_years(
         &self,
-        symbol: &str,
+        symbol: String,
     ) -> Result<Vec<HistoricalPrice>, anyhow::Error> {
         let time_range = "5y";
         let url = format!(
@@ -392,7 +392,7 @@ mod tests {
 
         // act
         let historical_prices = client
-            .get_historical_prices_last_five_years(symbol)
+            .get_historical_prices_last_five_years(symbol.to_string())
             .await
             .expect("error getting historical prices");
 

@@ -28,6 +28,7 @@ pub async fn execute(action: &str, config: &Configuration) -> Result<()> {
         "migrate_db_schema" => run_db_migrations(config)?,
         "download_symbols" => download_symbols(config).await?,
         "download_stats" => download_stats(config).await?,
+        "download_historical_prices" => download_historical_prices(config).await?,
         _ => warn!("Unknown action: {}", action)
     }
     Ok(())
@@ -65,6 +66,20 @@ pub async fn download_stats(config: &Configuration) -> Result<()> {
 
     info!("start: getting stats");
     service.download_stats().await?;
+    info!("done: getting stats");
+    Ok(())
+}
+
+pub async fn download_historical_prices(config: &Configuration) -> Result<()> {
+    let base_url = &config.iex.base_url;
+    let db_url = config.database.get_url();
+
+    let iex_client = client::IEXClient::new(&config.iex.api_key, base_url);
+    let repository = repository::Repository::new(&db_url);
+    let service = Service { iex_client: &iex_client, repository: &repository };
+
+    info!("start: getting stats");
+    service.download_historical_prices().await?;
     info!("done: getting stats");
     Ok(())
 }
