@@ -6,9 +6,10 @@ use diesel::result::Error;
 use log::debug;
 use reqwest::Url;
 
-use crate::models::{Stats, Symbol};
+use crate::models::{HistoricalPrice, Stats, Symbol};
 use crate::schema::symbols::dsl::*;
-use crate::schema::{stats, symbols};
+use crate::schema::{historical_prices, stats, symbols};
+use crate::schema::stats::dsl::*;
 
 pub(super) struct Repository<'a> {
     pub db_url: &'a str,
@@ -19,6 +20,22 @@ impl<'a> Repository<'a> {
 
     fn get_connection(&self) -> PgConnection {
         PgConnection::establish(self.db_url).expect(&format!("Error connecting to {}", self.db_url))
+    }
+
+    fn get_symbol(&self, some_symbol: &String) -> Result<Symbol, Error> {
+        let conn = self.get_connection();
+        let symbol_from_db: Symbol = symbols
+            .filter(symbols::symbol.eq(some_symbol))
+            .first(&conn)?;
+        debug!("got {} symbol from database", &symbol_from_db.symbol);
+        Ok(symbol_from_db)
+    }
+
+    fn get_stats(&self) -> Result<Vec<Stats>, Error> {
+        let conn = self.get_connection();
+        let stats_from_db = stats.load::<Stats>(&conn)?;
+        debug!("got {} stats from database", &stats_from_db.len());
+        Ok(stats_from_db)
     }
 
     // public functions
@@ -52,7 +69,25 @@ impl<'a> Repository<'a> {
 
     pub fn save_stats(&self, new_stats: Vec<Stats>) -> Result<(), Error> {
         let conn = self.get_connection();
-        let affected_rows = insert_into(stats::table).values(new_stats).execute(&conn)?;
+        let affected_rows = insert_into(stats::table)
+            .values(new_stats)
+            .on_conflict(stats::symbol)
+            .do_update()
+            .set((
+                stats::created_at.eq(excluded(stats::created_at)),
+                stats::marketcap.eq(excluded(stats::marketcap)),
+                stats::shares_outstanding.eq(excluded(stats::shares_outstanding)),
+                stats::employees.eq(excluded(stats::employees)),
+                stats::ttm_eps.eq(excluded(stats::ttm_eps)),
+                stats::ttm_dividend_rate.eq(excluded(stats::ttm_dividend_rate)),
+                stats::dividend_yield.eq(excluded(stats::dividend_yield)),
+                stats::next_dividend_date.eq(excluded(stats::next_dividend_date)),
+                stats::ex_dividend_date.eq(excluded(stats::ex_dividend_date)),
+                stats::next_earnings_date.eq(excluded(stats::next_earnings_date)),
+                stats::pe_ratio.eq(excluded(stats::pe_ratio)),
+                stats::beta.eq(excluded(stats::beta)),
+            ))
+            .execute(&conn)?;
         debug!("saved {} stats in DB", affected_rows);
         Ok(())
     }
@@ -199,6 +234,70 @@ mod tests {
         assert_eq!(updated_symbol.name, new_name.to_string());
     }
 
+    //-------------------------------------------------------------------------
+    // save_stats() tests
+    //-------------------------------------------------------------------------
+
+    #[test]
+    fn save_stats_given_non_empty_list_saves_stats() {
+        // arrange
+        let db_config = get_db_config_for_tests();
+        let docker = clients::Cli::default();
+        let container = containers::start_postgres_container(&db_config, &docker);
+        let host_port = container.get_host_port(POSTGRES_CONTAINER_PORT).unwrap();
+        let db_url = containers::get_test_db_url(&db_config, &host_port);
+
+        containers::execute_db_migrations(&db_url);
+        let repository = Repository::new(&db_url);
+        let list_size = 1;
+        let symbols = test_factories::get_symbols_list(list_size);
+
+        repository
+            .save_symbols(&symbols)
+            .expect("error saving symbols");
+
+        let symbol = &symbols[0];
+        let symbol_stats = test_factories::get_symbol_stats(&symbol.symbol, 0);
+        // act
+        repository.save_stats(vec![symbol_stats]);
+        // assert
+        let stats_from_db = repository.get_stats()
+            .expect("error getting stats");
+        assert_eq!(stats_from_db.len(), 1);
+    }
+
+    #[test]
+    fn save_stats_given_repeated_stats_updates_stats() {
+        // arrange
+        let db_config = get_db_config_for_tests();
+        let docker = clients::Cli::default();
+        let container = containers::start_postgres_container(&db_config, &docker);
+        let host_port = container.get_host_port(POSTGRES_CONTAINER_PORT).unwrap();
+        let db_url = containers::get_test_db_url(&db_config, &host_port);
+
+        containers::execute_db_migrations(&db_url);
+        let repository = Repository::new(&db_url);
+        let list_size = 1;
+        let symbols = test_factories::get_symbols_list(list_size);
+
+        repository
+            .save_symbols(&symbols)
+            .expect("error saving symbols");
+
+        let symbol = &symbols[0];
+        let original_symbol_stats = test_factories::get_symbol_stats(&symbol.symbol, 0);
+        repository.save_stats(vec![original_symbol_stats.clone()]);
+
+        let updated_symbol_stats = test_factories::get_symbol_stats(&symbol.symbol, 1);
+        // act
+        repository.save_stats(vec![updated_symbol_stats.clone()]);
+        // assert
+        let stats_from_db = repository.get_stats()
+            .expect("error getting stats");
+        assert_eq!(stats_from_db.len(), 1);
+        assert_eq!(stats_from_db[0].marketcap, original_symbol_stats.marketcap + 1)
+    }
+
     /// Module for using containers in tests
     mod containers {
         use diesel::{Connection, PgConnection};
@@ -246,11 +345,13 @@ mod tests {
 
     mod test_factories {
         use std::iter;
+        use bigdecimal::BigDecimal;
+        use chrono::{NaiveDate, NaiveDateTime, Utc};
 
         use rand::distributions::Alphanumeric;
         use rand::{thread_rng, Rng};
 
-        use crate::models::Symbol;
+        use crate::models::{Stats, Symbol};
 
         fn get_random_string() -> String {
             let mut rng = thread_rng();
@@ -276,6 +377,24 @@ mod tests {
                 symbols.push(symbol);
             }
             symbols
+        }
+
+        pub(crate) fn get_symbol_stats(symbol: &String, index: i64) -> Stats {
+            Stats {
+                symbol: symbol.to_string(),
+                created_at: Utc::now().naive_utc(),
+                marketcap: index + 1,
+                shares_outstanding: index + 2,
+                employees: index + 3,
+                ttm_eps: BigDecimal::from(index + 4),
+                ttm_dividend_rate: BigDecimal::from(index + 5),
+                dividend_yield: BigDecimal::from(index + 6),
+                next_dividend_date: Option::None,
+                ex_dividend_date: Option::None,
+                next_earnings_date: Option::None,
+                pe_ratio: BigDecimal::from(index + 7),
+                beta: BigDecimal::from(index + 8),
+            }
         }
     }
 }
