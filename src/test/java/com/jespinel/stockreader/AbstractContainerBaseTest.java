@@ -55,7 +55,7 @@ public class AbstractContainerBaseTest {
     }
 
     protected void cleanDatabase() {
-        String[] tables = {"symbols"};
+        String[] tables = {"stats", "symbols"};
         JdbcTestUtils.deleteFromTables(jdbcTemplate, tables);
     }
 }
