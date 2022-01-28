@@ -1,4 +1,4 @@
---changeset julianespinel:1
+-- changeset julianespinel:1
 CREATE TABLE symbols
 (
     symbol     VARCHAR(256) PRIMARY KEY,
@@ -6,4 +6,4 @@ CREATE TABLE symbols
     created_at TIMESTAMP    NOT NULL,
     updated_at TIMESTAMP    NOT NULL
 );
---rollback drop table symbols;
+-- rollback drop table symbols;

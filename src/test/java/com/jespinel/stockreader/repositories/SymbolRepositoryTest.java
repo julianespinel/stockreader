@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 
@@ -61,5 +62,28 @@ class SymbolRepositoryTest extends AbstractContainerBaseTest {
         // assert
         List<Symbol> savedSymbols = repository.getAll();
         assertThat(savedSymbols).hasSize(quantity);
+    }
+
+    @Test
+    void saveAll_givenDuplicatedSymbols_updatesNameAndDate() {
+        // arrange
+        int quantity = 7;
+        List<Symbol> symbols = testFactories.getRandomSymbolList(quantity);
+        repository.saveAll(symbols);
+
+        Symbol firstSymbol = symbols.get(0);
+        String newName = "Some name";
+        LocalDateTime date = LocalDateTime.now().plusMinutes(5);
+        Symbol duplicatedSymbol = new Symbol(firstSymbol.getSymbol(), newName, date, date);
+        // act
+        repository.saveAll(Collections.singletonList(duplicatedSymbol));
+        // assert
+        List<Symbol> savedSymbols = repository.getAll();
+        assertThat(savedSymbols).hasSize(quantity);
+
+        Symbol updatedSymbol = repository.getBySymbol(firstSymbol.getSymbol());
+        assertThat(updatedSymbol.getName()).isEqualTo(newName);
+        assertThat(updatedSymbol.getCreatedAt()).isEqualToIgnoringNanos(firstSymbol.getCreatedAt());
+        assertThat(updatedSymbol.getUpdatedAt()).isNotEqualTo(firstSymbol.getUpdatedAt());
     }
 }

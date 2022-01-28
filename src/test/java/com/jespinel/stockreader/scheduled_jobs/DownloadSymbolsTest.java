@@ -41,20 +41,7 @@ class DownloadSymbolsTest extends AbstractContainerBaseTest {
         // assert
         List<Symbol> symbols = repository.getAll();
         assertThat(symbols).hasSize(3);
-        assertThat(logOutput).contains("DownloadSymbols: saved 3 new symbols");
-    }
-
-    @Test
-    void execute_givenExistingSymbols_saveNewSymbolsOnly(CapturedOutput logOutput) throws IOException {
-        // arrange
-        testFactories.createRandomSymbols(5);
-        serverConfig.whenGettingSymbolsReturn200AndValidSymbolList(mockServer);
-        // act
-        job.execute();
-        // assert
-        List<Symbol> symbols = repository.getAll();
-        assertThat(symbols).hasSize(8);
-        assertThat(logOutput).contains("DownloadSymbols: saved 3 new symbols");
+        assertThat(logOutput).contains("DownloadSymbols: Done");
     }
 
     @Test
