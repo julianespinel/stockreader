@@ -8,15 +8,23 @@ import org.springframework.stereotype.Component;
 public class Scheduler {
 
     private final DownloadSymbols downloadSymbols;
+    private final DownloadStats downloadStats;
 
     @Autowired
-    public Scheduler(DownloadSymbols downloadSymbols) {
+    public Scheduler(DownloadSymbols downloadSymbols, DownloadStats downloadStats) {
         this.downloadSymbols = downloadSymbols;
+        this.downloadStats = downloadStats;
     }
 
-    // Every sunday at 00:00
+    // Every Sunday at 00:00
     @Scheduled(cron = "0 0 0 ? * SUN", zone = "UTC")
     public void downloadSymbols() {
         downloadSymbols.execute();
+    }
+
+    // Every Monday at 00:00
+    @Scheduled(cron = "0 0 0 ? * MON", zone = "UTC")
+    public void downloadStats() {
+        downloadStats.execute();
     }
 }
