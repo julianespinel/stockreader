@@ -1,7 +1,6 @@
 package com.jespinel.stockreader.repositories;
 
 import com.jespinel.stockreader.entities.Stats;
-import com.jespinel.stockreader.entities.Symbol;
 import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
