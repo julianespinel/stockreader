@@ -1,11 +1,13 @@
 package com.jespinel.stockreader.clients;
 
+import com.jespinel.stockreader.entities.Symbol;
 import org.mockserver.client.MockServerClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ResourceUtils;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 
@@ -52,6 +54,53 @@ public class MockServerConfigurations {
                         request()
                                 .withMethod("GET")
                                 .withPath("/ref-data/symbols")
+                                .withQueryStringParameter("token", apiKey)
+                )
+                .respond(
+                        response()
+                                .withStatusCode(200)
+                                .withBody(expectedBody)
+                );
+    }
+
+    public void whenGettingStatsReturn200AndValidStats(MockServerClient mockServer, Symbol symbol) throws IOException {
+        File file = ResourceUtils.getFile("classpath:mockserver_responses/get_symbol_stats.json");
+        String expectedBody = new String(Files.readAllBytes(file.toPath()));
+
+        mockServer.when(
+                        request()
+                                .withMethod("GET")
+                                .withPath("/stock/%s/stats".formatted(symbol.getSymbol()))
+                                .withQueryStringParameter("token", apiKey)
+                )
+                .respond(
+                        response()
+                                .withStatusCode(200)
+                                .withBody(expectedBody)
+                );
+    }
+
+    public void whenGettingStatsReturn403(MockServerClient mockServer, Symbol symbol) throws IOException {
+        File file = ResourceUtils.getFile("classpath:mockserver_responses/get_symbol_stats.json");
+        String expectedBody = new String(Files.readAllBytes(file.toPath()));
+
+        mockServer.when(
+                        request()
+                                .withMethod("GET")
+                                .withPath("/stock/%s/stats".formatted(symbol.getSymbol()))
+                                .withQueryStringParameter("token", apiKey)
+                )
+                .respond(response().withStatusCode(403));
+    }
+
+    public void whenGettingStatsReturn200AndNotValidJsonBody(MockServerClient mockServer, Symbol symbol) throws IOException {
+        File file = ResourceUtils.getFile("classpath:mockserver_responses/not_valid.json");
+        String expectedBody = new String(Files.readAllBytes(file.toPath()));
+
+        mockServer.when(
+                        request()
+                                .withMethod("GET")
+                                .withPath("/stock/%s/stats".formatted(symbol.getSymbol()))
                                 .withQueryStringParameter("token", apiKey)
                 )
                 .respond(

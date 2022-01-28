@@ -1,6 +1,8 @@
 package com.jespinel.stockreader.clients;
 
 import com.jespinel.stockreader.AbstractContainerBaseTest;
+import com.jespinel.stockreader.clients.iex.IEXClient;
+import com.jespinel.stockreader.entities.Stats;
 import com.jespinel.stockreader.entities.Symbol;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,6 +24,10 @@ class IEXClientTest extends AbstractContainerBaseTest {
         mockServer.reset();
         cleanDatabase();
     }
+
+    //-------------------------------------------------------------------------
+    // Get Symbols tests
+    //-------------------------------------------------------------------------
 
     @Test
     void getSymbols_gets200_returnsListOfSymbols() throws IOException, ClientException {
@@ -47,5 +53,42 @@ class IEXClientTest extends AbstractContainerBaseTest {
         serverConfig.whenGettingSymbolsReturn200AndNotValidJsonBody(mockServer);
         // act and assert
         assertThrows(ClientException.class, () -> client.getSymbols());
+    }
+
+    //-------------------------------------------------------------------------
+    // Get symbol stats tests
+    //-------------------------------------------------------------------------
+
+    @Test
+    void getSymbolStats_gets200_returnsSymbolStats() throws ClientException, IOException {
+        // arrange
+        Symbol symbol = testFactories.getRandomSymbol();
+        serverConfig.whenGettingStatsReturn200AndValidStats(mockServer, symbol);
+        // act
+        Stats stats = client.getSymbolStats(symbol);
+        // assert
+        assertThat(stats.getSymbol()).isEqualTo(symbol.getSymbol());
+        assertThat(stats.getMarketcap().toString()).isEqualTo("2872053733394");
+        assertThat(stats.getTtmEps().toString()).isEqualTo("11.67");
+        assertThat(stats.getExDividendDate().toString()).isEqualTo("2021-10-23");
+        assertThat(stats.getPeRatio().toString()).isEqualTo("15.265667005447652");
+    }
+
+    @Test
+    void getSymbolStats_gets403_throwsClientException() throws IOException {
+        // arrange
+        Symbol symbol = testFactories.getRandomSymbol();
+        serverConfig.whenGettingStatsReturn403(mockServer, symbol);
+        // act and assert
+        assertThrows(ClientException.class, () -> client.getSymbolStats(symbol));
+    }
+
+    @Test
+    void getSymbolStats_getsMalformedJsonResponse_throwsClientException() throws IOException {
+        // arrange
+        Symbol symbol = testFactories.getRandomSymbol();
+        serverConfig.whenGettingStatsReturn200AndNotValidJsonBody(mockServer, symbol);
+        // act and assert
+        assertThrows(ClientException.class, () -> client.getSymbolStats(symbol));
     }
 }

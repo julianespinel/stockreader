@@ -28,6 +28,12 @@ public class TestFactories {
         this.statsRepository = statsRepository;
     }
 
+    public Symbol getRandomSymbol() {
+        String symbol = faker.stock().nsdqSymbol();
+        String name = faker.company().name();
+        return new Symbol(symbol, name);
+    }
+
     public Symbol getRandomSymbol(int index) {
         String symbol = faker.stock().nsdqSymbol() + index;
         String name = faker.company().name();
