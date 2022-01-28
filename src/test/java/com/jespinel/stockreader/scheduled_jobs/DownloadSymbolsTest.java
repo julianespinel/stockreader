@@ -1,7 +1,6 @@
 package com.jespinel.stockreader.scheduled_jobs;
 
 import com.jespinel.stockreader.AbstractContainerBaseTest;
-import com.jespinel.stockreader.clients.ClientException;
 import com.jespinel.stockreader.entities.Symbol;
 import com.jespinel.stockreader.repositories.SymbolRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,7 +14,6 @@ import java.io.IOException;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(OutputCaptureExtension.class)
 class DownloadSymbolsTest extends AbstractContainerBaseTest {
