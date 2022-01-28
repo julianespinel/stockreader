@@ -1,8 +1,11 @@
-package com.jespinel.stockreader.clients;
+package com.jespinel.stockreader.clients.iex;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
+import com.jespinel.stockreader.clients.ClientException;
+import com.jespinel.stockreader.clients.StockAPIClient;
+import com.jespinel.stockreader.entities.Stats;
 import com.jespinel.stockreader.entities.Symbol;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,6 +79,34 @@ public class IEXClient implements StockAPIClient {
             TypeReference<List<Symbol>> symbolList = new TypeReference<>() {
             };
             return objectMapper.readValue(response.body(), symbolList);
+
+        } catch (IOException | InterruptedException | URISyntaxException e) {
+            log.error(e.getMessage(), e);
+            throw new ClientException(e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public Stats getSymbolStats(Symbol symbol) throws ClientException {
+        try {
+            String url = "%s/stock/%s/stats?token=%s".formatted(host, symbol.getSymbol(), apiKey);
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(new URI(url))
+                    .timeout(Duration.of(30, SECONDS))
+                    .GET()
+                    .build();
+
+            HttpClient client = HttpClient.newHttpClient();
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() != HttpStatus.OK.value()) {
+                String errorMessage = "Error %s getting symbol stats from IEX Cloud. Details: url: %s, response: %s"
+                        .formatted(response.statusCode(), url, response.body());
+                log.error(errorMessage);
+                throw new ClientException(errorMessage);
+            }
+
+            IEXStats iexStats = objectMapper.readValue(response.body(), IEXStats.class);
+            return iexStats.toStats(symbol.getSymbol());
 
         } catch (IOException | InterruptedException | URISyntaxException e) {
             log.error(e.getMessage(), e);
