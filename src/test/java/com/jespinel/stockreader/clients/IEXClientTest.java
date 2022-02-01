@@ -2,6 +2,7 @@ package com.jespinel.stockreader.clients;
 
 import com.jespinel.stockreader.AbstractContainerBaseTest;
 import com.jespinel.stockreader.clients.iex.IEXClient;
+import com.jespinel.stockreader.entities.HistoricalPrice;
 import com.jespinel.stockreader.entities.Stats;
 import com.jespinel.stockreader.entities.Symbol;
 import org.junit.jupiter.api.BeforeEach;
@@ -90,5 +91,38 @@ class IEXClientTest extends AbstractContainerBaseTest {
         serverConfig.whenGettingStatsReturn200AndNotValidJsonBody(mockServer, symbol);
         // act and assert
         assertThrows(ClientException.class, () -> client.getSymbolStats(symbol));
+    }
+
+    //-------------------------------------------------------------------------
+    // Get symbol historical prices last five years tests
+    //-------------------------------------------------------------------------
+
+    @Test
+    void getSymbolHistoricalPrices_gets200_returnsSymbolHistoricalPrices() throws ClientException, IOException {
+        // arrange
+        Symbol symbol = testFactories.getRandomSymbol();
+        serverConfig.whenGettingHistoricalPricesReturn200AndValidHistoricalPrices(mockServer, symbol);
+        // act
+        List<HistoricalPrice> prices = client.getSymbolHistoricalPricesLastFiveYears(symbol);
+        // assert
+        assertThat(prices).hasSize(5);
+    }
+
+    @Test
+    void getSymbolHistoricalPrices_gets403_throwsClientException() throws IOException {
+        // arrange
+        Symbol symbol = testFactories.getRandomSymbol();
+        serverConfig.whenGettingHistoricalPricesReturn403(mockServer, symbol);
+        // act and assert
+        assertThrows(ClientException.class, () -> client.getSymbolHistoricalPricesLastFiveYears(symbol));
+    }
+
+    @Test
+    void getSymbolHistoricalPrices_getsMalformedJsonResponse_throwsClientException() throws IOException {
+        // arrange
+        Symbol symbol = testFactories.getRandomSymbol();
+        serverConfig.whenGettingHistoricalPricesReturn200AndNotValidJsonBody(mockServer, symbol);
+        // act and assert
+        assertThrows(ClientException.class,() -> client.getSymbolHistoricalPricesLastFiveYears(symbol));
     }
 }

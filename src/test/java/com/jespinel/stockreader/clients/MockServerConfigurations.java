@@ -108,4 +108,52 @@ public class MockServerConfigurations {
                                 .withBody(expectedBody)
                 );
     }
+
+    public void whenGettingHistoricalPricesReturn200AndValidHistoricalPrices(MockServerClient mockServer, Symbol symbol) throws IOException {
+        File file = ResourceUtils.getFile("classpath:mockserver_responses/get_symbol_historical_prices.json");
+        String expectedBody = new String(Files.readAllBytes(file.toPath()));
+
+        String timeRange = "5y";
+        mockServer.when(
+                        request()
+                                .withMethod("GET")
+                                .withPath("/stock/%s/chart/%s".formatted(symbol.getSymbol(), timeRange))
+                                .withQueryStringParameter("token", apiKey)
+                )
+                .respond(
+                        response()
+                                .withStatusCode(200)
+                                .withBody(expectedBody)
+                );
+    }
+
+    public void whenGettingHistoricalPricesReturn403(MockServerClient mockServer, Symbol symbol) {
+        String timeRange = "5y";
+        mockServer.when(
+                        request()
+                                .withMethod("GET")
+                                .withPath("/stock/%s/chart/%s".formatted(symbol.getSymbol(), timeRange))
+                                .withQueryStringParameter("token", apiKey)
+                )
+                .respond(response().withStatusCode(403));
+    }
+
+
+    public void whenGettingHistoricalPricesReturn200AndNotValidJsonBody(MockServerClient mockServer, Symbol symbol) throws IOException {
+        File file = ResourceUtils.getFile("classpath:mockserver_responses/not_valid.json");
+        String expectedBody = new String(Files.readAllBytes(file.toPath()));
+
+        String timeRange = "5y";
+        mockServer.when(
+                        request()
+                                .withMethod("GET")
+                                .withPath("/stock/%s/chart/%s".formatted(symbol.getSymbol(), timeRange))
+                                .withQueryStringParameter("token", apiKey)
+                )
+                .respond(
+                        response()
+                                .withStatusCode(200)
+                                .withBody(expectedBody)
+                );
+    }
 }
