@@ -23,7 +23,7 @@ public class AbstractContainerBaseTest {
     private static final String TEST_POSTGRES_PASSWORD = "example";
 
     @Autowired
-    private JdbcTemplate jdbcTemplate;
+    protected JdbcTemplate jdbcTemplate;
 
     @Autowired
     protected TestFactories testFactories;
@@ -55,7 +55,7 @@ public class AbstractContainerBaseTest {
     }
 
     protected void cleanDatabase() {
-        String[] tables = {"stats", "symbols"};
+        String[] tables = {"historical_prices", "stats", "symbols"};
         JdbcTestUtils.deleteFromTables(jdbcTemplate, tables);
     }
 }

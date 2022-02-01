@@ -1,6 +1,7 @@
 package com.jespinel.stockreader;
 
 import com.github.javafaker.Faker;
+import com.jespinel.stockreader.entities.HistoricalPrice;
 import com.jespinel.stockreader.entities.Stats;
 import com.jespinel.stockreader.entities.Symbol;
 import com.jespinel.stockreader.repositories.StatsRepository;
@@ -107,6 +108,48 @@ public class TestFactories {
                 stat.getBeta().add(BigDecimal.valueOf(delta)),
                 stat.getCreatedAt(),
                 stat.getUpdatedAt().plusMinutes(delta)
+        );
+    }
+
+    public HistoricalPrice getPriceForSymbol(Symbol symbol, int index) {
+        LocalDate date = LocalDate.now().plusDays(index);
+        BigDecimal bigDecimal = BigDecimal.valueOf(index);
+        BigInteger bigInt = BigInteger.valueOf(index);
+        return new HistoricalPrice(symbol.getSymbol(),
+                date, bigDecimal, bigDecimal, bigDecimal, bigDecimal, bigInt,
+                bigDecimal, bigDecimal);
+    }
+
+    public List<HistoricalPrice> getPricesForSymbol(Symbol symbol, int quantity) {
+        List<HistoricalPrice> prices = new ArrayList<>(quantity);
+        for (int i = 0; i < quantity; i++) {
+            HistoricalPrice price = getPriceForSymbol(symbol, i);
+            prices.add(price);
+        }
+        return prices;
+    }
+
+    /**
+     * Return a new HistoricalPrice object containing the values of the given
+     * price plus a delta.
+     *
+     * @param price Original price
+     * @param delta Delta to add to all values
+     * @return object containing the values of the given price plus a delta.
+     */
+    public HistoricalPrice from(HistoricalPrice price, int delta) {
+        return new HistoricalPrice(
+                price.getSymbol(),
+                price.getDate(),
+                price.getOpen().add(BigDecimal.valueOf(delta)),
+                price.getClose().add(BigDecimal.valueOf(delta)),
+                price.getHigh().add(BigDecimal.valueOf(delta)),
+                price.getLow().add(BigDecimal.valueOf(delta)),
+                price.getVolume().add(BigInteger.valueOf(delta)),
+                price.getChange().add(BigDecimal.valueOf(delta)),
+                price.getChangePercent().add(BigDecimal.valueOf(delta)),
+                price.getCreatedAt(),
+                price.getUpdatedAt().plusMinutes(delta)
         );
     }
 }
