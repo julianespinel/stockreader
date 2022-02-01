@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
 import com.jespinel.stockreader.clients.ClientException;
 import com.jespinel.stockreader.clients.StockAPIClient;
+import com.jespinel.stockreader.entities.HistoricalPrice;
 import com.jespinel.stockreader.entities.Stats;
 import com.jespinel.stockreader.entities.Symbol;
 import org.slf4j.Logger;
@@ -107,6 +108,37 @@ public class IEXClient implements StockAPIClient {
 
             IEXStats iexStats = objectMapper.readValue(response.body(), IEXStats.class);
             return iexStats.toStats(symbol.getSymbol());
+
+        } catch (IOException | InterruptedException | URISyntaxException e) {
+            log.error(e.getMessage(), e);
+            throw new ClientException(e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public List<HistoricalPrice> getSymbolHistoricalPricesLastFiveYears(Symbol symbol) throws ClientException {
+        try {
+            String timeRange = "5y";
+            String url = "%s/stock/%s/chart/%s?token=%s"
+                    .formatted(host, symbol.getSymbol(), timeRange, apiKey);
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(new URI(url))
+                    .timeout(Duration.of(30, SECONDS))
+                    .GET()
+                    .build();
+
+            HttpClient client = HttpClient.newHttpClient();
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() != HttpStatus.OK.value()) {
+                String errorMessage = "Error %s getting %s historical prices from IEX Cloud. Details: url: %s, response: %s"
+                        .formatted(response.statusCode(), symbol, url, response.body());
+                log.error(errorMessage);
+                throw new ClientException(errorMessage);
+            }
+
+            TypeReference<List<HistoricalPrice>> symbolList = new TypeReference<>() {
+            };
+            return objectMapper.readValue(response.body(), symbolList);
 
         } catch (IOException | InterruptedException | URISyntaxException e) {
             log.error(e.getMessage(), e);
