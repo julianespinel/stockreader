@@ -106,10 +106,21 @@ class IEXClientTest extends AbstractContainerBaseTest {
         List<HistoricalPrice> prices = client.getSymbolHistoricalPricesLastFiveYears(symbol);
         // assert
         assertThat(prices).hasSize(5);
+
+        HistoricalPrice firstPrice = prices.get(0);
+        assertThat(firstPrice.getSymbol()).isEqualTo("AAPL");
+        assertThat(firstPrice.getDate().toString()).isEqualTo("2017-02-01");
+        assertThat(firstPrice.getOpen().toString()).isEqualTo("30.0731");
+        assertThat(firstPrice.getClose().toString()).isEqualTo("30.6431");
+        assertThat(firstPrice.getHigh().toString()).isEqualTo("31.232");
+        assertThat(firstPrice.getLow().toString()).isEqualTo("29.972");
+        assertThat(firstPrice.getVolume().toString()).isEqualTo("465511602");
+        assertThat(firstPrice.getChange().toString()).isEqualTo("0");
+        assertThat(firstPrice.getChangePercent().toString()).isEqualTo("0");
     }
 
     @Test
-    void getSymbolHistoricalPrices_gets403_throwsClientException() throws IOException {
+    void getSymbolHistoricalPrices_gets403_throwsClientException() {
         // arrange
         Symbol symbol = testFactories.getRandomSymbol();
         serverConfig.whenGettingHistoricalPricesReturn403(mockServer, symbol);

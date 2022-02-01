@@ -24,6 +24,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static java.time.temporal.ChronoUnit.SECONDS;
 
@@ -131,14 +132,14 @@ public class IEXClient implements StockAPIClient {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() != HttpStatus.OK.value()) {
                 String errorMessage = "Error %s getting %s historical prices from IEX Cloud. Details: url: %s, response: %s"
-                        .formatted(response.statusCode(), symbol, url, response.body());
+                        .formatted(response.statusCode(), symbol.getSymbol(), url, response.body());
                 log.error(errorMessage);
                 throw new ClientException(errorMessage);
             }
 
-            TypeReference<List<HistoricalPrice>> symbolList = new TypeReference<>() {
-            };
-            return objectMapper.readValue(response.body(), symbolList);
+            TypeReference<List<IEXHistoricalPrice>> symbolList = new TypeReference<>() {};
+            List<IEXHistoricalPrice> iexPrices = objectMapper.readValue(response.body(), symbolList);
+            return iexPrices.stream().map(IEXHistoricalPrice::toHistoricalPrice).collect(Collectors.toList());
 
         } catch (IOException | InterruptedException | URISyntaxException e) {
             log.error(e.getMessage(), e);
