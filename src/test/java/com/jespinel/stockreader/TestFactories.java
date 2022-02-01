@@ -13,6 +13,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -48,6 +49,12 @@ public class TestFactories {
             symbols.add(symbol);
         }
         return symbols;
+    }
+
+    public Symbol createSymbol(String symbol, String name) {
+        Symbol aSymbol = new Symbol(symbol, name);
+        symbolRepository.saveAll(Collections.singletonList(aSymbol));
+        return aSymbol;
     }
 
     public List<Symbol> createRandomSymbols(int quantity) {
