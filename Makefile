@@ -1,4 +1,4 @@
-all: clean test package run
+all: clean test package
 
 clean:
 	mvn clean
