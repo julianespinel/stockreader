@@ -9,31 +9,31 @@ public class Scheduler {
 
     private final DownloadSymbols downloadSymbols;
     private final DownloadStats downloadStats;
-    private final DownloadHistoricalPrices downloadHistoricalPrices;
+    private final DownloadPrices downloadPrices;
 
     @Autowired
     public Scheduler(DownloadSymbols downloadSymbols, DownloadStats downloadStats,
-                     DownloadHistoricalPrices downloadHistoricalPrices) {
+                     DownloadPrices downloadPrices) {
         this.downloadSymbols = downloadSymbols;
         this.downloadStats = downloadStats;
-        this.downloadHistoricalPrices = downloadHistoricalPrices;
+        this.downloadPrices = downloadPrices;
     }
 
-    // Every Sunday at 00:00
-    @Scheduled(cron = "0 0 0 ? * SUN", zone = "UTC")
+    // Every day at 06:00 UTC
+    @Scheduled(cron = "0 0 6 * * *", zone = "UTC")
     public void downloadSymbols() {
         downloadSymbols.execute();
     }
 
-    // Every Monday at 00:00
-    @Scheduled(cron = "0 0 0 ? * MON", zone = "UTC")
+    // Every Sunday at 00:00 UTC
+    @Scheduled(cron = "0 0 0 * * SUN", zone = "UTC")
     public void downloadStats() {
         downloadStats.execute();
     }
 
-    // At 3:00am on the 1st and 15th of each month
-    @Scheduled(cron = "0 0 3 1,15 * *", zone = "UTC")
-    public void downloadHistoricalPrices() {
-        downloadHistoricalPrices.execute();
+    // Every weekday at 07:00 UTC
+    @Scheduled(cron = "0 0 7 * * MON-FRI", zone = "UTC")
+    public void downloadPreviousDayPrices() {
+        downloadPrices.execute();
     }
 }
