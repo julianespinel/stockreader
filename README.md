@@ -44,3 +44,19 @@ iex.api_key=<your_API_key_here>
 ```bash
 make run
 ```
+
+### Current cost in IEX credits
+
+| Job                               | IEX credits per execution        | IEX credits per month |
+|-----------------------------------|----------------------------------|-----------------------|
+| Download symbols                  | 0                                | 0                     |
+| Download stats                    | 5 * symbol = 5 * 11_000 = 55_000 | 55_000 * 4 = 220_000  |
+| Download prices from previous day | 2 * symbol = 2 * 11_000 = 22_000 | 22_000 * 20 = 440_000 |
+
+Total IEX prices per month = 0 + 220_000 + 440_000 = 663_000
+
+Source:
+
+- https://iexcloud.io/docs/api/#iex-symbols
+- https://iexcloud.io/docs/api/#stats-basic
+- https://iexcloud.io/docs/api/#previous-day-price
