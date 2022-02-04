@@ -1,35 +1,29 @@
 package com.jespinel.stockreader.scheduled_jobs;
 
+import com.jespinel.stockreader.clients.ClientException;
 import com.jespinel.stockreader.clients.StockAPIClient;
-import com.jespinel.stockreader.entities.HistoricalPrice;
+import com.jespinel.stockreader.entities.Price;
 import com.jespinel.stockreader.entities.Symbol;
-import com.jespinel.stockreader.repositories.HistoricalPriceRepository;
+import com.jespinel.stockreader.repositories.PriceRepository;
 import com.jespinel.stockreader.repositories.SymbolRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.*;
 
 @Service
-public class DownloadHistoricalPrices implements Job {
+public class DownloadPrices implements Job {
 
-    private static final Logger log = LoggerFactory.getLogger(DownloadHistoricalPrices.class);
-
-    private static final int THREADS = 8;
+    private static final Logger log = LoggerFactory.getLogger(DownloadPrices.class);
 
     private final SymbolRepository symbolRepository;
-    private final HistoricalPriceRepository pricesRepository;
+    private final PriceRepository pricesRepository;
     private final StockAPIClient client;
 
     @Autowired
-    public DownloadHistoricalPrices(SymbolRepository symbolRepository, HistoricalPriceRepository pricesRepository, StockAPIClient client) {
+    public DownloadPrices(SymbolRepository symbolRepository, PriceRepository pricesRepository, StockAPIClient client) {
         this.symbolRepository = symbolRepository;
         this.pricesRepository = pricesRepository;
         this.client = client;
@@ -38,30 +32,30 @@ public class DownloadHistoricalPrices implements Job {
     @Override
     public void execute() {
         try {
-            log.info("DownloadHistoricalPrices: Start");
+            log.info("DownloadPrices: Start");
             List<Symbol> symbols = symbolRepository.getAll();
-            List<Future<List<HistoricalPrice>>> futurePrices = downloadHistoricalPricesAsync(symbols);
-            saveHistoricalPrices(futurePrices);
-            log.info("DownloadHistoricalPrices: Done");
-        } catch (ExecutionException | InterruptedException e) {
-            log.error("DownloadHistoricalPrices: Error: " + e.getMessage(), e);
-        }
-    }
-
-    private List<Future<List<HistoricalPrice>>> downloadHistoricalPricesAsync(List<Symbol> symbols) {
-        ExecutorService pool = Executors.newFixedThreadPool(THREADS);
-        List<Future<List<HistoricalPrice>>> futurePrices = new ArrayList<>();
-        for (Symbol symbol : symbols) {
-            Future<List<HistoricalPrice>> future = pool.submit(() -> client.getSymbolHistoricalPricesLastFiveYears(symbol));
-            futurePrices.add(future);
-        }
-        return futurePrices;
-    }
-
-    private void saveHistoricalPrices(List<Future<List<HistoricalPrice>>> futurePrices) throws ExecutionException, InterruptedException {
-        for (Future<List<HistoricalPrice>> futurePrice : futurePrices) {
-            List<HistoricalPrice> prices = futurePrice.get();
+            List<Price> pricesPreviousDay = client.getMarketPricesPreviousDay();
+            List<Price> prices = getIntersectionBySymbol(symbols, pricesPreviousDay);
             pricesRepository.saveAll(prices);
+            log.info("DownloadPrices: Done");
+        } catch (ClientException e) {
+            log.error("DownloadPrices: Error: " + e.getMessage(), e);
         }
+    }
+
+    private List<Price> getIntersectionBySymbol(List<Symbol> symbols, List<Price> prices) {
+        Set<String> existingSymbols = new HashSet<>();
+        for (Symbol symbol : symbols) {
+            existingSymbols.add(symbol.getSymbol());
+        }
+
+        List<Price> pricesWithExistentSymbol = new ArrayList<>();
+        for (Price price : prices) {
+            if (existingSymbols.contains(price.getSymbol())) {
+                pricesWithExistentSymbol.add(price);
+            }
+        }
+
+        return pricesWithExistentSymbol;
     }
 }
