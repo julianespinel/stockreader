@@ -38,7 +38,7 @@ class DownloadSymbolsTest extends AbstractContainerBaseTest {
         job.execute();
         // assert
         List<Symbol> symbols = repository.getAll();
-        assertThat(symbols).hasSize(3);
+        assertThat(symbols).hasSize(11940);
         assertThat(logOutput).contains("DownloadSymbols: Done");
     }
 

@@ -1,16 +1,22 @@
 package com.jespinel.stockreader;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.javafaker.Faker;
-import com.jespinel.stockreader.entities.HistoricalPrice;
+import com.jespinel.stockreader.entities.Price;
 import com.jespinel.stockreader.entities.Stats;
 import com.jespinel.stockreader.entities.Symbol;
 import com.jespinel.stockreader.repositories.StatsRepository;
 import com.jespinel.stockreader.repositories.SymbolRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ResourceUtils;
 
+import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.nio.file.Files;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -71,7 +77,7 @@ public class TestFactories {
         BigInteger integer = BigInteger.valueOf(index);
         BigDecimal decimal = BigDecimal.valueOf(index);
         LocalDate date = LocalDate.now().plusDays(index);
-        return new Stats(symbol, integer,integer, integer, decimal, decimal,
+        return new Stats(symbol, integer, integer, integer, decimal, decimal,
                 decimal, date, date, date, decimal, decimal);
     }
 
@@ -95,7 +101,7 @@ public class TestFactories {
      * Return a new stats object containing the values of the given stat
      * plus a delta.
      *
-     * @param stat Original stat
+     * @param stat  Original stat
      * @param delta Delta to add to all values
      * @return object containing the values of the given stat plus a delta.
      */
@@ -118,34 +124,34 @@ public class TestFactories {
         );
     }
 
-    public HistoricalPrice getPriceForSymbol(Symbol symbol, int index) {
+    public Price getPriceForSymbol(Symbol symbol, int index) {
         LocalDate date = LocalDate.now().plusDays(index);
         BigDecimal bigDecimal = BigDecimal.valueOf(index);
         BigInteger bigInt = BigInteger.valueOf(index);
-        return new HistoricalPrice(symbol.getSymbol(),
+        return new Price(symbol.getSymbol(),
                 date, bigDecimal, bigDecimal, bigDecimal, bigDecimal, bigInt,
                 bigDecimal, bigDecimal);
     }
 
-    public List<HistoricalPrice> getPricesForSymbol(Symbol symbol, int quantity) {
-        List<HistoricalPrice> prices = new ArrayList<>(quantity);
+    public List<Price> getPricesForSymbol(Symbol symbol, int quantity) {
+        List<Price> prices = new ArrayList<>(quantity);
         for (int i = 0; i < quantity; i++) {
-            HistoricalPrice price = getPriceForSymbol(symbol, i);
+            Price price = getPriceForSymbol(symbol, i);
             prices.add(price);
         }
         return prices;
     }
 
     /**
-     * Return a new HistoricalPrice object containing the values of the given
+     * Return a new Price object containing the values of the given
      * price plus a delta.
      *
      * @param price Original price
      * @param delta Delta to add to all values
      * @return object containing the values of the given price plus a delta.
      */
-    public HistoricalPrice from(HistoricalPrice price, int delta) {
-        return new HistoricalPrice(
+    public Price from(Price price, int delta) {
+        return new Price(
                 price.getSymbol(),
                 price.getDate(),
                 price.getOpen().add(BigDecimal.valueOf(delta)),
@@ -158,5 +164,13 @@ public class TestFactories {
                 price.getCreatedAt(),
                 price.getUpdatedAt().plusMinutes(delta)
         );
+    }
+
+    public void createAllSymbols(ObjectMapper mapper) throws IOException {
+        File file = ResourceUtils.getFile("classpath:mockserver_responses/symbols.json");
+        String symbolsString = new String(Files.readAllBytes(file.toPath()));
+        TypeReference<List<Symbol>> symbolList = new TypeReference<>() {};
+        List<Symbol> symbols = mapper.readValue(symbolsString, symbolList);
+        symbolRepository.saveAll(symbols);
     }
 }

@@ -20,13 +20,13 @@ public class MockServerConfigurations {
     private String apiKey;
 
     public void whenGettingSymbolsReturn200AndValidSymbolList(MockServerClient mockServer) throws IOException {
-        File file = ResourceUtils.getFile("classpath:mockserver_responses/get_symbols.json");
+        File file = ResourceUtils.getFile("classpath:mockserver_responses/symbols.json");
         String expectedBody = new String(Files.readAllBytes(file.toPath()));
 
         mockServer.when(
                         request()
                                 .withMethod("GET")
-                                .withPath("/ref-data/symbols")
+                                .withPath("/ref-data/iex/symbols")
                                 .withQueryStringParameter("token", apiKey)
                 )
                 .respond(
@@ -40,7 +40,7 @@ public class MockServerConfigurations {
         mockServer.when(
                         request()
                                 .withMethod("GET")
-                                .withPath("/ref-data/symbols")
+                                .withPath("/ref-data/iex/symbols")
                                 .withQueryStringParameter("token", apiKey)
                 )
                 .respond(response().withStatusCode(403));
@@ -52,7 +52,7 @@ public class MockServerConfigurations {
         mockServer.when(
                         request()
                                 .withMethod("GET")
-                                .withPath("/ref-data/symbols")
+                                .withPath("/ref-data/iex/symbols")
                                 .withQueryStringParameter("token", apiKey)
                 )
                 .respond(
@@ -63,7 +63,7 @@ public class MockServerConfigurations {
     }
 
     public void whenGettingStatsReturn200AndValidStats(MockServerClient mockServer, Symbol symbol) throws IOException {
-        File file = ResourceUtils.getFile("classpath:mockserver_responses/get_symbol_stats.json");
+        File file = ResourceUtils.getFile("classpath:mockserver_responses/symbol_stats.json");
         String expectedBody = new String(Files.readAllBytes(file.toPath()));
 
         mockServer.when(
@@ -80,7 +80,7 @@ public class MockServerConfigurations {
     }
 
     public void whenGettingStatsReturn403(MockServerClient mockServer, Symbol symbol) throws IOException {
-        File file = ResourceUtils.getFile("classpath:mockserver_responses/get_symbol_stats.json");
+        File file = ResourceUtils.getFile("classpath:mockserver_responses/symbol_stats.json");
         String expectedBody = new String(Files.readAllBytes(file.toPath()));
 
         mockServer.when(
@@ -109,8 +109,8 @@ public class MockServerConfigurations {
                 );
     }
 
-    public void whenGettingHistoricalPricesReturn200AndValidHistoricalPrices(MockServerClient mockServer, Symbol symbol) throws IOException {
-        File file = ResourceUtils.getFile("classpath:mockserver_responses/get_symbol_historical_prices.json");
+    public void whenGettingPricesReturn200AndValidPrices(MockServerClient mockServer, Symbol symbol) throws IOException {
+        File file = ResourceUtils.getFile("classpath:mockserver_responses/symbol_prices.json");
         String expectedBody = new String(Files.readAllBytes(file.toPath()));
 
         String timeRange = "5y";
@@ -127,7 +127,7 @@ public class MockServerConfigurations {
                 );
     }
 
-    public void whenGettingHistoricalPricesReturn403(MockServerClient mockServer, Symbol symbol) {
+    public void whenGettingPricesReturn403(MockServerClient mockServer, Symbol symbol) {
         String timeRange = "5y";
         mockServer.when(
                         request()
@@ -139,7 +139,7 @@ public class MockServerConfigurations {
     }
 
 
-    public void whenGettingHistoricalPricesReturn200AndNotValidJsonBody(MockServerClient mockServer, Symbol symbol) throws IOException {
+    public void whenGettingPricesReturn200AndNotValidJsonBody(MockServerClient mockServer, Symbol symbol) throws IOException {
         File file = ResourceUtils.getFile("classpath:mockserver_responses/not_valid.json");
         String expectedBody = new String(Files.readAllBytes(file.toPath()));
 
@@ -148,6 +148,50 @@ public class MockServerConfigurations {
                         request()
                                 .withMethod("GET")
                                 .withPath("/stock/%s/chart/%s".formatted(symbol.getSymbol(), timeRange))
+                                .withQueryStringParameter("token", apiKey)
+                )
+                .respond(
+                        response()
+                                .withStatusCode(200)
+                                .withBody(expectedBody)
+                );
+    }
+
+    public void whenGettingMarketPricesFromPreviousDayReturn200AndValidPrices(MockServerClient mockServer) throws IOException {
+        File file = ResourceUtils.getFile("classpath:mockserver_responses/market_previous_day_prices.json");
+        String expectedBody = new String(Files.readAllBytes(file.toPath()));
+
+        mockServer.when(
+                        request()
+                                .withMethod("GET")
+                                .withPath("/stock/market/previous")
+                                .withQueryStringParameter("token", apiKey)
+                )
+                .respond(
+                        response()
+                                .withStatusCode(200)
+                                .withBody(expectedBody)
+                );
+    }
+
+    public void whenGettingMarketPricesFromPreviousDayReturn403(MockServerClient mockServer) {
+        mockServer.when(
+                        request()
+                                .withMethod("GET")
+                                .withPath("/stock/market/previous")
+                                .withQueryStringParameter("token", apiKey)
+                )
+                .respond(response().withStatusCode(403));
+    }
+
+    public void whenGettingMarketPricesFromPreviousDayReturn200AndNotValidJsonBody(MockServerClient mockServer) throws IOException {
+        File file = ResourceUtils.getFile("classpath:mockserver_responses/not_valid.json");
+        String expectedBody = new String(Files.readAllBytes(file.toPath()));
+
+        mockServer.when(
+                        request()
+                                .withMethod("GET")
+                                .withPath("/stock/market/previous")
                                 .withQueryStringParameter("token", apiKey)
                 )
                 .respond(

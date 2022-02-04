@@ -2,7 +2,7 @@ package com.jespinel.stockreader.clients;
 
 import com.jespinel.stockreader.AbstractContainerBaseTest;
 import com.jespinel.stockreader.clients.iex.IEXClient;
-import com.jespinel.stockreader.entities.HistoricalPrice;
+import com.jespinel.stockreader.entities.Price;
 import com.jespinel.stockreader.entities.Stats;
 import com.jespinel.stockreader.entities.Symbol;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,7 +37,7 @@ class IEXClientTest extends AbstractContainerBaseTest {
         // act
         List<Symbol> symbols = client.getSymbols();
         // assert
-        assertThat(symbols).hasSize(3);
+        assertThat(symbols).hasSize(11940);
     }
 
     @Test
@@ -94,20 +94,20 @@ class IEXClientTest extends AbstractContainerBaseTest {
     }
 
     //-------------------------------------------------------------------------
-    // Get symbol historical prices last five years tests
+    // Get symbol prices last five years tests
     //-------------------------------------------------------------------------
 
     @Test
-    void getSymbolHistoricalPrices_gets200_returnsSymbolHistoricalPrices() throws ClientException, IOException {
+    void getSymbolPrices_gets200_returnsSymbolPrices() throws ClientException, IOException {
         // arrange
         Symbol symbol = testFactories.getRandomSymbol();
-        serverConfig.whenGettingHistoricalPricesReturn200AndValidHistoricalPrices(mockServer, symbol);
+        serverConfig.whenGettingPricesReturn200AndValidPrices(mockServer, symbol);
         // act
-        List<HistoricalPrice> prices = client.getSymbolHistoricalPricesLastFiveYears(symbol);
+        List<Price> prices = client.getSymbolPricesLastFiveYears(symbol);
         // assert
         assertThat(prices).hasSize(5);
 
-        HistoricalPrice firstPrice = prices.get(0);
+        Price firstPrice = prices.get(0);
         assertThat(firstPrice.getSymbol()).isEqualTo("AAPL");
         assertThat(firstPrice.getDate().toString()).isEqualTo("2017-02-01");
         assertThat(firstPrice.getOpen().toString()).isEqualTo("30.0731");
@@ -120,20 +120,64 @@ class IEXClientTest extends AbstractContainerBaseTest {
     }
 
     @Test
-    void getSymbolHistoricalPrices_gets403_throwsClientException() {
+    void getSymbolPrices_gets403_throwsClientException() {
         // arrange
         Symbol symbol = testFactories.getRandomSymbol();
-        serverConfig.whenGettingHistoricalPricesReturn403(mockServer, symbol);
+        serverConfig.whenGettingPricesReturn403(mockServer, symbol);
         // act and assert
-        assertThrows(ClientException.class, () -> client.getSymbolHistoricalPricesLastFiveYears(symbol));
+        assertThrows(ClientException.class, () -> client.getSymbolPricesLastFiveYears(symbol));
     }
 
     @Test
-    void getSymbolHistoricalPrices_getsMalformedJsonResponse_throwsClientException() throws IOException {
+    void getSymbolPrices_getsMalformedJsonResponse_throwsClientException() throws IOException {
         // arrange
         Symbol symbol = testFactories.getRandomSymbol();
-        serverConfig.whenGettingHistoricalPricesReturn200AndNotValidJsonBody(mockServer, symbol);
+        serverConfig.whenGettingPricesReturn200AndNotValidJsonBody(mockServer, symbol);
         // act and assert
-        assertThrows(ClientException.class,() -> client.getSymbolHistoricalPricesLastFiveYears(symbol));
+        assertThrows(ClientException.class,() -> client.getSymbolPricesLastFiveYears(symbol));
+    }
+
+    //-------------------------------------------------------------------------
+    // Get market prices from previous day
+    //-------------------------------------------------------------------------
+
+    @Test
+    void getMarketPricesPreviousDay_gets200_returnsMarketPricesFromPreviousDay() throws ClientException, IOException {
+        // arrange
+        Symbol symbol = testFactories.getRandomSymbol();
+        serverConfig.whenGettingMarketPricesFromPreviousDayReturn200AndValidPrices(mockServer);
+        // act
+        List<Price> prices = client.getMarketPricesPreviousDay();
+        // assert
+        assertThat(prices).hasSize(11741);
+
+        Price firstPrice = prices.get(0);
+        assertThat(firstPrice.getSymbol()).isEqualTo("SCCO");
+        assertThat(firstPrice.getDate().toString()).isEqualTo("2022-02-01");
+        assertThat(firstPrice.getOpen().toString()).isEqualTo("67.12");
+        assertThat(firstPrice.getClose().toString()).isEqualTo("67.58");
+        assertThat(firstPrice.getHigh().toString()).isEqualTo("67.66");
+        assertThat(firstPrice.getLow().toString()).isEqualTo("65.61");
+        assertThat(firstPrice.getVolume().toString()).isEqualTo("958016");
+        assertThat(firstPrice.getChange().toString()).isEqualTo("1.293610926517872");
+        assertThat(firstPrice.getChangePercent().toString()).isEqualTo("0.02");
+    }
+
+    @Test
+    void getMarketPricesPreviousDay_gets403_throwsClientException() {
+        // arrange
+        Symbol symbol = testFactories.getRandomSymbol();
+        serverConfig.whenGettingMarketPricesFromPreviousDayReturn403(mockServer);
+        // act and assert
+        assertThrows(ClientException.class, () -> client.getMarketPricesPreviousDay());
+    }
+
+    @Test
+    void getMarketPricesPreviousDay_getsMalformedJsonResponse_throwsClientException() throws IOException {
+        // arrange
+        Symbol symbol = testFactories.getRandomSymbol();
+        serverConfig.whenGettingMarketPricesFromPreviousDayReturn200AndNotValidJsonBody(mockServer);
+        // act and assert
+        assertThrows(ClientException.class,() -> client.getMarketPricesPreviousDay());
     }
 }
