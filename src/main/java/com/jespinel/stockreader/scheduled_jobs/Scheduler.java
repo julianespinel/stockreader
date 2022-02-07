@@ -20,7 +20,7 @@ public class Scheduler {
     }
 
     // Every day at 06:00 UTC
-    @Scheduled(cron = "0 0 6 * * *", zone = "UTC")
+    @Scheduled(cron = "0 0 6 * * MON-FRI", zone = "UTC")
     public void downloadSymbols() {
         downloadSymbols.execute();
     }
