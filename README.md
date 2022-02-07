@@ -4,11 +4,11 @@ Stockreader is a program that downloads US stock market data and stores it in a 
 
 It currently supports the following scheduled jobs:
 
-| Job                               | Description                                     | Executed at               |
-|-----------------------------------|-------------------------------------------------|---------------------------|
-| Download symbols                  | Downloads US stock symbols and names            | Every day at 06:00 UTC    |
-| Download stats                    | Downloads US stock stats                        | Every Sunday at 00:00 UTC |
-| Download prices from previous day | Downloads US stock prices from the previous day | Every day at 07:00 UTC    |
+| Job                               | Description                                     | Executed at                |
+|-----------------------------------|-------------------------------------------------|----------------------------|
+| Download symbols                  | Downloads US stock symbols and names            | Every weekday at 06:00 UTC |
+| Download stats                    | Downloads US stock stats                        | Every Sunday at 00:00 UTC  |
+| Download prices from previous day | Downloads US stock prices from the previous day | Every weekday at 07:00 UTC |
 
 ## Test
 
