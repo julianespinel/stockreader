@@ -3,13 +3,13 @@ all: package
 clean:
 	mvn clean
 
-test:
-	mvn clean test
+test: clean
+	mvn test
 
-package:
-	mvn clean package
+package: clean
+	mvn package
 
-run:
+run: clean package
 	docker-compose up -d
 	java -jar -Dspring.profiles.active=local target/stockreader-0.0.1.jar
 
