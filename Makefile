@@ -1,13 +1,13 @@
-all: clean package
+all: package
 
 clean:
 	mvn clean
 
 test:
-	mvn test
+	mvn clean test
 
 package:
-	mvn package
+	mvn clean package
 
 run:
 	docker-compose up -d
