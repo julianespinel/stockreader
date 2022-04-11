@@ -10,6 +10,7 @@ package:
 	mvn package
 
 run:
+	docker-compose up -d
 	java -jar -Dspring.profiles.active=local target/stockreader-0.0.1.jar
 
 deploy:
