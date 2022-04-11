@@ -17,6 +17,11 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class IEXClientTest extends AbstractContainerBaseTest {
 
+    /**
+     * Number of elements in the mock response
+     */
+    private static final int TEN = 10;
+
     @Autowired
     private IEXClient client;
 
@@ -37,7 +42,7 @@ class IEXClientTest extends AbstractContainerBaseTest {
         // act
         List<Symbol> symbols = client.getSymbols();
         // assert
-        assertThat(symbols).hasSize(11940);
+        assertThat(symbols).hasSize(TEN);
     }
 
     @Test
@@ -149,7 +154,7 @@ class IEXClientTest extends AbstractContainerBaseTest {
         // act
         List<Price> prices = client.getMarketPricesPreviousDay();
         // assert
-        assertThat(prices).hasSize(11741);
+        assertThat(prices).hasSize(TEN);
 
         Price firstPrice = prices.get(0);
         assertThat(firstPrice.getSymbol()).isEqualTo("SCCO");

@@ -18,6 +18,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ExtendWith(OutputCaptureExtension.class)
 class DownloadSymbolsTest extends AbstractContainerBaseTest {
 
+    /**
+     * Number of elements in the mock response
+     */
+    private static final int TEN = 10;
+
     @Autowired
     private SymbolRepository repository;
 
@@ -38,7 +43,7 @@ class DownloadSymbolsTest extends AbstractContainerBaseTest {
         job.execute();
         // assert
         List<Symbol> symbols = repository.getAll();
-        assertThat(symbols).hasSize(11940);
+        assertThat(symbols).hasSize(TEN);
         assertThat(logOutput).contains("DownloadSymbols: Done");
     }
 
