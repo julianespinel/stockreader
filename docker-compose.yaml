@@ -3,29 +3,12 @@ version: '3.1'
 services:
 
   db:
-    image: postgres
+    image: postgres:14-alpine
+    command: [ "postgres", "-c", "log_statement=all", "-c", "log_destination=stderr" ]
     restart: always
     environment:
-      POSTGRES_USER: username
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: stockreader_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: example
+      POSTGRES_DB: stockreaderdb
     ports:
-      - 5432:5432
-
-  adminer:
-    image: adminer
-    restart: always
-    ports:
-      - 8080:8080
-
-  lambda:
-    image: lambci/lambda:provided.al2
-    env_file:
-      - .env
-    environment:
-      DOCKER_LAMBDA_STAY_OPEN: 1
-      DB_HOST: db
-    volumes:
-      - /tmp/lambda:/var/task:ro,delegated
-    ports:
-      - 9001:9001
+      - "15432:5432"
