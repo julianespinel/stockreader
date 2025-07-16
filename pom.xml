@@ -35,7 +35,7 @@
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>42.3.3</version>
+            <version>42.3.9</version>
         </dependency>
         <dependency>
             <groupId>org.liquibase</groupId>
@@ -70,7 +70,7 @@
         <dependency>
             <groupId>org.mock-server</groupId>
             <artifactId>mockserver-junit-jupiter</artifactId>
-            <version>5.11.2</version>
+            <version>5.15.0</version>
         </dependency>
 
     </dependencies>
